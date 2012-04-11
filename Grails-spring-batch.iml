@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Spring" name="Spring">
+      <configuration>
+        <fileset id="fileset1" name="Xml Application Context" removed="false">
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/admin/web/resources/servlet-config.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/admin/web/resources/webapp-config.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/integration/configuration-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/integration/file-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/integration/jmx-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/integration/launcher-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/integration/restart-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/manager/data-source-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/manager/env-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/manager/execution-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/manager/jmx-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/bootstrap/resources/resources-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/servlet/manager/controller-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/servlet/manager/integration-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/servlet/manager/manager-context.xml</file>
+          <file>file://$MODULE_DIR$/lib/grails/plugins/springbatch/servlet/resources/resources-context.xml</file>
+          <file>file://$MODULE_DIR$/web-app/WEB-INF/applicationContext.xml</file>
+        </fileset>
+      </configuration>
+    </facet>
+    <facet type="web" name="GrailsWeb">
+      <configuration>
+        <webroots>
+          <root url="file://$MODULE_DIR$/web-app" relative="/" />
+          <root url="file://$MODULE_DIR$/grails-app/views" relative="/" />
+        </webroots>
+        <sourceRoots />
+      </configuration>
+    </facet>
+    <facet type="hibernate" name="Hibernate">
+      <configuration>
+        <datasource-map />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/grails-app/utils" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/groovy" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/grails-app/i18n" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/grails-app/controllers" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/grails-app/domain" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/grails-app/services" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/grails-app/taglib" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test/unit" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/test/integration" isTestSource="true" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="grails-2.0.3" level="application" />
+    <orderEntry type="module-library" exported="">
+      <library name="Grails User Library (Grails-spring-batch)">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/commons-fileupload/commons-fileupload/jars/commons-fileupload-1.2.1.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.integration/spring-integration-jmx/jars/spring-integration-jmx-2.0.3.RELEASE.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.aspectj/aspectjweaver/jars/aspectjweaver-1.6.6.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.freemarker/freemarker/jars/freemarker-2.3.15.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.3.0.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.integration/spring-integration-file/jars/spring-integration-file-2.0.3.RELEASE.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.integration/spring-integration-http/jars/spring-integration-http-2.0.3.RELEASE.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.integration/spring-integration-core/jars/spring-integration-core-2.0.3.RELEASE.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.batch/spring-batch-integration/jars/spring-batch-integration-1.2.1.RELEASE.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.aspectj/aspectjrt/jars/aspectjrt-1.6.6.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.batch/spring-batch-admin-manager/jars/spring-batch-admin-manager-1.2.1.RELEASE.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/commons-pool/commons-pool/jars/commons-pool-1.3.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/commons-dbcp/commons-dbcp/jars/commons-dbcp-1.2.2.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.slf4j/jcl-over-slf4j/jars/jcl-over-slf4j-1.5.8.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.batch/spring-batch-admin-resources/jars/spring-batch-admin-resources-1.2.1.RELEASE.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/commons-logging/commons-logging/jars/commons-logging-1.1.1.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.codehaus.jettison/jettison/bundles/jettison-1.1.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/com.thoughtworks.xstream/xstream/jars/xstream-1.3.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.batch/spring-batch-infrastructure/jars/spring-batch-infrastructure-2.1.8.RELEASE.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.batch/spring-batch-core/jars/spring-batch-core-2.1.8.RELEASE.jar!/" />
+          <root url="jar://$DOTGRAILS$/ivy-cache/org.springframework.batch/spring-batch-test/jars/spring-batch-test-2.1.8.RELEASE.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
+      </library>
+    </orderEntry>
+  </component>
+</module>
+
