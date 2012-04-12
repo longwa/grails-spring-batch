@@ -12,7 +12,7 @@ To install the plugin,
 <pre><code>grails install plugin spring-batch</code></pre>
 
 or add the following entry to your BuildConfig.groovy file in the plugins sections:
-<pre><code>compile ':spring-batch:0.1'
+<pre><code>compile ':spring-batch:0.1'</code></pre>
 
 Supported Features
 ---
