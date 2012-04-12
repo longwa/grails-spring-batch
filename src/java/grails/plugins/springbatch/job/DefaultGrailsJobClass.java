@@ -41,8 +41,16 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
         return steps;
     }
 
+    @SuppressWarnings("unchecked")
     private void loadSteps() {
         List stepOrder = (List) GrailsClassUtils.getStaticPropertyValue(getClazz(), "steps");
+        //If not defined, add 1 step with the same same as the Job
+        if(stepOrder == null) {
+            stepOrder = new ArrayList();
+        }
+        if(stepOrder.isEmpty()) {
+            stepOrder.add(getName());
+        }
         List<Class> steps = new ArrayList<Class>();
         for(Object o : stepOrder) {
             if(!((o instanceof Class) || (o instanceof String))) {

@@ -33,7 +33,12 @@ public class DefaultGrailsStepClass extends AbstractInjectableGrailsClass implem
     }
 
     private void loadTasklet() {
+        String stepName = getName();
         Object tasklet = GrailsClassUtils.getStaticPropertyValue(getClazz(), "tasklet");
+        //If no tasklet defined, then try to find a Tasklet with the same name as this step.
+        if(tasklet == null) {
+            tasklet = stepName;
+        }
         if(!((tasklet instanceof Class) || (tasklet instanceof String))) {
             throw new RuntimeException("Must specify class or string for tasklet");
         }
@@ -41,10 +46,9 @@ public class DefaultGrailsStepClass extends AbstractInjectableGrailsClass implem
             this.taskletClass = (Class) tasklet;
         } else {
             String clazz = GrailsNameUtils.getClassName((String) tasklet, "Tasklet");
-            String stepName = getName();
-            String taskletName = getPackageName() + "." + stepName + clazz;
+            String fullClassName = getPackageName() + "." + clazz;
             try {
-                Class taskletClass = getClass().getClassLoader().loadClass(taskletName);
+                Class taskletClass = getClass().getClassLoader().loadClass(fullClassName);
                 this.taskletClass = taskletClass;
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
