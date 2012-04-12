@@ -7,10 +7,8 @@ import org.springframework.batch.repeat.RepeatStatus;
 
 public class DefaultGrailsTaskletClass extends AbstractInjectableGrailsClass implements GrailsTaskletClass {
 
-    public static final String TASKLET = "Tasklet";
-
     public DefaultGrailsTaskletClass(Class clazz) {
-        super(clazz, TASKLET);
+        super(clazz, TaskletArtefactHandler.TYPE);
     }
 
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {

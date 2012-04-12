@@ -1,5 +1,6 @@
 package grails.plugins.springbatch.step;
 
+import grails.plugins.springbatch.tasklet.TaskletArtefactHandler;
 import grails.util.GrailsNameUtils;
 import org.codehaus.groovy.grails.commons.AbstractInjectableGrailsClass;
 import org.codehaus.groovy.grails.commons.GrailsClassUtils;
@@ -8,11 +9,10 @@ import org.springframework.batch.core.StepExecution;
 
 public class DefaultGrailsStepClass extends AbstractInjectableGrailsClass implements GrailsStepClass {
 
-    public static final String STEP = "Step";
     private Class taskletClass;
 
     public DefaultGrailsStepClass(Class clazz) {
-        super(clazz, STEP);
+        super(clazz, StepArtefactHandler.TYPE);
         loadTasklet();
     }
 
@@ -45,7 +45,7 @@ public class DefaultGrailsStepClass extends AbstractInjectableGrailsClass implem
         if(tasklet instanceof Class) {
             this.taskletClass = (Class) tasklet;
         } else {
-            String clazz = GrailsNameUtils.getClassName((String) tasklet, "Tasklet");
+            String clazz = GrailsNameUtils.getClassName((String) tasklet, TaskletArtefactHandler.TYPE);
             String fullClassName = getPackageName() + "." + clazz;
             try {
                 Class taskletClass = getClass().getClassLoader().loadClass(fullClassName);

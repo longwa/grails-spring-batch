@@ -1,5 +1,6 @@
 package grails.plugins.springbatch.job;
 
+import grails.plugins.springbatch.step.StepArtefactHandler;
 import grails.util.GrailsNameUtils;
 import org.codehaus.groovy.grails.commons.AbstractInjectableGrailsClass;
 import org.codehaus.groovy.grails.commons.GrailsClassUtils;
@@ -12,38 +13,43 @@ import java.util.List;
 
 public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass implements GrailsJobClass {
 
-    public static final String JOB = "Job";
-
     private List<Class> steps;
+    private List<Class> listeners;
 
     public DefaultGrailsJobClass(Class clazz) {
-        super(clazz, JOB);
+        super(clazz, JobArtefactHandler.TYPE);
         loadSteps();
+        loadListeners();
     }
 
     public boolean isRestartable() {
-        return (Boolean) (getMetaClass().invokeMethod(getReferenceInstance(), GrailsJobClassProperty.RESTARTABLE, new Object[]{}));
+        Boolean restartable = (Boolean) (GrailsClassUtils.getPropertyValueOfNewInstance(getClazz(), GrailsJobClassProperty.RESTARTABLE));
+        if(restartable == null) {
+            //if not set defined, then set to true since that's the Spring Batch default.
+            restartable = true;
+        }
+        return restartable;
     }
 
-    public void execute(JobExecution jobExecution) {
-        getMetaClass().invokeMethod(getReferenceInstance(), GrailsJobClassProperty.EXECUTE, new Object[]{jobExecution});
+    public Class getIncrementor() {
+        return (Class) (GrailsClassUtils.getPropertyValueOfNewInstance(getClazz(), GrailsJobClassProperty.INCREMENTOR));
     }
 
-    public JobParametersIncrementer getJobParametersIncrementer() {
-        return (JobParametersIncrementer) (getMetaClass().invokeMethod(getReferenceInstance(), GrailsJobClassProperty.INCREMENTOR, new Object[]{}));
-    }
-
-    public JobParametersValidator getJobParametersValidator() {
-        return (JobParametersValidator) (getMetaClass().invokeMethod(getReferenceInstance(), GrailsJobClassProperty.VALIDATOR, new Object[]{}));
+    public Class getValidator() {
+        return (Class) (GrailsClassUtils.getPropertyValueOfNewInstance(getClazz(), GrailsJobClassProperty.VALIDATOR));
     }
 
     public List<Class> getSteps() {
         return steps;
     }
 
+    public List<Class> getListeners() {
+        return listeners;
+    }
+
     @SuppressWarnings("unchecked")
     private void loadSteps() {
-        List stepOrder = (List) GrailsClassUtils.getStaticPropertyValue(getClazz(), "steps");
+        List stepOrder = (List) GrailsClassUtils.getPropertyValueOfNewInstance(getClazz(), GrailsJobClassProperty.STEPS);
         //If not defined, add 1 step with the same same as the Job
         if(stepOrder == null) {
             stepOrder = new ArrayList();
@@ -60,7 +66,7 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
                 Class clazz = (Class) o;
                 steps.add(clazz);
             } else {
-                String clazz = GrailsNameUtils.getClassName((String) o, "Step");
+                String clazz = GrailsNameUtils.getClassName((String) o, StepArtefactHandler.TYPE);
                 String jobName = getName();
                 String stepName = getPackageName() + "." + jobName + clazz;
                 try {
@@ -72,5 +78,9 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
             }
         }
         this.steps = steps;
+    }
+
+    private void loadListeners() {
+        this.listeners = new ArrayList<Class>();
     }
 }
