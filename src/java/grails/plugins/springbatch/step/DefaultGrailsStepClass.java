@@ -40,15 +40,15 @@ public class DefaultGrailsStepClass extends AbstractInjectableGrailsClass implem
         if(tasklet instanceof Class) {
             this.taskletClass = (Class) tasklet;
         } else {
-//            String clazz = GrailsNameUtils.getClassName((String) tasklet, "Tasklet");
-//            String stepName = getName();
-//            String taskletName = stepName + clazz;
-//            try {
-//                Class taskletClass = Thread.currentThread().getContextClassLoader().loadClass(taskletName);
-//                this.taskletClass = taskletClass;
-//            } catch (ClassNotFoundException e) {
-//                throw new RuntimeException(e);
-//            }
+            String clazz = GrailsNameUtils.getClassName((String) tasklet, "Tasklet");
+            String stepName = getName();
+            String taskletName = getPackageName() + "." + stepName + clazz;
+            try {
+                Class taskletClass = getClass().getClassLoader().loadClass(taskletName);
+                this.taskletClass = taskletClass;
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
