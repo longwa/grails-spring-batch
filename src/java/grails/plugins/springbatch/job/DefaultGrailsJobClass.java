@@ -42,7 +42,7 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
     }
 
     private void loadSteps() {
-        List stepOrder = (List) GrailsClassUtils.getStaticPropertyValue(getClazz(), "stepOrder");
+        List stepOrder = (List) GrailsClassUtils.getStaticPropertyValue(getClazz(), "steps");
         List<Class> steps = new ArrayList<Class>();
         for(Object o : stepOrder) {
             if(!((o instanceof Class) || (o instanceof String))) {
@@ -52,15 +52,15 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
                 Class clazz = (Class) o;
                 steps.add(clazz);
             } else {
-//                String clazz = GrailsNameUtils.getClassName((String) o, "Step");
-//                String jobName = getName();
-//                String stepName = jobName + clazz;
-//                try {
-//                    Class stepClass = Thread.currentThread().getContextClassLoader().loadClass(stepName);
-//                    steps.add(stepClass);
-//                } catch (ClassNotFoundException e) {
-//                    throw new RuntimeException(e);
-//                }
+                String clazz = GrailsNameUtils.getClassName((String) o, "Step");
+                String jobName = getName();
+                String stepName = getPackageName() + "." + jobName + clazz;
+                try {
+                    Class stepClass = getClass().getClassLoader().loadClass(stepName);
+                    steps.add(stepClass);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         this.steps = steps;

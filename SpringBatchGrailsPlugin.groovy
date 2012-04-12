@@ -5,6 +5,7 @@ import grails.plugins.springbatch.tasklet.GrailsTaskletClass
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import grails.plugins.springbatch.step.GrailsStepClass
 import grails.plugins.springbatch.job.GrailsJobClass
+import grails.util.GrailsNameUtils
 
 class SpringBatchGrailsPlugin {
     // the plugin version
@@ -77,12 +78,12 @@ Provides the Spring Batch framework and convention based Jobs.
             dataSource = ref("dataSource")
         }
 
-        log.debug("Batch Tasklet Classes: ${application.taskletClasses}")
+        log.debug("Batch Tasklet Classes: ${application.batchTaskletClasses}")
         application.batchTaskletClasses.each {taskletClass ->
             configureTaskletBeans.delegate = delegate
             configureTaskletBeans(taskletClass)
         }
-        log.debug("Batch Step Classes: ${application.stepClasses}")
+        log.debug("Batch Step Classes: ${application.batchStepClasses}")
             application.batchStepClasses.each {stepClass ->
             configureStepBeans.delegate = delegate
             configureStepBeans(stepClass)
