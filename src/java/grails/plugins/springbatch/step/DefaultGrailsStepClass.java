@@ -1,6 +1,6 @@
 package grails.plugins.springbatch.step;
 
-import grails.plugins.springbatch.tasklet.TaskletArtefactHandler;
+import grails.util.GrailsNameUtils;
 import org.codehaus.groovy.grails.commons.AbstractInjectableGrailsClass;
 import org.codehaus.groovy.grails.commons.GrailsClassUtils;
 import org.springframework.batch.core.JobInterruptedException;
@@ -33,13 +33,22 @@ public class DefaultGrailsStepClass extends AbstractInjectableGrailsClass implem
     }
 
     private void loadTasklet() {
-        Class taskletClass = (Class) GrailsClassUtils.getStaticPropertyValue(getClazz(), "tasklet");
-        if(false) {
-            //TODO can't do this yet cause grailsApplication is null
-//        if(taskletClass == null || !grailsApplication.isArtefactOfType(TaskletArtefactHandler.TYPE, taskletClass)) {
-//            throw new RuntimeException("Must specify tasklet for step class: " + getClazz().getName());
+        Object tasklet = GrailsClassUtils.getStaticPropertyValue(getClazz(), "tasklet");
+        if(!((tasklet instanceof Class) || (tasklet instanceof String))) {
+            throw new RuntimeException("Must specify class or string for tasklet");
+        }
+        if(tasklet instanceof Class) {
+            this.taskletClass = (Class) tasklet;
         } else {
-            this.taskletClass = taskletClass;
+//            String clazz = GrailsNameUtils.getClassName((String) tasklet, "Tasklet");
+//            String stepName = getName();
+//            String taskletName = stepName + clazz;
+//            try {
+//                Class taskletClass = Thread.currentThread().getContextClassLoader().loadClass(taskletName);
+//                this.taskletClass = taskletClass;
+//            } catch (ClassNotFoundException e) {
+//                throw new RuntimeException(e);
+//            }
         }
     }
 }

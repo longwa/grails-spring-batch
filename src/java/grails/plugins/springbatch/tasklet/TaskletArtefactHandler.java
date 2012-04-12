@@ -5,7 +5,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 
 public class TaskletArtefactHandler extends ArtefactHandlerAdapter {
 
-    public static final String TYPE = "Tasklet";
+    public static final String TYPE = "BatchTasklet";
 
     public TaskletArtefactHandler() {
         super(TYPE, GrailsTaskletClass.class, DefaultGrailsTaskletClass.class, null);

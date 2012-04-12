@@ -5,6 +5,7 @@ import grails.plugins.springbatch.tasklet.GrailsTaskletClass
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import grails.plugins.springbatch.step.GrailsStepClass
 import grails.plugins.springbatch.job.GrailsJobClass
+import grails.util.GrailsNameUtils
 
 class GrailsSpringBatchGrailsPlugin {
     // the plugin version
@@ -47,12 +48,12 @@ Brief summary/description of the plugin.
 //    def scm = [ url: "http://svn.grails-plugins.codehaus.org/browse/grails-plugins/" ]
 
     def watchedResources = [
-            "file:./grails-app/jobs/**/*Job.groovy",
-            "file:./plugins/*/grails-app/jobs/**/*Job.groovy",
-            "file:./grails-app/jobs/**/*Step.groovy",
-            "file:./plugins/*/grails-app/jobs/**/*Step.groovy",
-            "file:./grails-app/jobs/**/*Tasklet.groovy",
-            "file:./plugins/*/grails-app/jobs/**/*Tasklet.groovy"
+            "file:./grails-app/batch/**/*Job.groovy",
+            "file:./plugins/*/grails-app/batch/**/*Job.groovy",
+            "file:./grails-app/batch/**/*Step.groovy",
+            "file:./plugins/*/grails-app/batch/**/*Step.groovy",
+            "file:./grails-app/batch/**/*Tasklet.groovy",
+            "file:./plugins/*/grails-app/batch/**/*Tasklet.groovy"
     ]
 
     def artefacts = [new JobArtefactHandler(), new StepArtefactHandler(), new TaskletArtefactHandler()]
@@ -76,26 +77,19 @@ Brief summary/description of the plugin.
         jobExplorer(org.springframework.batch.core.explore.support.JobExplorerFactoryBean) {
             dataSource = ref("dataSource")
         }
-        jobService(org.springframework.batch.admin.service.SimpleJobServiceFactoryBean) {
-            jobRepository = ref("jobRepository")
-            jobLauncher = ref("jobLauncher")
-            jobLocator = ref("jobRegistry")
-            dataSource = ref("dataSource")
-        }
 
-        log.info("Registering Spring Batch classes")
-        log.info("Tasklet Classes: ${application.taskletClasses}")
-        application.taskletClasses.each {taskletClass ->
+        log.debug("Batch Tasklet Classes: ${application.taskletClasses}")
+        application.batchTaskletClasses.each {taskletClass ->
             configureTaskletBeans.delegate = delegate
             configureTaskletBeans(taskletClass)
         }
-        log.info("Step Classes: ${application.stepClasses}")
-            application.stepClasses.each {stepClass ->
+        log.debug("Batch Step Classes: ${application.stepClasses}")
+            application.batchStepClasses.each {stepClass ->
             configureStepBeans.delegate = delegate
             configureStepBeans(stepClass)
 
         }
-        log.info("Job Classes: ${application.batchJobClasses}")
+        log.debug("Batch Job Classes: ${application.batchJobClasses}")
         application.batchJobClasses.each {batchJobClass ->
             configureBatchJobBeans.delegate = delegate
             configureBatchJobBeans(batchJobClass)
@@ -107,7 +101,6 @@ Brief summary/description of the plugin.
     }
 
     def doWithApplicationContext = { applicationContext ->
-        log.info("Wiring Spring Batch Jobs")
         application.stepClasses.each {GrailsStepClass stepClass ->
             def tasklet = application.getArtefact(TaskletArtefactHandler.TYPE, stepClass.taskletClass.canonicalName)
             def taskletBean = applicationContext.getBean("${tasklet.propertyName}")
@@ -141,7 +134,6 @@ Brief summary/description of the plugin.
     def configureTaskletBeans = {GrailsTaskletClass taskletClass ->
         def fullName = taskletClass.fullName
         def propertyName = taskletClass.propertyName
-        log.info("Registering ${taskletClass} of ${fullName} as ${propertyName}")
 
         "${fullName}Class"(MethodInvokingFactoryBean) {
             targetObject = ref("grailsApplication", true)
@@ -152,14 +144,15 @@ Brief summary/description of the plugin.
         "${propertyName}"(ref("${fullName}Class")) {bean ->
             bean.factoryMethod = "newInstance"
             bean.autowire = "byName"
-            bean.scope = "singleton"
+            bean.scope = "prototype"
         }
     }
 
     def configureStepBeans = {GrailsStepClass stepClass ->
         def fullName = stepClass.fullName
         def propertyName = stepClass.propertyName
-        log.info("Registering ${stepClass} of ${fullName} as ${propertyName}")
+
+        def taskletClass = stepClass.getTaskletClass();
 
         "${fullName}Class"(MethodInvokingFactoryBean) {
             targetObject = ref("grailsApplication", true)
@@ -170,16 +163,18 @@ Brief summary/description of the plugin.
         "${propertyName}"(ref("${fullName}Class")) {bean ->
             bean.factoryMethod = "newInstance"
             bean.autowire = "byName"
-            bean.scope = "singleton"
+            bean.scope = "prototype"
             jobRepository = ref("jobRepository")
             transactionManager = ref("transactionManager")
+//            tasklet = ref(GrailsNameUtils.getPropertyName(taskletClass))
         }
     }
 
     def configureBatchJobBeans = {GrailsJobClass jobClass ->
         def fullName = jobClass.fullName
         def propertyName = jobClass.propertyName
-        log.info("Registering ${jobClass} of ${fullName} as ${propertyName}")
+
+        def stepClasses = jobClass.steps
 
         "${fullName}Class"(MethodInvokingFactoryBean) {
             targetObject = ref("grailsApplication", true)
@@ -190,8 +185,9 @@ Brief summary/description of the plugin.
         "${propertyName}"(ref("${fullName}Class")) {bean ->
             bean.factoryMethod = "newInstance"
             bean.autowire = "byName"
-            bean.scope = "singleton"
+            bean.scope = "prototype"
             jobRepository = ref("jobRepository")
+//            steps = stepClasses.collect { ref(GrailsNameUtils.getPropertyName(it)) }
         }
     }
 }

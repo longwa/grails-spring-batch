@@ -5,7 +5,7 @@ import org.springframework.batch.core.Step;
 
 public class StepArtefactHandler extends ArtefactHandlerAdapter {
 
-    public static final String TYPE = "Step";
+    public static final String TYPE = "BatchStep";
 
     public StepArtefactHandler() {
         super(TYPE, GrailsStepClass.class, DefaultGrailsStepClass.class, null);

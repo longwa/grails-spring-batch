@@ -1,6 +1,6 @@
 package grails.plugins.springbatch.job;
 
-import grails.plugins.springbatch.step.StepArtefactHandler;
+import grails.util.GrailsNameUtils;
 import org.codehaus.groovy.grails.commons.AbstractInjectableGrailsClass;
 import org.codehaus.groovy.grails.commons.GrailsClassUtils;
 import org.springframework.batch.core.JobExecution;
@@ -42,19 +42,26 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
     }
 
     private void loadSteps() {
-        List stepClasses = (List) GrailsClassUtils.getStaticPropertyValue(getClazz(), "steps");
-        if(stepClasses == null || stepClasses.isEmpty()) {
-            throw new RuntimeException("Must specify steps for job class: " + getClazz().getName());
-        }
+        List stepOrder = (List) GrailsClassUtils.getStaticPropertyValue(getClazz(), "stepOrder");
         List<Class> steps = new ArrayList<Class>();
-        for(Object o : stepClasses) {
-            if(!(o instanceof Class))
-                throw new RuntimeException("Must provide classes for steps.");
-            Class clazz = (Class) o;
-            //TODO can't do this yet cause grailsApplication is null
-//            if(!grailsApplication.isArtefactOfType(StepArtefactHandler.TYPE, clazz))
-//                throw new RuntimeException("Steps must be of type: " + StepArtefactHandler.TYPE);
-            steps.add(clazz);
+        for(Object o : stepOrder) {
+            if(!((o instanceof Class) || (o instanceof String))) {
+                throw new RuntimeException("Must provide class or string for steps.");
+            }
+            if(o instanceof Class) {
+                Class clazz = (Class) o;
+                steps.add(clazz);
+            } else {
+//                String clazz = GrailsNameUtils.getClassName((String) o, "Step");
+//                String jobName = getName();
+//                String stepName = jobName + clazz;
+//                try {
+//                    Class stepClass = Thread.currentThread().getContextClassLoader().loadClass(stepName);
+//                    steps.add(stepClass);
+//                } catch (ClassNotFoundException e) {
+//                    throw new RuntimeException(e);
+//                }
+            }
         }
         this.steps = steps;
     }
