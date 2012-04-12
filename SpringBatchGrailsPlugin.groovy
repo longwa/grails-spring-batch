@@ -5,9 +5,8 @@ import grails.plugins.springbatch.tasklet.GrailsTaskletClass
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import grails.plugins.springbatch.step.GrailsStepClass
 import grails.plugins.springbatch.job.GrailsJobClass
-import grails.util.GrailsNameUtils
 
-class GrailsSpringBatchGrailsPlugin {
+class SpringBatchGrailsPlugin {
     // the plugin version
     def version = "0.1"
     // the version or versions of Grails the plugin is designed for
@@ -21,14 +20,14 @@ class GrailsSpringBatchGrailsPlugin {
 
     // TODO Fill in these fields
     def title = "Grails Spring Batch Plugin" // Headline display name of the plugin
-    def author = "Your name"
-    def authorEmail = ""
+    def author = "John Engelman"
+    def authorEmail = "john.r.engelman@gmail.com"
     def description = '''\
-Brief summary/description of the plugin.
+Provides the Spring Batch framework and convention based Jobs.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/grails-spring-batch"
+    def documentation = "http://johnrengelman.github.com/grails-spring-batch"
 
     // Extra (optional) plugin metadata
 
@@ -101,23 +100,23 @@ Brief summary/description of the plugin.
     }
 
     def doWithApplicationContext = { applicationContext ->
-        application.stepClasses.each {GrailsStepClass stepClass ->
-            def tasklet = application.getArtefact(TaskletArtefactHandler.TYPE, stepClass.taskletClass.canonicalName)
-            def taskletBean = applicationContext.getBean("${tasklet.propertyName}")
-            def step = applicationContext.getBean("${stepClass.propertyName}")
-            log.info("Wiring tasklet ${taskletBean} to step ${step}")
-            step.setTasklet(taskletBean)
-        }
-        application.batchJobClasses.each {GrailsJobClass jobClass ->
-            def steps = jobClass.steps
-            def job = applicationContext.getBean("${jobClass.propertyName}")
-            steps.each {step ->
-                def stepClass = application.getArtefact(StepArtefactHandler.TYPE, step.canonicalName)
-                def stepBean = applicationContext.getBean("${stepClass.propertyName}")
-                log.info("Wiring step ${stepBean} to job ${job}")
-                job.addStep(stepBean)
-            }
-        }
+//        application.stepClasses.each {GrailsStepClass stepClass ->
+//            def tasklet = application.getArtefact(TaskletArtefactHandler.TYPE, stepClass.taskletClass.canonicalName)
+//            def taskletBean = applicationContext.getBean("${tasklet.propertyName}")
+//            def step = applicationContext.getBean("${stepClass.propertyName}")
+//            log.info("Wiring tasklet ${taskletBean} to step ${step}")
+//            step.setTasklet(taskletBean)
+//        }
+//        application.batchJobClasses.each {GrailsJobClass jobClass ->
+//            def steps = jobClass.steps
+//            def job = applicationContext.getBean("${jobClass.propertyName}")
+//            steps.each {step ->
+//                def stepClass = application.getArtefact(StepArtefactHandler.TYPE, step.canonicalName)
+//                def stepBean = applicationContext.getBean("${stepClass.propertyName}")
+//                log.info("Wiring step ${stepBean} to job ${job}")
+//                job.addStep(stepBean)
+//            }
+//        }
     }
 
     def onChange = { event ->
@@ -166,7 +165,7 @@ Brief summary/description of the plugin.
             bean.scope = "prototype"
             jobRepository = ref("jobRepository")
             transactionManager = ref("transactionManager")
-//            tasklet = ref(GrailsNameUtils.getPropertyName(taskletClass))
+            tasklet = ref(GrailsNameUtils.getPropertyName(taskletClass))
         }
     }
 
@@ -187,7 +186,7 @@ Brief summary/description of the plugin.
             bean.autowire = "byName"
             bean.scope = "prototype"
             jobRepository = ref("jobRepository")
-//            steps = stepClasses.collect { ref(GrailsNameUtils.getPropertyName(it)) }
+            steps = stepClasses.collect { ref(GrailsNameUtils.getPropertyName(it)) }
         }
     }
 }
