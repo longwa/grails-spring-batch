@@ -1,6 +1,7 @@
 package grails.plugins.springbatch.job;
 
 import grails.plugins.springbatch.incrementor.IncrementorArtefactHandler;
+import grails.plugins.springbatch.listener.JobListenerArtefactHandler;
 import grails.plugins.springbatch.step.StepArtefactHandler;
 import grails.plugins.springbatch.validator.ValidatorArtefactHandler;
 import grails.util.GrailsNameUtils;
@@ -95,36 +96,87 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
     private void loadSteps() {
         List stepOrder = (List) GrailsClassUtils.getPropertyValueOfNewInstance(getClazz(), GrailsJobClassProperty.STEPS);
         //If not defined, add 1 step with the same same as the Job
-        if(stepOrder == null) {
-            stepOrder = new ArrayList();
-        }
-        if(stepOrder.isEmpty()) {
-            stepOrder.add(getName());
-        }
-        List<Class> steps = new ArrayList<Class>();
-        for(Object o : stepOrder) {
-            if(!((o instanceof Class) || (o instanceof String))) {
-                throw new RuntimeException("Must provide class or string for steps.");
-            }
-            if(o instanceof Class) {
-                Class clazz = (Class) o;
-                steps.add(clazz);
-            } else {
-                String clazz = GrailsNameUtils.getClassName((String) o, StepArtefactHandler.TYPE);
-                String jobName = getName();
-                String stepName = getPackageName() + "." + jobName + clazz;
-                try {
-                    Class stepClass = getClass().getClassLoader().loadClass(stepName);
-                    steps.add(stepClass);
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+        if(stepOrder == null || stepOrder.isEmpty()) {
+            tryLoadDefaultStep();
+        } else {
+            List<Class> steps = new ArrayList<Class>();
+            for(Object o : stepOrder) {
+                if(!((o instanceof Class) || (o instanceof String))) {
+                    throw new RuntimeException("Must provide class or string for steps.");
+                }
+                if(o instanceof Class) {
+                    Class clazz = (Class) o;
+                    steps.add(clazz);
+                } else {
+                    String clazz = GrailsNameUtils.getClassName((String) o, StepArtefactHandler.TYPE);
+                    String jobName = getName();
+                    String stepName = getPackageName() + "." + jobName + clazz;
+                    try {
+                        Class stepClass = getClass().getClassLoader().loadClass(stepName);
+                        steps.add(stepClass);
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
+            this.steps = steps;
         }
-        this.steps = steps;
     }
 
+    private void tryLoadDefaultStep() {
+        this.steps = new ArrayList<Class>();
+        String clazz = GrailsNameUtils.getClassName(getName(), StepArtefactHandler.TYPE);
+        String stepName = getPackageName() + "." + clazz;
+        try {
+            Class stepClass = getClass().getClassLoader().loadClass(stepName);
+            if(stepClass != null) {
+                this.steps.add(stepClass);
+            }
+        } catch (ClassNotFoundException e) {
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     private void loadListeners() {
+        List listeners = (List) GrailsClassUtils.getPropertyValueOfNewInstance(getClazz(), GrailsJobClassProperty.LISTENERS);
+        //If not defined, add 1 step with the same same as the Job
+        if(listeners == null || listeners.isEmpty()) {
+            tryLoadDefaultListener();
+        } else {
+            List<Class> listenerClasses = new ArrayList<Class>();
+            for(Object o : listeners) {
+                if(!((o instanceof Class) || (o instanceof String))) {
+                    throw new RuntimeException("Must provide class or string for listeners.");
+                }
+                if(o instanceof Class) {
+                    Class clazz = (Class) o;
+                    listenerClasses.add(clazz);
+                } else {
+                    String clazz = GrailsNameUtils.getClassName((String) o, JobListenerArtefactHandler.TYPE);
+                    String jobName = getName();
+                    String listenerName = getPackageName() + "." + jobName + clazz;
+                    try {
+                        Class stepClass = getClass().getClassLoader().loadClass(listenerName);
+                        listenerClasses.add(stepClass);
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            this.listeners = listenerClasses;
+        }
+    }
+
+    private void tryLoadDefaultListener() {
         this.listeners = new ArrayList<Class>();
+        String clazz = GrailsNameUtils.getClassName(getName(), JobListenerArtefactHandler.TYPE);
+        String listenerName = getPackageName() + "." + clazz;
+        try {
+            Class listenerClass = getClass().getClassLoader().loadClass(listenerName);
+            if(listenerClass != null) {
+                this.listeners.add(listenerClass);
+            }
+        } catch (ClassNotFoundException e) {
+        }
     }
 }

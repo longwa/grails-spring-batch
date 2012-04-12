@@ -13,6 +13,7 @@ import grails.plugins.springbatch.validator.ValidatorArtefactHandler
 import grails.plugins.springbatch.incrementor.IncrementorArtefactHandler
 import org.codehaus.groovy.grails.commons.ArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsClass
+import grails.plugins.springbatch.listener.JobListenerArtefactHandler
 
 class SpringBatchGrailsPlugin {
     // the plugin version
@@ -55,15 +56,18 @@ Provides the Spring Batch framework and convention based Jobs.
 //    def scm = [ url: "http://svn.grails-plugins.codehaus.org/browse/grails-plugins/" ]
 
     def watchedResources = [
-            "file:./grails-app/batch/**/*Job.groovy",
-            "file:./plugins/*/grails-app/batch/**/*Job.groovy",
-            "file:./grails-app/batch/**/*Step.groovy",
-            "file:./plugins/*/grails-app/batch/**/*Step.groovy",
-            "file:./grails-app/batch/**/*Tasklet.groovy",
-            "file:./plugins/*/grails-app/batch/**/*Tasklet.groovy"
+        "file:./grails-app/batch/**/*Job.groovy",
+        "file:./plugins/*/grails-app/batch/**/*Job.groovy",
+        "file:./grails-app/batch/**/*Step.groovy",
+        "file:./plugins/*/grails-app/batch/**/*Step.groovy",
+        "file:./grails-app/batch/**/*Tasklet.groovy",
+        "file:./plugins/*/grails-app/batch/**/*Tasklet.groovy"
     ]
 
-    def artefacts = [new JobArtefactHandler(), new StepArtefactHandler(), new TaskletArtefactHandler(), new ValidatorArtefactHandler(), new IncrementorArtefactHandler()]
+    def artefacts = [
+        new JobArtefactHandler(), new StepArtefactHandler(), new TaskletArtefactHandler(),
+        new ValidatorArtefactHandler(), new IncrementorArtefactHandler(), new JobListenerArtefactHandler()
+    ]
 
     def doWithWebDescriptor = { xml ->
 
@@ -83,6 +87,12 @@ Provides the Spring Batch framework and convention based Jobs.
         }
         jobExplorer(org.springframework.batch.core.explore.support.JobExplorerFactoryBean) {
             dataSource = ref("dataSource")
+        }
+
+        log.debug("Batch Job Listener Classes: ${application.batchJobListenerClasses}")
+        application.batchJobListenerClasses.each {jobListenerClass ->
+            configureBeans.delegate = delegate
+            configureBeans(jobListenerClass, JobListenerArtefactHandler.TYPE)
         }
 
         log.debug("Batch Incrementor Classes: ${application.batchIncrementorClasses}")
@@ -169,10 +179,10 @@ Provides the Spring Batch framework and convention based Jobs.
         def propertyName = jobClass.propertyName
 
         def stepClasses = jobClass.steps
+        def listenerClasses = jobClass.listeners
 
         def jobValidator = jobClass.getValidator() ? ref(GrailsNameUtils.getPropertyName(jobClass.getValidator())) : null
         def jobIncrementor = jobClass.getIncrementor() ? ref(GrailsNameUtils.getPropertyName(jobClass.getIncrementor())) : null
-        def jobListeners = jobClass.getListeners()
 
         "${propertyName}"(SimpleJob) {bean ->
             bean.autowire = "byName"
@@ -182,7 +192,7 @@ Provides the Spring Batch framework and convention based Jobs.
             restartable = jobClass.isRestartable()
             jobParametersValidator = jobValidator
             jobParametersIncrementer = jobIncrementor
-            jobExecutionListeners = jobListeners
+            jobExecutionListeners = listenerClasses.collect { ref(GrailsNameUtils.getPropertyName(it)) }
         }
     }
 }
