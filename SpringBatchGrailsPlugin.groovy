@@ -10,6 +10,9 @@ import org.springframework.batch.core.job.SimpleJob
 import org.springframework.batch.core.step.tasklet.TaskletStep
 import grails.plugins.springbatch.validator.GrailsValidatorClass
 import grails.plugins.springbatch.validator.ValidatorArtefactHandler
+import grails.plugins.springbatch.incrementor.IncrementorArtefactHandler
+import org.codehaus.groovy.grails.commons.ArtefactHandler
+import org.codehaus.groovy.grails.commons.GrailsClass
 
 class SpringBatchGrailsPlugin {
     // the plugin version
@@ -60,7 +63,7 @@ Provides the Spring Batch framework and convention based Jobs.
             "file:./plugins/*/grails-app/batch/**/*Tasklet.groovy"
     ]
 
-    def artefacts = [new JobArtefactHandler(), new StepArtefactHandler(), new TaskletArtefactHandler(), new ValidatorArtefactHandler()]
+    def artefacts = [new JobArtefactHandler(), new StepArtefactHandler(), new TaskletArtefactHandler(), new ValidatorArtefactHandler(), new IncrementorArtefactHandler()]
 
     def doWithWebDescriptor = { xml ->
 
@@ -82,16 +85,22 @@ Provides the Spring Batch framework and convention based Jobs.
             dataSource = ref("dataSource")
         }
 
+        log.debug("Batch Incrementor Classes: ${application.batchIncrementorClasses}")
+        application.batchValidatorClasses.each {incrementorClass ->
+            configureBeans.delegate = delegate
+            configureBeans(incrementorClass, IncrementorArtefactHandler.TYPE)
+        }
+
         log.debug("Batch Validator Classes: ${application.batchValidatorClasses}")
         application.batchValidatorClasses.each {validatorClass ->
-            configureBatchValidators.delegate = delegate
-            configureBatchValidators(validatorClass)
+            configureBeans.delegate = delegate
+            configureBeans(validatorClass, ValidatorArtefactHandler.TYPE)
         }
 
         log.debug("Batch Tasklet Classes: ${application.batchTaskletClasses}")
         application.batchTaskletClasses.each {taskletClass ->
-            configureBatchTasklets.delegate = delegate
-            configureBatchTasklets(taskletClass)
+            configureBeans.delegate = delegate
+            configureBeans(taskletClass, TaskletArtefactHandler.TYPE)
         }
         log.debug("Batch Step Classes: ${application.batchStepClasses}")
             application.batchStepClasses.each {stepClass ->
@@ -125,31 +134,14 @@ Provides the Spring Batch framework and convention based Jobs.
         // The event is the same as for 'onChange'.
     }
 
-    def configureBatchValidators = {GrailsValidatorClass validatorClass ->
-        def fullName = validatorClass.fullName
-        def propertyName = validatorClass.propertyName
+    def configureBeans = {GrailsClass clazz, String type ->
+        def fullName = clazz.fullName
+        def propertyName = clazz.propertyName
 
         "${fullName}Class"(MethodInvokingFactoryBean) {
             targetObject = ref("grailsApplication", true)
             targetMethod = "getArtefact"
-            arguments = [ValidatorArtefactHandler.TYPE, fullName]
-        }
-
-        "${propertyName}"(ref("${fullName}Class")) {bean ->
-            bean.factoryMethod = "newInstance"
-            bean.autowire = "byName"
-            bean.scope = "prototype"
-        }
-    }
-
-    def configureBatchTasklets = {GrailsTaskletClass taskletClass ->
-        def fullName = taskletClass.fullName
-        def propertyName = taskletClass.propertyName
-
-        "${fullName}Class"(MethodInvokingFactoryBean) {
-            targetObject = ref("grailsApplication", true)
-            targetMethod = "getArtefact"
-            arguments = [TaskletArtefactHandler.TYPE, fullName]
+            arguments = [type, fullName]
         }
 
         "${propertyName}"(ref("${fullName}Class")) {bean ->

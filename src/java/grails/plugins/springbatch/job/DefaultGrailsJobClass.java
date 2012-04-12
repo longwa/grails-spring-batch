@@ -1,6 +1,8 @@
 package grails.plugins.springbatch.job;
 
+import grails.plugins.springbatch.incrementor.IncrementorArtefactHandler;
 import grails.plugins.springbatch.step.StepArtefactHandler;
+import grails.plugins.springbatch.validator.ValidatorArtefactHandler;
 import grails.util.GrailsNameUtils;
 import org.codehaus.groovy.grails.commons.AbstractInjectableGrailsClass;
 import org.codehaus.groovy.grails.commons.GrailsClassUtils;
@@ -15,10 +17,14 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
 
     private List<Class> steps;
     private List<Class> listeners;
+    private Class validator;
+    private Class incrementor;
 
     public DefaultGrailsJobClass(Class clazz) {
         super(clazz, JobArtefactHandler.TYPE);
         loadSteps();
+        loadValidator();
+        loadIncrementor();
         loadListeners();
     }
 
@@ -36,7 +42,7 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
     }
 
     public Class getValidator() {
-        return (Class) (GrailsClassUtils.getPropertyValueOfNewInstance(getClazz(), GrailsJobClassProperty.VALIDATOR));
+        return validator;
     }
 
     public List<Class> getSteps() {
@@ -45,6 +51,44 @@ public class DefaultGrailsJobClass extends AbstractInjectableGrailsClass impleme
 
     public List<Class> getListeners() {
         return listeners;
+    }
+
+    private void loadValidator() {
+        Class validator = (Class) GrailsClassUtils.getPropertyValueOfNewInstance(getClazz(), GrailsJobClassProperty.VALIDATOR);
+        if(validator == null) {
+            String clazz = GrailsNameUtils.getClassName(getName(), ValidatorArtefactHandler.TYPE);
+            String validatorName = getPackageName() + "." + clazz;
+            try {
+                Class validatorClass = getClass().getClassLoader().loadClass(validatorName);
+                if(validatorClass != null) {
+                    validator = validatorClass;
+                } else {
+                    validator = null;
+                }
+            } catch (ClassNotFoundException e) {
+                validator = null;
+            }
+        }
+        this.validator = validator;
+    }
+
+    private void loadIncrementor() {
+        Class incrementor = (Class) GrailsClassUtils.getPropertyValueOfNewInstance(getClazz(), GrailsJobClassProperty.INCREMENTOR);
+        if(incrementor == null) {
+            String clazz = GrailsNameUtils.getClassName(getName(), IncrementorArtefactHandler.TYPE);
+            String incrementorName = getPackageName() + "." + clazz;
+            try {
+                Class incrementorClass = getClass().getClassLoader().loadClass(incrementorName);
+                if(incrementorClass != null) {
+                    incrementor = incrementorClass;
+                } else {
+                    incrementor = null;
+                }
+            } catch (ClassNotFoundException e) {
+                incrementor = null;
+            }
+        }
+        this.incrementor = incrementor;
     }
 
     @SuppressWarnings("unchecked")
