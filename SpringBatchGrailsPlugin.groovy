@@ -80,19 +80,19 @@ Provides the Spring Batch framework and convention based Jobs.
 
         log.debug("Batch Tasklet Classes: ${application.batchTaskletClasses}")
         application.batchTaskletClasses.each {taskletClass ->
-            configureTaskletBeans.delegate = delegate
-            configureTaskletBeans(taskletClass)
+            configureBatchTasklets.delegate = delegate
+            configureBatchTasklets(taskletClass)
         }
         log.debug("Batch Step Classes: ${application.batchStepClasses}")
             application.batchStepClasses.each {stepClass ->
-            configureStepBeans.delegate = delegate
-            configureStepBeans(stepClass)
+            configureBatchSteps.delegate = delegate
+            configureBatchSteps(stepClass)
 
         }
         log.debug("Batch Job Classes: ${application.batchJobClasses}")
         application.batchJobClasses.each {batchJobClass ->
-            configureBatchJobBeans.delegate = delegate
-            configureBatchJobBeans(batchJobClass)
+            configureBatchJobs.delegate = delegate
+            configureBatchJobs(batchJobClass)
         }
     }
 
@@ -101,23 +101,7 @@ Provides the Spring Batch framework and convention based Jobs.
     }
 
     def doWithApplicationContext = { applicationContext ->
-//        application.stepClasses.each {GrailsStepClass stepClass ->
-//            def tasklet = application.getArtefact(TaskletArtefactHandler.TYPE, stepClass.taskletClass.canonicalName)
-//            def taskletBean = applicationContext.getBean("${tasklet.propertyName}")
-//            def step = applicationContext.getBean("${stepClass.propertyName}")
-//            log.info("Wiring tasklet ${taskletBean} to step ${step}")
-//            step.setTasklet(taskletBean)
-//        }
-//        application.batchJobClasses.each {GrailsJobClass jobClass ->
-//            def steps = jobClass.steps
-//            def job = applicationContext.getBean("${jobClass.propertyName}")
-//            steps.each {step ->
-//                def stepClass = application.getArtefact(StepArtefactHandler.TYPE, step.canonicalName)
-//                def stepBean = applicationContext.getBean("${stepClass.propertyName}")
-//                log.info("Wiring step ${stepBean} to job ${job}")
-//                job.addStep(stepBean)
-//            }
-//        }
+
     }
 
     def onChange = { event ->
@@ -131,7 +115,7 @@ Provides the Spring Batch framework and convention based Jobs.
         // The event is the same as for 'onChange'.
     }
 
-    def configureTaskletBeans = {GrailsTaskletClass taskletClass ->
+    def configureBatchTasklets = {GrailsTaskletClass taskletClass ->
         def fullName = taskletClass.fullName
         def propertyName = taskletClass.propertyName
 
@@ -148,7 +132,7 @@ Provides the Spring Batch framework and convention based Jobs.
         }
     }
 
-    def configureStepBeans = {GrailsStepClass stepClass ->
+    def configureBatchSteps = {GrailsStepClass stepClass ->
         def fullName = stepClass.fullName
         def propertyName = stepClass.propertyName
 
@@ -170,7 +154,7 @@ Provides the Spring Batch framework and convention based Jobs.
         }
     }
 
-    def configureBatchJobBeans = {GrailsJobClass jobClass ->
+    def configureBatchJobs = {GrailsJobClass jobClass ->
         def fullName = jobClass.fullName
         def propertyName = jobClass.propertyName
 
