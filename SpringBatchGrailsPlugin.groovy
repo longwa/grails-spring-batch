@@ -152,16 +152,9 @@ Provides the Spring Batch framework and convention based Jobs.
     }
 
     def configureBatchSteps = {GrailsStepClass stepClass ->
-        def fullName = stepClass.fullName
         def propertyName = stepClass.propertyName
 
         def taskletClass = stepClass.getTaskletClass();
-
-        "${fullName}Class"(MethodInvokingFactoryBean) {
-            targetObject = ref("grailsApplication", true)
-            targetMethod = "getArtefact"
-            arguments = [StepArtefactHandler.TYPE, fullName]
-        }
 
         "${propertyName}"(TaskletStep) {bean ->
             bean.autowire = "byName"
@@ -173,16 +166,9 @@ Provides the Spring Batch framework and convention based Jobs.
     }
 
     def configureBatchJobs = {GrailsJobClass jobClass ->
-        def fullName = jobClass.fullName
         def propertyName = jobClass.propertyName
 
         def stepClasses = jobClass.steps
-
-        "${fullName}Class"(MethodInvokingFactoryBean) {
-            targetObject = ref("grailsApplication", true)
-            targetMethod = "getArtefact"
-            arguments = [JobArtefactHandler.TYPE, fullName]
-        }
 
         def jobValidator = jobClass.getValidator() ? ref(GrailsNameUtils.getPropertyName(jobClass.getValidator())) : null
         def jobIncrementor = jobClass.getIncrementor() ? ref(GrailsNameUtils.getPropertyName(jobClass.getIncrementor())) : null
