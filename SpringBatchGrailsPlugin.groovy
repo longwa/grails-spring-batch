@@ -53,7 +53,7 @@ Provides the Spring Batch framework and convention based Jobs.
 //    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
 
     // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.grails-plugins.codehaus.org/browse/grails-plugins/" ]
+    def scm = [ url: "https://github.com/johnrengelman/grails-spring-batch" ]
 
     def watchedResources = [
         "file:./grails-app/batch/**/*Job.groovy",
