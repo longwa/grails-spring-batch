@@ -24,17 +24,56 @@ The plugin creates the following Spring Beans:
 
 These beans use the defined dataSource bean for your application and expected the Spring Batch tables to be available in this dataSource under and prefixed with "batch_".
 
-Creating Jobs
+Configuration
 ---
 
-To create a Spring Batch job, create a new class under "grails-app/batch" and end the class name with "Job". This class MUST implemented the Spring Batch Job interface (or extends from a class that implements the Job interface).
+Jobs
+--
 
-Declare the steps for the job by defining in your job class.
-<pre><code>def static steps = []</code></pre>
-The steps static property should be an array list containg Step classes or a String (e.g. "process"). The list can contain both Class and String entries. The order of entries in the list is the step order for the Job. Declaring a step using a Class will link that specific class to the job. If declaring using a String, the plugin looks for a class in the same package as the Job and has a name that starts with the Job name and ends with "Step". For example:
+To create a Spring Batch job, create a new class under "grails-app/batch" and end the class name with "BatchJob". All jobs are created as a SimpleJob.
+The following fields are available for configuration on a Job class:
+* steps - list of steps for the job. 
+* validator - specify the JobParametersValidator for this job. Class or String.
+* incrementor - specify the JobParametersIncrementor for this job. Class or String.
+* listeners - list of listeners for this job. Classes or Strings.
+
+The Framework will try to configure this settings based on convention if no entry is defined. For example:
 <pre><code>
-class FooJob extends SimpleJob {
-   def static steps = ['process']
+class FooBatchJob { }
+</code></pre>
+
+By default, the plugin will try to configre the following:
+* Steps - a single step with class name FooBatchStep. Must be in same package as FooBatchJob.
+* Validator - FooBatchValidator. Must be in same package as FooBatchJob.
+* Incrementor - FooBatchIncrementor. Must be in same package as FooBatchJob.
+* Listeners - a single listener with class name FooBatchJobListener. Must be in same package as FooBatchJob.
+
+The only required item is a single step for the job. If the validator, incrementor, or listener cannot be found, they are not configured for the job.
+
+Steps
+--
+
+To create a Spring Batch step, create a new class under "grails-app/batch" and end the class name with "BatchStep". All steps are created as a TaskletStep.
+Steps can be added to a job by setting a list to the "steps" property in the job. The list can contain classes or strings. For example:
+<pre></code>
+class FooBatchJob {
+   def steps = [ProcessBatchStep, "report"]
 }
 </code></pre>
-Will attempt to find a class in the same package as FooJob that is named "FooProcessStep".
+
+The step list contains 2 declarations:
+* Class - Load the specified Class and use it.
+* String - try to resolve String using the Job's prefix (i.e. "Foo"). Must be located in the same package as the Job. In the example, the plugin will try to resolve "FooReportBatchStep".
+
+The following items are available to configure on a step:
+* tasklet - the tasklet to handle the steps actions. Class or String.
+
+By default, if a tasklet field is not specifed, the plugin will attempt to find a class in the same package with the same prefix as the step (i.e. FooProcessBatchTasklet).
+
+<pre><code>
+class FooProcessBatchStep {
+   def tasklet = "list"
+}
+</code></pre>
+
+Will try to load a class with the name ListBatchTasklet. (Note, this ignores the step's prefix.)
