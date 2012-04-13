@@ -36,7 +36,7 @@ Provides the Spring Batch framework and convention based Jobs.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://johnrengelman.github.com/grails-spring-batch"
+    def documentation = "https://github.com/johnrengelman/grails-spring-batch"
 
     // Extra (optional) plugin metadata
 
