@@ -1,0 +1,4 @@
+*.zip
+target
+plugin.xml
+web-app/WEB-INF/tld/*.tld
