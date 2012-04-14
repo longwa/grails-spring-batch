@@ -1,10 +1,8 @@
-GRAILS SPRING BATCH PLUGIN
-===
+# GRAILS SPRING BATCH PLUGIN
 
 This plugin adds the Spring Batch framework to a Grails project. It's intent is to minimize/eliminate the need for verbose XML files to configure Spring Batch jobs. 
 
-Getting Started
----
+## Getting Started
 
 The Grails Spring Batch plugin is built using Grails 2.x, it currently has not been tested against Grails 1.3.x and will not install in those versions.
 
@@ -14,8 +12,7 @@ To install the plugin,
 or add the following entry to your BuildConfig.groovy file in the plugins sections:
 <pre><code>compile ':spring-batch:0.1'</code></pre>
 
-Supported Features
----
+## Supported Features
 
 The plugin creates the following Spring Beans:
 * jobRepository (JobRepositoryFactoryBean)
@@ -24,11 +21,9 @@ The plugin creates the following Spring Beans:
 
 These beans use the defined dataSource bean for your application and expected the Spring Batch tables to be available in this dataSource under and prefixed with "batch_".
 
-Configuration
----
+## Configuration
 
-Jobs
---
+### Jobs
 
 To create a Spring Batch job, create a new class under "grails-app/batch" and end the class name with "BatchJob". All jobs are created as a SimpleJob.
 The following fields are available for configuration on a Job class:
@@ -50,8 +45,7 @@ By default, the plugin will try to configre the following:
 
 The only required item is a single step for the job. If the validator, incrementor, or listener cannot be found, they are not configured for the job.
 
-Steps
---
+### Steps
 
 To create a Spring Batch step, create a new class under "grails-app/batch" and end the class name with "BatchStep". All steps are created as a TaskletStep.
 Steps can be added to a job by setting a list to the "steps" property in the job. The list can contain classes or strings. For example:
@@ -78,25 +72,26 @@ class FooProcessBatchStep {
 
 Will try to load a class with the name ListBatchTasklet. (Note, this ignores the step's prefix.)
 
-Tasklets
---
+### Tasklets
 
 To create a Spring Batch tasklet, create a new class under "grails-app/batch" and end the class name with "BatchTasklet". Additionally, the class must implement the Tasklet interface from Spring Batch (or extend a class that implements the interface).
 
 The following items are avabile to configure on a tasklet:
 * None at this time - support for chuncking coming soon!
 
-Job Parameters Validator
---
+### Job Parameters Validator
 
 Define a class in "grails-app/batch" that ends with "BatchValidator" and implements the JobParameterValidator interface. Add the validator to the Job using the 'validator' property on the job, or name it by convention using the same prefix as the job (i.e. 'FooBatchJob' and 'FooBatchValidator').
 
-Job Parameters Incrementor
---
+### Job Parameters Incrementor
 
 Define a class in "grails-app/batch" that ends with "BatchIncrementor" and implements the JobParameterIncrementor interface. Add the incrementor to the Job using the 'incrementor' property on the job, or name it by convention using the same prefix as the job (i.e. 'FooBatchJob' and 'FooBatchIncrementor').
 
-Job Listeners
---
+### Job Listeners
 
 Define a class in "grails-app/batch" that end with "BatchJobListener" and implements the JobExecutionListener interface. Add the listener to the Job using the 'listeners' property (remember it's a List!), or name it by convention using the same prefix as the job (i.e. 'FooBatchJob' and 'FooBatchJobListener', note that if multiple listeners are required, then you must declare them all using the 'listeners' property).
+
+## Versions
+
++ v.0.1 - Support for SimpleJob, TaskletStep, Tasklet, JobParametersValidator, JobParametersIncrementor, JobExecutionListener.
++ v.0.1.1 - Minor update to include extra verification of tasklet, validator, incrementor, and jobListener artifacts.
