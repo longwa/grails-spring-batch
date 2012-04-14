@@ -32,7 +32,7 @@ class SpringBatchGrailsPlugin {
     def author = "John Engelman"
     def authorEmail = "john.r.engelman@gmail.com"
     def description = '''\
-Provides the Spring Batch framework and convention based Jobs.
+Provides the Spring Batch framework and convention based Jobs. See documentation at https://github.com/johnrengelman/grails-spring-batch for details.
 '''
 
     // URL to the plugin's documentation
@@ -50,7 +50,7 @@ Provides the Spring Batch framework and convention based Jobs.
 //    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
 
     // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
+    def issueManagement = [ system: "JIRA", url: "https://github.com/johnrengelman/grails-spring-batch/issues" ]
 
     // Online location of the plugin's browseable source code.
     def scm = [ url: "https://github.com/johnrengelman/grails-spring-batch" ]

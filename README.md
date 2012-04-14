@@ -77,3 +77,26 @@ class FooProcessBatchStep {
 </code></pre>
 
 Will try to load a class with the name ListBatchTasklet. (Note, this ignores the step's prefix.)
+
+Tasklets
+--
+
+To create a Spring Batch tasklet, create a new class under "grails-app/batch" and end the class name with "BatchTasklet". Additionally, the class must implement the Tasklet interface from Spring Batch (or extend a class that implements the interface).
+
+The following items are avabile to configure on a tasklet:
+* None at this time - support for chuncking coming soon!
+
+Job Parameters Validator
+--
+
+Define a class in "grails-app/batch" that ends with "BatchValidator" and implements the JobParameterValidator interface. Add the validator to the Job using the 'validator' property on the job, or name it by convention using the same prefix as the job (i.e. 'FooBatchJob' and 'FooBatchValidator').
+
+Job Parameters Incrementor
+--
+
+Define a class in "grails-app/batch" that ends with "BatchIncrementor" and implements the JobParameterIncrementor interface. Add the incrementor to the Job using the 'incrementor' property on the job, or name it by convention using the same prefix as the job (i.e. 'FooBatchJob' and 'FooBatchIncrementor').
+
+Job Listeners
+--
+
+Define a class in "grails-app/batch" that end with "BatchJobListener" and implements the JobExecutionListener interface. Add the listener to the Job using the 'listeners' property (remember it's a List!), or name it by convention using the same prefix as the job (i.e. 'FooBatchJob' and 'FooBatchJobListener', note that if multiple listeners are required, then you must declare them all using the 'listeners' property).
