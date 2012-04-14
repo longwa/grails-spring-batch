@@ -95,3 +95,9 @@ Define a class in "grails-app/batch" that end with "BatchJobListener" and implem
 
 + v.0.1 - Support for SimpleJob, TaskletStep, Tasklet, JobParametersValidator, JobParametersIncrementor, JobExecutionListener.
 + v.0.1.1 - Minor update to include extra verification of tasklet, validator, incrementor, and jobListener artifacts.
+
+## Feature Backlog
+
++ Step Execution Listeners
++ Chunk Oriented Processing (including reader and writer)
++ Chunk, itemReader, itemProcess, itemWriter listeners
