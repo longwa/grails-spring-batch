@@ -2,3 +2,5 @@
 target
 plugin.xml
 web-app/WEB-INF/tld/*.tld
+*.iml
+.idea
