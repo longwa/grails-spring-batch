@@ -1,19 +1,6 @@
-import grails.plugins.springbatch.job.JobArtefactHandler
-import grails.plugins.springbatch.step.StepArtefactHandler
-import grails.plugins.springbatch.tasklet.TaskletArtefactHandler
-import grails.plugins.springbatch.tasklet.GrailsTaskletClass
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
-import grails.plugins.springbatch.step.GrailsStepClass
-import grails.plugins.springbatch.job.GrailsJobClass
 import grails.util.GrailsNameUtils
-import org.springframework.batch.core.job.SimpleJob
-import org.springframework.batch.core.step.tasklet.TaskletStep
-import grails.plugins.springbatch.validator.GrailsValidatorClass
-import grails.plugins.springbatch.validator.ValidatorArtefactHandler
-import grails.plugins.springbatch.incrementor.IncrementorArtefactHandler
-import org.codehaus.groovy.grails.commons.ArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsClass
-import grails.plugins.springbatch.listener.JobListenerArtefactHandler
 
 class SpringBatchGrailsPlugin {
     // the plugin version
@@ -56,17 +43,8 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
     def scm = [ url: "https://github.com/johnrengelman/grails-spring-batch" ]
 
     def watchedResources = [
-        "file:./grails-app/batch/**/*Job.groovy",
-        "file:./plugins/*/grails-app/batch/**/*Job.groovy",
-        "file:./grails-app/batch/**/*Step.groovy",
-        "file:./plugins/*/grails-app/batch/**/*Step.groovy",
-        "file:./grails-app/batch/**/*Tasklet.groovy",
-        "file:./plugins/*/grails-app/batch/**/*Tasklet.groovy"
-    ]
-
-    def artefacts = [
-        new JobArtefactHandler(), new StepArtefactHandler(), new TaskletArtefactHandler(),
-        new ValidatorArtefactHandler(), new IncrementorArtefactHandler(), new JobListenerArtefactHandler()
+        "file:./grails-app/batch/**/*BatchConfig.groovy",
+        "file:./plugins/*/grails-app/batch/**/*BatchConfig.groovy",
     ]
 
     def doWithWebDescriptor = { xml ->
@@ -89,40 +67,6 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
             dataSource = ref("dataSource")
         }
 
-        log.debug("Batch Job Listener Classes: ${application.batchJobListenerClasses}")
-        application.batchJobListenerClasses.each {jobListenerClass ->
-            configureBeans.delegate = delegate
-            configureBeans(jobListenerClass, JobListenerArtefactHandler.TYPE)
-        }
-
-        log.debug("Batch Incrementor Classes: ${application.batchIncrementorClasses}")
-        application.batchValidatorClasses.each {incrementorClass ->
-            configureBeans.delegate = delegate
-            configureBeans(incrementorClass, IncrementorArtefactHandler.TYPE)
-        }
-
-        log.debug("Batch Validator Classes: ${application.batchValidatorClasses}")
-        application.batchValidatorClasses.each {validatorClass ->
-            configureBeans.delegate = delegate
-            configureBeans(validatorClass, ValidatorArtefactHandler.TYPE)
-        }
-
-        log.debug("Batch Tasklet Classes: ${application.batchTaskletClasses}")
-        application.batchTaskletClasses.each {taskletClass ->
-            configureBeans.delegate = delegate
-            configureBeans(taskletClass, TaskletArtefactHandler.TYPE)
-        }
-        log.debug("Batch Step Classes: ${application.batchStepClasses}")
-            application.batchStepClasses.each {stepClass ->
-            configureBatchSteps.delegate = delegate
-            configureBatchSteps(stepClass)
-
-        }
-        log.debug("Batch Job Classes: ${application.batchJobClasses}")
-        application.batchJobClasses.each {batchJobClass ->
-            configureBatchJobs.delegate = delegate
-            configureBatchJobs(batchJobClass)
-        }
     }
 
     def doWithDynamicMethods = { ctx ->
@@ -144,55 +88,4 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
         // The event is the same as for 'onChange'.
     }
 
-    def configureBeans = {GrailsClass clazz, String type ->
-        def fullName = clazz.fullName
-        def propertyName = clazz.propertyName
-
-        "${fullName}Class"(MethodInvokingFactoryBean) {
-            targetObject = ref("grailsApplication", true)
-            targetMethod = "getArtefact"
-            arguments = [type, fullName]
-        }
-
-        "${propertyName}"(ref("${fullName}Class")) {bean ->
-            bean.factoryMethod = "newInstance"
-            bean.autowire = "byName"
-            bean.scope = "prototype"
-        }
-    }
-
-    def configureBatchSteps = {GrailsStepClass stepClass ->
-        def propertyName = stepClass.propertyName
-
-        def taskletClass = stepClass.getTaskletClass();
-
-        "${propertyName}"(TaskletStep) {bean ->
-            bean.autowire = "byName"
-            bean.scope = "prototype"
-            jobRepository = ref("jobRepository")
-            transactionManager = ref("transactionManager")
-            tasklet = ref(GrailsNameUtils.getPropertyName(taskletClass))
-        }
-    }
-
-    def configureBatchJobs = {GrailsJobClass jobClass ->
-        def propertyName = jobClass.propertyName
-
-        def stepClasses = jobClass.steps
-        def listenerClasses = jobClass.listeners
-
-        def jobValidator = jobClass.getValidator() ? ref(GrailsNameUtils.getPropertyName(jobClass.getValidator())) : null
-        def jobIncrementor = jobClass.getIncrementor() ? ref(GrailsNameUtils.getPropertyName(jobClass.getIncrementor())) : null
-
-        "${propertyName}"(SimpleJob) {bean ->
-            bean.autowire = "byName"
-            bean.scope = "prototype"
-            jobRepository = ref("jobRepository")
-            steps = stepClasses.collect { ref(GrailsNameUtils.getPropertyName(it)) }
-            restartable = jobClass.isRestartable()
-            jobParametersValidator = jobValidator
-            jobParametersIncrementer = jobIncrementor
-            jobExecutionListeners = listenerClasses.collect { ref(GrailsNameUtils.getPropertyName(it)) }
-        }
-    }
 }
