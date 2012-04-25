@@ -49,7 +49,7 @@ grails.project.dependency.resolution = {
                     'log4j'
         }
 
-        compile ('org.springframework.batch:spring-batch-test:2.1.8.RELEASE') {
+        test ('org.springframework.batch:spring-batch-test:2.1.8.RELEASE') {
             excludes 'junit',
                     'spring-aop',
                     'spring-core', // Use spring-core from Grails.
