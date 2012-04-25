@@ -52,6 +52,36 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
     }
 
     def doWithSpring = {
+        def loadRequired = loadRequiredSpringBatchBeans.clone()
+        loadRequired.delegate = delegate
+        loadRequired.call()
+
+        def loadConfig = loadBatchConfig.clone()
+        loadConfig.delegate = delegate
+        loadConfig.call()
+    }
+
+    def doWithDynamicMethods = { ctx ->
+        // TODO Implement registering dynamic methods to classes (optional)
+    }
+
+    def doWithApplicationContext = { applicationContext ->
+
+    }
+
+    def onChange = { event ->
+        //TODO need to figure out how to reload beans from the update config file...the event has the compiled class
+    }
+
+    def onConfigChange = { event ->
+
+    }
+
+    def loadBatchConfig = { ->
+        loadBeans 'classpath*:/batch/*BatchConfig.groovy'
+    }
+
+    def loadRequiredSpringBatchBeans = { ->
         jobRepository(org.springframework.batch.core.repository.support.JobRepositoryFactoryBean) {
             dataSource = ref("dataSource")
             transactionManager = ref("transactionManager")
@@ -66,26 +96,6 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
         jobExplorer(org.springframework.batch.core.explore.support.JobExplorerFactoryBean) {
             dataSource = ref("dataSource")
         }
-
-    }
-
-    def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
-
-    def doWithApplicationContext = { applicationContext ->
-
-    }
-
-    def onChange = { event ->
-        // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-    }
-
-    def onConfigChange = { event ->
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
     }
 
 }
