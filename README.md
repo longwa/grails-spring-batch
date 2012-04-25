@@ -27,6 +27,10 @@ The plugin provides the following scripts:
 
 ## Configuration
 
+User the Groovy BeanBuilder DSL to define your job configurations in the grails-app/batch directory. End each configuration name with "BatchConfig" (i.e. JobBatchConfig.groovy). These groovy files will be copied into your classpath and imported. To use the Spring Batch namespace in your config file, declare the following:
+<pre><code>xmlns batch:"http://www.springframework.org/schema/batch"</code></pre>
+inside the beans {} closure.
+
 ## Versions
 
 + v.0.2 - Started over to make everything simplier. Define your configurations in the grails-app/batch folder in scripts named *BatchConfig.groovy. Use the groovy BeanBuilder syntax to define. The plugin provides jobLauncher, jobRepository, and jobExplorer for you.
