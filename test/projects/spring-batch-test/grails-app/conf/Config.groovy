@@ -91,3 +91,7 @@ log4j = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 }
+
+plugin.springBatch.jmx.enable = true
+plugin.springBatch.loadTables = true
+plugin.springBatch.database = 'h2'

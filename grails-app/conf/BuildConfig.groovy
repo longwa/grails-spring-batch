@@ -66,5 +66,6 @@ grails.project.dependency.resolution = {
               ":release:2.0.0") {
             export = false
         }
+        compile ":platform-core:1.0.M1"
     }
 }

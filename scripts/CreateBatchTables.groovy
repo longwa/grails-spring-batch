@@ -13,7 +13,11 @@ target(main: "Installs the Spring Batch tables into database") {
         exit 1
     }
 
-    def dsConfig = config.dataSource
+    def selectedDs = config.plugin.springBatch.dataSource
+    if(!selectedDs) {
+        selectedDs = "dataSource"
+    }
+    def dsConfig = config."${selectedDs}"
     String dbDesc = dsConfig.jndiName ? "JNDI $dsConfig.jndiName" : "$dsConfig.username @ $dsConfig.url"
     def hyphenatedScriptName = GrailsNameUtils.getScriptName(scriptName)
     printMessage "Starting $hyphenatedScriptName for database $dbDesc"

@@ -1,10 +1,24 @@
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClass
+import org.springframework.jmx.export.MBeanExporter
+import org.springframework.aop.framework.ProxyFactoryBean
+import org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler
+import org.springframework.batch.core.launch.support.SimpleJobOperator
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
+import org.springframework.batch.core.launch.support.SimpleJobLauncher
+import org.springframework.core.task.SimpleAsyncTaskExecutor
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean
+import org.springframework.batch.core.configuration.support.MapJobRegistry
+import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor
+import org.springframework.remoting.rmi.RmiRegistryFactoryBean
+import org.springframework.jmx.support.ConnectorServerFactoryBean
+import org.springframework.batch.core.launch.JobOperator
+import groovy.sql.Sql
 
 class SpringBatchGrailsPlugin {
     // the plugin version
-    def version = "0.2"
+    def version = "0.2.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0 > *"
     // the other plugins this plugin depends on
@@ -47,18 +61,54 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
         "file:./plugins/*/grails-app/batch/**/*BatchConfig.groovy",
     ]
 
+    //From Platform Core
+    def doWithConfigOptions = {
+        //TODO this only gets exposed in artefacts
+        'jmx.enable'(type: Boolean, defaultValue: false)
+        'jmx.remote.enable'(type: Boolean, defaultValue: false)
+        'jmx.remote.rmi.port'(type: Integer, defaultValue: 1099)
+        'dataSource'(type: String, defaultValue: "dataSource")
+        'tablePrefix'(type: String, defaultValue: "batch")
+        'loadTables'(type: Boolean, defaultValue: false)
+        'database'(type: String)
+    }
+
+    //From Platform Core
+    def doWithConfig = { config ->
+
+    }
+
     def doWithWebDescriptor = { xml ->
 
     }
 
     def doWithSpring = {
+        def conf = application.config.plugin.springBatch
+
+        def tablePrefix = conf.tablePrefix ?: "batch" //TODO can I get the default values from doWithConfigOptions?
+        def dataSourceBean = conf.dataSource ?: "dataSource" //TODO can I get the default values from doWithConfigOptions?
         def loadRequired = loadRequiredSpringBatchBeans.clone()
         loadRequired.delegate = delegate
-        loadRequired.call()
+        loadRequired.call(dataSourceBean, tablePrefix)
 
         def loadConfig = loadBatchConfig.clone()
         loadConfig.delegate = delegate
         loadConfig.call()
+
+        def loadJmx = conf.jmx.enable ?: false //TODO can I get the default values from doWithConfigOptions?
+        def loadRemoteJmx = conf.jmx.remote.enable ?: false //TODO can I get the default values from doWithConfigOptions?
+
+        if(loadJmx) {
+            def loadJmxClosure = loadSpringBatchJmx.clone()
+            loadJmxClosure.delegate = delegate
+            loadJmxClosure.call()
+        }
+        if(loadRemoteJmx) {
+            def jmxRemoteRmiPort = conf.jmx.remote.rmi.port ?: 1099 //TODO can I get the default values from doWithConfigOptions?
+            def loadRemoteJmxClosure = loadSpringBatchRemoteJmx.clone()
+            loadRemoteJmxClosure.delegate = delegate
+            loadRemoteJmxClosure.call(jmxRemoteRmiPort)
+        }
     }
 
     def doWithDynamicMethods = { ctx ->
@@ -66,7 +116,24 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
     }
 
     def doWithApplicationContext = { applicationContext ->
-
+        def conf = application.config.plugin.springBatch
+        String dataSourceName = conf.dataSource ?: "dataSource" //TODO can I get the default values from doWithConfigOptions?
+        def database = conf.database
+        def loadTables = conf.loadTables
+        if(loadTables) {
+            if(database) {
+                def ds = applicationContext.getBean(dataSourceName)
+                def sql = new Sql(ds)
+                def schemaScript = "org/springframework/batch/core/schema-${database}.sql"
+                def script = applicationContext.classLoader.getResourceAsStream(schemaScript).text
+                sql.execute(script)
+                sql.commit()
+                sql.close()
+            } else {
+                log.error("Must specify plugin.springBatch.database variable if plugin.springBatch.loadTables = true")
+                throw new RuntimeException("Must specify plugin.springBatch.database variable if plugin.springBatch.loadTables = true")
+            }
+        }
     }
 
     def onChange = { event ->
@@ -81,20 +148,59 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
         loadBeans 'classpath*:/batch/*BatchConfig.groovy'
     }
 
-    def loadRequiredSpringBatchBeans = { ->
-        jobRepository(org.springframework.batch.core.repository.support.JobRepositoryFactoryBean) {
-            dataSource = ref("dataSource")
+    def loadRequiredSpringBatchBeans = { String dataSourceBean, String tablePrefixValue ->
+        jobRepository(JobRepositoryFactoryBean) {
+            dataSource = ref(dataSourceBean)
             transactionManager = ref("transactionManager")
             isolationLevelForCreate: "SERIALIZABLE"
-            tablePrefix: "batch_"
+            tablePrefix: "${tablePrefixValue}_".toString()
+        }
+        jobLauncher(SimpleJobLauncher){
+            jobRepository = ref("jobRepository")
+            taskExecutor = { SimpleAsyncTaskExecutor executor -> }
+        }
+        jobExplorer(JobExplorerFactoryBean) {
+            dataSource = ref(dataSourceBean)
+        }
+        jobRegistry(MapJobRegistry) { }
+        jobRegistryPostProcessor(JobRegistryBeanPostProcessor) {
+            jobRegistry = ref("jobRegistry")
+        }
+    }
+
+    def loadSpringBatchJmx = { ->
+        jobOperator(SimpleJobOperator) {
+            jobRepository = ref("jobRepository")
+            jobLauncher = ref("jobLauncher")
+            jobRegistry = ref("jobRegistry")
+            jobExplorer = ref("jobExplorer")
         }
 
-        jobLauncher(org.springframework.batch.core.launch.support.SimpleJobLauncher){
-            jobRepository = ref("jobRepository")
-            taskExecutor = { org.springframework.core.task.SimpleAsyncTaskExecutor executor -> }
+        springBatchExporter(MBeanExporter) {bean ->
+            beans = [
+                //TODO can't seem to get this to work. It appears that the "ref" below is resolving to a Grails closure instead of a bean
+//                "spring:service=batch,bean=jobOperator": {ProxyFactoryBean proxyFactoryBean ->
+//                    target = ref("jobOperator")
+//                    interceptorNames = "exceptionTranslator"
+//                }
+                "spring:service=batch,bean=jobOperator": ref("jobOperator")
+            ]
+            assembler = {InterfaceBasedMBeanInfoAssembler interfaceBasedMBeanInfoAssembler ->
+                interfaceMappings = [
+                    "spring:service=batch,bean=jobOperator": "org.springframework.batch.core.launch.JobOperator"
+                ]
+            }
         }
-        jobExplorer(org.springframework.batch.core.explore.support.JobExplorerFactoryBean) {
-            dataSource = ref("dataSource")
+    }
+
+    def loadSpringBatchRemoteJmx = {sbRmiPort ->
+        sbRmiRegistry(RmiRegistryFactoryBean) {
+            port = sbRmiPort
+        }
+        sbRmiServerConnector(ConnectorServerFactoryBean) {
+            objectName = "connector:name=rmi"
+            serviceUrl = "service:jmx:rmi://localhost/jndi/rmi://localhost:$sbRmiPort/springBatch"
+            threaded = "true"
         }
     }
 
