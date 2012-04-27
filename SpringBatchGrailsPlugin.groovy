@@ -166,15 +166,16 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
         jobRegistryPostProcessor(JobRegistryBeanPostProcessor) {
             jobRegistry = ref("jobRegistry")
         }
-    }
 
-    def loadSpringBatchJmx = { ->
         jobOperator(SimpleJobOperator) {
             jobRepository = ref("jobRepository")
             jobLauncher = ref("jobLauncher")
             jobRegistry = ref("jobRegistry")
             jobExplorer = ref("jobExplorer")
         }
+    }
+
+    def loadSpringBatchJmx = { ->
 
         springBatchExporter(MBeanExporter) {bean ->
             beans = [
