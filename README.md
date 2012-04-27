@@ -18,6 +18,9 @@ The plugin creates the following Spring Beans:
 * jobRepository (JobRepositoryFactoryBean)
 * jobLauncher (SimpleJobLauncher)
 * jobExplorer (JobExplorerFactoryBean)
+* jobRegistry (MapJobRegistry)
+* jobRegistryPostProcessor (JobRegistryBeanPostProcessor)
+* jobOperator (SimpleJobOperator)
 
 These beans use the defined dataSource bean for your application and expected the Spring Batch tables to be available in this dataSource under and prefixed with "batch_".
 
