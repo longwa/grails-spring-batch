@@ -36,16 +36,16 @@ inside the beans {} closure.
 
 A sample / test project is included with the original plugin source, available at test/projects/spring-batch-test.  To get running, follow the instructions below:  
 
-1. Zip up the github repository, unzip it into directory called grails-spring-batch.  Then go into test/projects/spring-batch-test directory.  
-2. The default project uses h2, so run the command 
+* Zip up the github repository, unzip it into directory called grails-spring-batch.  Then go into test/projects/spring-batch-test directory.  
+* The default project uses h2, so run the command 
 ```    grails create-batch-tables h2
 ```
 
-3. After that start the application (grails run-app), you will find it at http://localhost:8080/spring-batch-test/
-4. Check db tables were created.  Go to dbconsole at http://localhost:8080/spring-batch-test/dbconsole/.  
+* After that start the application (grails run-app), you will find it at http://localhost:8080/spring-batch-test/
+* Check db tables were created.  Go to dbconsole at http://localhost:8080/spring-batch-test/dbconsole/.  
    Substitute jdbc string to connect to the devDb: jdbc:h2:devDb;MVCC=TRUE.  
    Connect and make sure a bunch of tables that start with BATCH* exist.   All of the tables will have zero entries until the first run. 
-5. Run Included Simple Job.  Go to console, http://localhost:8080/spring-batch-test/console.  Type in or paste the following code into console window:  
+* Run Included Simple Job.  Go to console, http://localhost:8080/spring-batch-test/console.  Type in or paste the following code into console window:  
 
 ```
     import org.springframework.batch.core.JobParameters
@@ -56,7 +56,7 @@ A sample / test project is included with the original plugin source, available a
 
 After pressing execute, you can go to the application console (i.e. shell), and you should see text "Starting Job".  That means the batch job ran fine.  You can view the definition and modify at ROOT/test\projects\spring-batch-test\grails-app\batch\SimpleJobBatchConfig.groovy.
 
-6. See run record in the db.   Running select euqries on batch tables will now show you information written about the run. 
+* See run record in the db.   Running select euqries on batch tables will now show you information written about the run. 
 
 
 ## Versions
