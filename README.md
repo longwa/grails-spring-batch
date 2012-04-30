@@ -45,10 +45,12 @@ A sample / test project is included with the original plugin source, available a
    Connect and make sure a bunch of tables that start with BATCH* exist.   All of the tables will have zero entries until the first run. 
 5. Run Included Simple Job.  Go to console, http://localhost:8080/spring-batch-test/console.  Type in or paste the following code into console window:  
 
+```
     import org.springframework.batch.core.JobParameters
 
     simppleJob = ctx.simpleJob
     ctx.jobLauncher.run(simppleJob, new JobParameters());
+```
 
 After pressing execute, you can go to the application console (i.e. shell), and you should see text "Starting Job".  That means the batch job ran fine.  You can view the definition and modify at ROOT/test\projects\spring-batch-test\grails-app\batch\SimpleJobBatchConfig.groovy.
 
