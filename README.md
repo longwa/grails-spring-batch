@@ -38,7 +38,8 @@ A sample / test project is included with the original plugin source, available a
 
 1. Zip up the github repository, unzip it into directory called grails-spring-batch.  Then go into test/projects/spring-batch-test directory.  
 2. The default project uses h2, so run the command 
-    grails create-batch-tables h2
+```    grails create-batch-tables h2
+```
 3. After that start the application (grails run-app), you will find it at http://localhost:8080/spring-batch-test/
 4. Check db tables were created.  Go to dbconsole at http://localhost:8080/spring-batch-test/dbconsole/.  
    Substitute jdbc string to connect to the devDb: jdbc:h2:devDb;MVCC=TRUE.  
