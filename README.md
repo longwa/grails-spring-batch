@@ -64,6 +64,7 @@ After pressing execute, you can go to the application console (i.e. shell), and 
 
 ## Versions
 
++ v.0.2.1 - Added jobOperator bean for use in UI, added JMX export, and loading of tables for in memory database
 + v.0.2 - Started over to make everything simplier. Define your configurations in the grails-app/batch folder in scripts named *BatchConfig.groovy. Use the groovy BeanBuilder syntax to define. The plugin provides jobLauncher, jobRepository, and jobExplorer for you.
 + v.0.1.1 - Minor update to include extra verification of tasklet, validator, incrementor, and jobListener artifacts.
 + v.0.1 - Support for SimpleJob, TaskletStep, Tasklet, JobParametersValidator, JobParametersIncrementor, JobExecutionListener.
