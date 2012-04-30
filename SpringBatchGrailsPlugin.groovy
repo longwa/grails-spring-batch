@@ -18,7 +18,7 @@ import groovy.sql.Sql
 
 class SpringBatchGrailsPlugin {
     // the plugin version
-    def version = "0.2.1"
+    def version = "0.2.2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0 > *"
     // the other plugins this plugin depends on
@@ -68,7 +68,7 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
         'jmx.remote.enable'(type: Boolean, defaultValue: false)
         'jmx.remote.rmi.port'(type: Integer, defaultValue: 1099)
         'dataSource'(type: String, defaultValue: "dataSource")
-        'tablePrefix'(type: String, defaultValue: "batch")
+        'tablePrefix'(type: String, defaultValue: "BATCH")
         'loadTables'(type: Boolean, defaultValue: false)
         'database'(type: String)
     }
@@ -85,7 +85,7 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
     def doWithSpring = {
         def conf = application.config.plugin.springBatch
 
-        def tablePrefix = conf.tablePrefix ?: "batch" //TODO can I get the default values from doWithConfigOptions?
+        def tablePrefix = conf.tablePrefix ?: "BATCH" //TODO can I get the default values from doWithConfigOptions?
         def dataSourceBean = conf.dataSource ?: "dataSource" //TODO can I get the default values from doWithConfigOptions?
         def loadRequired = loadRequiredSpringBatchBeans.clone()
         loadRequired.delegate = delegate
