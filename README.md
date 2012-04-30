@@ -53,13 +53,13 @@ A sample / test project is included with the original plugin source, available a
 ```
     import org.springframework.batch.core.JobParameters
 
-    simppleJob = ctx.simpleJob
-    ctx.jobLauncher.run(simppleJob, new JobParameters());
+    simpleJob = ctx.simpleJob
+    ctx.jobLauncher.run(simpleJob, new JobParameters());
 ```
 
 After pressing execute, you can go to the application console (i.e. shell), and you should see text "Starting Job".  That means the batch job ran fine.  You can view the definition and modify at ROOT/test\projects\spring-batch-test\grails-app\batch\SimpleJobBatchConfig.groovy.
 
-* See run record in the db.   Running select euqries on batch tables will now show you information written about the run. 
+* See run record in the db.   Running select queries on batch tables will now show you information written about the run. 
 
 
 ## Versions
