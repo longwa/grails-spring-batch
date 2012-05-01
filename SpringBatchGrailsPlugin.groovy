@@ -148,7 +148,7 @@ Provides the Spring Batch framework and convention based Jobs. See documentation
         loadBeans 'classpath*:/batch/*BatchConfig.groovy'
     }
 
-    def loadRequiredSpringBatchBeans = { String dataSourceBean, String tablePrefixValue ->
+    def loadRequiredSpringBatchBeans = { def dataSourceBean, def tablePrefixValue ->
         jobRepository(JobRepositoryFactoryBean) {
             dataSource = ref(dataSourceBean)
             transactionManager = ref("transactionManager")
