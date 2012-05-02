@@ -1,4 +1,4 @@
-package springBatch
+package springbatchtest
 
 class SpringBatch {
 

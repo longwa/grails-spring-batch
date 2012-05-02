@@ -1,4 +1,4 @@
-import springBatch.PrintStartMessageTasklet
+import springbatchtest.PrintStartMessageTasklet
 
 beans {
     xmlns batch:"http://www.springframework.org/schema/batch"
