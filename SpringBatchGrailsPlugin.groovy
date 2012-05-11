@@ -179,7 +179,7 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
 
         springBatchExporter(MBeanExporter) {bean ->
             beans = [
-                //TODO can't seem to get this to work. It appears that the "ref" below is resolving to a Grails closure instead of a bean
+                //TODO GRAILS-6557
 //                "spring:service=batch,bean=jobOperator": {ProxyFactoryBean proxyFactoryBean ->
 //                    target = ref("jobOperator")
 //                    interceptorNames = "exceptionTranslator"
