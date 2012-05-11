@@ -64,6 +64,7 @@ After pressing execute, you can go to the application console (i.e. shell), and 
 
 ## Versions
 
++ v.0.2.2 - Minor tweaks. Changed default table prefix to be upper case since that's what the Spring Batch library expects. Allow closure style config. Some package refactoring.
 + v.0.2.1 - Added jobOperator bean for use in UI, added JMX export, and loading of tables for in memory database
 + v.0.2 - Started over to make everything simplier. Define your configurations in the grails-app/batch folder in scripts named *BatchConfig.groovy. Use the groovy BeanBuilder syntax to define. The plugin provides jobLauncher, jobRepository, and jobExplorer for you.
 + v.0.1.1 - Minor update to include extra verification of tasklet, validator, incrementor, and jobListener artifacts.
