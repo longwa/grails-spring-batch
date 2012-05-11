@@ -33,7 +33,7 @@ class SpringBatchGrailsPlugin {
     def author = "John Engelman"
     def authorEmail = "john.r.engelman@gmail.com"
     def description = '''\
-Provides the Spring Batch framework and convention based Jobs. See documentation at https://github.com/johnrengelman/grails-spring-batch for details.
+Adds the Spring Batch framework to application. Allows for job configuration using Spring Bean DSL. See documentation at https://github.com/johnrengelman/grails-spring-batch for details.
 '''
 
     // URL to the plugin's documentation
