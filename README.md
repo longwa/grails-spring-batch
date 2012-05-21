@@ -15,8 +15,8 @@ or add the following entry to your BuildConfig.groovy file in the plugins sectio
 Once the plugin is installed, you can define your Spring Batch job configuration in a Groovy script file in your application's grails-app/batch directory. The script's filename must end with BatchConfig (i.e. SimpleJobBatchConfig.groovy). Define your Spring Bach job using the Grails BeanBuilder syntax (just like in the resources.groovy file).
 
 To launch a job from your application do the following:
-# Inject the Spring Batch Job Launcher and the job you defined in your configuration file into the controller or service (or lookup it up from the grailsApplication.mainContext)
-# Call the `jobLauncher.launch()` method with a reference to your job and a `JobParameters` object. Spring Batch will take care of the rest
+1. Inject the Spring Batch Job Launcher and the job you defined in your configuration file into the controller or service (or lookup it up from the grailsApplication.mainContext)
+2. Call the `jobLauncher.launch()` method with a reference to your job and a `JobParameters` object. Spring Batch will take care of the rest
 
 grails-app/batch/SimpleJob.groovy
 ```
