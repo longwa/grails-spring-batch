@@ -12,6 +12,42 @@ To install the plugin,
 or add the following entry to your BuildConfig.groovy file in the plugins sections:
 <pre><code>compile ':spring-batch:0.2'</code></pre>
 
+Once the plugin is installed, you can define your Spring Batch job configuration in a Groovy script file in your application's grails-app/batch directory. The script's filename must end with BatchConfig (i.e. SimpleJobBatchConfig.groovy). Define your Spring Bach job using the Grails BeanBuilder syntax (just like in the resources.groovy file).
+
+To launch a job from your application do the following:
+# Inject the Spring Batch Job Launcher and the job you defined in your configuration file into the controller or service (or lookup it up from the grailsApplication.mainContext)
+# Call the `jobLauncher.launch()` method with a reference to your job and a `JobParameters` object. Spring Batch will take care of the rest
+
+grails-app/batch/SimpleJob.groovy
+```
+beans {
+    xmlns batch:"http://www.springframework.org/schema/batch"
+
+    batch.job(id: 'simpleJob') {
+        batch.step(id: 'logStart') {
+            batch.tasklet(ref: 'printStartMessage')
+        }
+    }
+
+    printStartMessage(PrintStartMessageTasklet) { bean ->
+        bean.autowire = "byName"
+    }
+
+}
+```
+
+grails-app/services/foo/FooService
+```
+class FooService {
+   def jobLauncher
+   def simpleJob
+
+   public void launchFoo() {
+      jobLauncher.launch(simpleJob, new JobParameters())
+   }
+}
+```
+
 ## Supported Features
 
 The plugin creates the following Spring Beans:
@@ -27,13 +63,11 @@ These beans use the defined dataSource bean for your application and expected th
 The plugin provides the following scripts:
 * CreateBatchTables - takes 1 argument that matches a supported DB for Spring Batch: db2, derby, h2, hsqldb, mysql, oracle10g, postgresql, sqlserver, sybase
 
-
 ## Configuration
 
 User the Groovy BeanBuilder DSL to define your job configurations in the grails-app/batch directory. End each configuration name with "BatchConfig" (i.e. JobBatchConfig.groovy). These groovy files will be copied into your classpath and imported. To use the Spring Batch namespace in your config file, declare the following:
 <pre><code>xmlns batch:"http://www.springframework.org/schema/batch"</code></pre>
 inside the beans {} closure.
-
 
 ## Sample Project
 
