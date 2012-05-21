@@ -58,14 +58,14 @@ The plugin creates the following Spring Beans:
 * jobRegistryPostProcessor (JobRegistryBeanPostProcessor)
 * jobOperator (SimpleJobOperator)
 
-These beans use the defined dataSource bean for your application and expected the Spring Batch tables to be available in this dataSource under and prefixed with "batch_".
+These beans use the defined dataSource bean for your application and expected the Spring Batch tables to be available in this dataSource under and prefixed with "BATCH_".
 
 The plugin provides the following scripts:
 * CreateBatchTables - takes 1 argument that matches a supported DB for Spring Batch: db2, derby, h2, hsqldb, mysql, oracle10g, postgresql, sqlserver, sybase
 
 ## Configuration
 
-User the Groovy BeanBuilder DSL to define your job configurations in the grails-app/batch directory. End each configuration name with "BatchConfig" (i.e. JobBatchConfig.groovy). These groovy files will be copied into your classpath and imported. To use the Spring Batch namespace in your config file, declare the following:
+The plugin expects your job configuration to be defined using the Grails BeanBuilder DSL in the grails-app/batch directory. End each configuration name with "BatchConfig" (i.e. JobBatchConfig.groovy). These groovy files will be copied into your classpath and imported. To use the Spring Batch namespace in your config file, declare the following:
 <pre><code>xmlns batch:"http://www.springframework.org/schema/batch"</code></pre>
 inside the beans {} closure.
 
