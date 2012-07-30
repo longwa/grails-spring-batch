@@ -25,7 +25,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
-        // runtime 'mysql:mysql-connector-java:5.1.5'
+        runtime 'mysql:mysql-connector-java:5.1.5'
 
         compile ('org.springframework.batch:spring-batch-core:2.1.8.RELEASE') {
             excludes 'junit',
@@ -66,6 +66,6 @@ grails.project.dependency.resolution = {
               ":release:2.0.0") {
             export = false
         }
-        compile ":platform-core:1.0.M1"
+        compile ":platform-core:1.0.M2"
     }
 }

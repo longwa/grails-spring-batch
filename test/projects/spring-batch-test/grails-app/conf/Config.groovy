@@ -101,3 +101,12 @@ plugin {
         database = "h2"
     }
 }
+environments {
+    mysql {
+        plugin {
+            springBatch {
+                database = "mysql"
+            }
+        }
+    }
+}

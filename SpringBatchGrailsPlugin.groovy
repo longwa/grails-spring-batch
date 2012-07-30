@@ -18,7 +18,7 @@ import groovy.sql.Sql
 
 class SpringBatchGrailsPlugin {
     // the plugin version
-    def version = "v0.2.3"
+    def version = "0.3"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0 > *"
     // the other plugins this plugin depends on
@@ -42,7 +42,7 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
     // Extra (optional) plugin metadata
 
     // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = "APACHE"
+    def license = "APACHE"
 
     // Details of company behind the plugin (if there is one)
 //    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]
@@ -124,9 +124,22 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
             if(database) {
                 def ds = applicationContext.getBean(dataSourceName)
                 def sql = new Sql(ds)
-                def schemaScript = "org/springframework/batch/core/schema-${database}.sql"
-                def script = applicationContext.classLoader.getResourceAsStream(schemaScript).text
-                sql.execute(script)
+
+                def script = "org/springframework/batch/core/schema-drop-${database}.sql"
+                def text = applicationContext.classLoader.getResourceAsStream(script).text
+                text.split(";").each { statement ->
+                    if(statement.trim()) {
+                        sql.execute(statement)
+                    }
+                }
+
+                script = "org/springframework/batch/core/schema-${database}.sql"
+                text = applicationContext.classLoader.getResourceAsStream(script).text
+                text.split(";").each { statement ->
+                    if(statement.trim()) {
+                        sql.execute(statement)
+                    }
+                }
                 sql.commit()
                 sql.close()
             } else {

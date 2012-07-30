@@ -17,6 +17,16 @@ environments {
             url = "jdbc:h2:mem:devDb;MVCC=TRUE"
         }
     }
+    mysql {
+        dataSource {
+            driverClassName = "com.mysql.jdbc.Driver"
+            dbCreate = "create-drop"
+            def jdbcUrl = "jdbc:mysql://localhost/springbatch?autoReconnect=true"
+            url = jdbcUrl
+            username = ""
+            password = ""
+        }
+    }
     test {
         dataSource {
             dbCreate = "update"
