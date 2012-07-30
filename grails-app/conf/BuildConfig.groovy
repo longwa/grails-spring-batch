@@ -28,7 +28,9 @@ grails.project.dependency.resolution = {
         runtime 'mysql:mysql-connector-java:5.1.5'
 
         compile ('org.springframework.batch:spring-batch-core:2.1.8.RELEASE',
-                 'org.springframework.batch:spring-batch-infrastructure:2.1.8.RELEASE') {
+                 'org.springframework.batch:spring-batch-infrastructure:2.1.8.RELEASE',
+                 'org.springframework.batch:spring-batch-admin-resources:1.2.1.RELEASE',
+                 'org.springframework.batch:spring-batch-admin-manager:1.2.1.RELEASE') {
             excludes 'junit',
                     'spring-aop',
                     'spring-core', // Use spring-core from Grails.
