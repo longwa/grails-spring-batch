@@ -39,7 +39,7 @@ class JobExecutionModelUnitTests {
         assert jobExecution.endTime == dateWithDuration(jobExecutionModel.startDateTime, jobExecutionModel.duration)
         assert jobExecution.status == jobExecutionModel.status
         assert jobExecution.exitStatus == jobExecutionModel.exitStatus
-        //TODO
+
         assert jobExecution.stepExecutions.collect {
           StepExecutionModel.fromService(jobServiceMock.createMock() as JobService, it)
         } == jobExecutionModel.stepExecutions

@@ -186,6 +186,12 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
             jobRegistry = ref("jobRegistry")
             jobExplorer = ref("jobExplorer")
         }
+        jobService(SimpleJobServiceFactoryBean) {
+            jobRepository = ref("jobRepository")
+            jobLauncher = ref("jobLauncher")
+            jobLocator = ref("jobRegistry")
+            dataSource = ref(dataSourceBean)
+        }
     }
 
     def loadSpringBatchJmx = { ->
