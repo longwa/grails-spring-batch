@@ -10,8 +10,11 @@ class SpringBatchUiUtilities {
     }
 
     public static List paginate(int offset, int max, Closure c) {
-        def list = c.call()
-        list.metaClass.mixin(PaginateableList)
-        return list.paginate(max, offset)
+        def list = c.call() as List
+        return paginateInternal(list, max, offset)
+    }
+
+    private static List paginateInternal(List list, max, offset=0 ) {
+        ((max as Integer) <= 0 || (offset as Integer) < 0) ? [] : list.subList( Math.min( offset as Integer, list.size() ), Math.min( (offset as Integer) + (max as Integer), list.size() ) )
     }
 }
