@@ -1,8 +1,4 @@
-import org.springframework.beans.factory.config.MethodInvokingFactoryBean
-import grails.util.GrailsNameUtils
-import org.codehaus.groovy.grails.commons.GrailsClass
 import org.springframework.jmx.export.MBeanExporter
-import org.springframework.aop.framework.ProxyFactoryBean
 import org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler
 import org.springframework.batch.core.launch.support.SimpleJobOperator
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
@@ -13,8 +9,8 @@ import org.springframework.batch.core.configuration.support.MapJobRegistry
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor
 import org.springframework.remoting.rmi.RmiRegistryFactoryBean
 import org.springframework.jmx.support.ConnectorServerFactoryBean
-import org.springframework.batch.core.launch.JobOperator
 import groovy.sql.Sql
+import org.springframework.batch.admin.service.SimpleJobServiceFactoryBean
 
 class SpringBatchGrailsPlugin {
     // the plugin version
