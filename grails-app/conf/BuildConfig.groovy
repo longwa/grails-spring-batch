@@ -27,18 +27,8 @@ grails.project.dependency.resolution = {
 
         runtime 'mysql:mysql-connector-java:5.1.5'
 
-        compile ('org.springframework.batch:spring-batch-core:2.1.8.RELEASE') {
-            excludes 'junit',
-                    'spring-aop',
-                    'spring-core', // Use spring-core from Grails.
-                    'spring-oxm',
-                    'spring-test',
-                    'spring-tx',
-                    'slf4j-log4j12',
-                    'log4j'
-        }
-
-        compile ('org.springframework.batch:spring-batch-infrastructure:2.1.8.RELEASE') {
+        compile ('org.springframework.batch:spring-batch-core:2.1.8.RELEASE',
+                 'org.springframework.batch:spring-batch-infrastructure:2.1.8.RELEASE') {
             excludes 'junit',
                     'spring-aop',
                     'spring-core', // Use spring-core from Grails.
@@ -63,9 +53,19 @@ grails.project.dependency.resolution = {
 
     plugins {
         build(":tomcat:$grailsVersion",
-              ":release:2.0.0") {
+              ":release:2.0.3") {
             export = false
         }
         compile ":platform-core:1.0.M2"
+        compile(":codenarc:0.17") {
+            export = false
+        }
+
+        runtime(":hibernate:$grailsVersion") {
+            export = false
+        }
+        test(":code-coverage:1.2.5") {
+            export = false
+        }
     }
 }
