@@ -14,7 +14,7 @@ class SpringBatchUiUtilities {
         return paginateInternal(list, max, offset)
     }
 
-    private static List paginateInternal(List list, max, offset=0 ) {
+    private static List paginateInternal(List list, int max, int offset=0 ) {
         ((max as Integer) <= 0 || (offset as Integer) < 0) ? [] : list.subList( Math.min( offset as Integer, list.size() ), Math.min( (offset as Integer) + (max as Integer), list.size() ) )
     }
 }

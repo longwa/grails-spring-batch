@@ -34,4 +34,69 @@ class SpringBatchUiUtilitiesUnitTests {
         assert 2 == pagedList.size()
         assert [2,3] == pagedList
     }
+
+    @Test
+    public void testPaginate_MaxLimitedToListSize() {
+        def pagedList = SpringBatchUiUtilities.paginate(0, 6) {
+            return (1..5)
+        }
+
+        assert pagedList
+        assert 5 == pagedList.size()
+        assert (1..5) == pagedList
+    }
+
+    @Test
+    public void testPaginate_MaxLimitedToListSize2() {
+        def pagedList = SpringBatchUiUtilities.paginate(1, 6) {
+            return (1..5)
+        }
+
+        assert pagedList
+        assert 4 == pagedList.size()
+        assert (2..5) == pagedList
+    }
+
+    @Test
+    public void testPaginate_OffsetLimitedToListSize() {
+        def pagedList = SpringBatchUiUtilities.paginate(6, 1) {
+            return (1..5)
+        }
+
+        assert !pagedList
+        assert 0 == pagedList.size()
+        assert [] == pagedList
+    }
+
+    @Test
+    public void testPaginate_NegativeOffset() {
+        def pagedList = SpringBatchUiUtilities.paginate(-1, 1) {
+            return (1..5)
+        }
+
+        assert !pagedList
+        assert 0 == pagedList.size()
+        assert [] == pagedList
+    }
+
+    @Test
+    public void testPaginate_NegativeMax() {
+        def pagedList = SpringBatchUiUtilities.paginate(0, -1) {
+            return (1..5)
+        }
+
+        assert !pagedList
+        assert 0 == pagedList.size()
+        assert [] == pagedList
+    }
+
+    public void testPaginate_ZeroMax() {
+        def pagedList = SpringBatchUiUtilities.paginate(0, 0) {
+            return (1..5)
+        }
+
+        assert !pagedList
+        assert 0 == pagedList.size()
+        assert [] == pagedList
+    }
 }

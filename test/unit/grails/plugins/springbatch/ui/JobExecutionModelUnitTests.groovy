@@ -29,7 +29,7 @@ class JobExecutionModelUnitTests {
         stepExecution.endTime = dateWithDuration(stepExecution.startTime, 20000)
         jobExecution.addStepExecutions([stepExecution])
 
-        def jobExecutionModel = JobExecutionModel.fromService(jobServiceMock.createMock() as JobService, jobExecution)
+        JobExecutionModel jobExecutionModel = JobExecutionModel.fromService(jobServiceMock.createMock() as JobService, jobExecution)
 
         assert jobExecutionModel
         assert jobExecution.id == jobExecutionModel.id

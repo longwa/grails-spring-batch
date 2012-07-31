@@ -29,7 +29,7 @@ class JobInstanceModelUnitTests {
         def jobParameters = new JobParameters()
         def jobInstance = new JobInstance(1, jobParameters, "testJob")
 
-        def jobInstanceModel = JobInstanceModel.fromService(jobServiceMock.createMock() as JobService, jobInstance)
+        JobInstanceModel jobInstanceModel = JobInstanceModel.fromService(jobServiceMock.createMock() as JobService, jobInstance)
 
         assert jobInstanceModel
         assert 1 == jobInstanceModel.id

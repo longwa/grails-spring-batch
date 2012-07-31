@@ -14,10 +14,8 @@ class SpringBatchUiService {
         def max = params.max ?: jobCount
         def jobs = jobService.listJobs(offset, max)
 
-        def jobModelList = SpringBatchUiUtilities.paginate(offset, max) {
-            jobs.collect {
-                JobModel.fromService(jobService, it)
-            }
+        def jobModelList = jobs.collect {
+            JobModel.fromService(jobService, it)
         }
         jobModelList
     }
@@ -35,10 +33,8 @@ class SpringBatchUiService {
         def max = params.max ?: jobInstanceCount
         def jobInstances = jobService.listJobInstances(jobName, offset, max)
 
-        def jobInstanceModelList = SpringBatchUiUtilities.paginate(offset, max) {
-            jobInstances.collect {
-                JobInstanceModel.fromService(jobService, it)
-            }
+        def jobInstanceModelList = jobInstances.collect {
+            JobInstanceModel.fromService(jobService, it)
         }
         jobInstanceModelList
     }
