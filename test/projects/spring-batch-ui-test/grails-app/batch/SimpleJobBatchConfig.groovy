@@ -5,11 +5,15 @@ beans {
 
     batch.job(id: 'simpleUiJob') {
         batch.step(id: 'logStart') {
-            batch.tasklet(ref: 'printStartMessage')
+            batch.tasklet(ref: 'printStartMessage2')
         }
     }
 
     printStartMessage(PrintStartMessageTasklet) { bean ->
+        bean.autowire = "byName"
+    }
+
+    printStartMessage2(PrintStartMessageTasklet) { bean ->
         bean.autowire = "byName"
     }
 

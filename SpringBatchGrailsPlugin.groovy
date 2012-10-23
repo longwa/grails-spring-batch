@@ -11,6 +11,9 @@ import org.springframework.remoting.rmi.RmiRegistryFactoryBean
 import org.springframework.jmx.support.ConnectorServerFactoryBean
 import groovy.sql.Sql
 import org.springframework.batch.admin.service.SimpleJobServiceFactoryBean
+import grails.spring.BeanBuilder
+import grails.util.CollectionUtils
+import org.codehaus.groovy.grails.commons.spring.WebRuntimeSpringConfiguration
 
 class SpringBatchGrailsPlugin {
     // the plugin version
@@ -146,7 +149,20 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
     }
 
     def onChange = { event ->
-        //TODO need to figure out how to reload beans from the update config file...the event has the compiled class
+        if(event.source instanceof Class && event.source.name.endsWith("BatchConfig")) {
+            Class configClass = event.source
+            //TODO need to figure out how to reload beans from the update config file...the event has the compiled class
+            def springRuntimeConfiguration = new WebRuntimeSpringConfiguration(event.ctx, event.application.classLoader)
+            def springGroovyResourcesBeanBuilder = new BeanBuilder(null, springRuntimeConfiguration,event.application.classLoader)
+            springGroovyResourcesBeanBuilder.setBinding(new Binding(CollectionUtils.newMap(
+                "application", event.application,
+                "grailsApplication", event.application))) // GRAILS-7550
+            Script script = (Script) configClass.newInstance()
+            script.run()
+            Object beans = script.getProperty("beans");
+            springGroovyResourcesBeanBuilder.beans((Closure<?>)beans)
+            springGroovyResourcesBeanBuilder.registerBeans(springRuntimeConfiguration)
+        }
     }
 
     def onConfigChange = { event ->
