@@ -80,7 +80,7 @@ A sample / test project is included with the original plugin source, available a
 
 * After that start the application (grails run-app), you will find it at http://localhost:8080/spring-batch-test/
 * Check db tables were created.  Go to dbconsole at http://localhost:8080/spring-batch-test/dbconsole/.  
-   Substitute jdbc string to connect to the devDb: jdbc:h2:devDb;MVCC=TRUE.  
+   Substitute jdbc string to connect to the devDb: jdbc:h2:mem:devDb;MVCC=TRUE.
    Connect and make sure a bunch of tables that start with BATCH* exist.   All of the tables will have zero entries until the first run. 
 * Run Included Simple Job.  Go to console, http://localhost:8080/spring-batch-test/console.  Type in or paste the following code into console window:  
 
