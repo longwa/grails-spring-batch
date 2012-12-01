@@ -12,3 +12,11 @@ class PrintStartMessageTasklet implements Tasklet {
         return RepeatStatus.FINISHED
     }
 }
+
+class PrintStartMessageTasklet2 implements Tasklet {
+
+    RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
+        println "Starting Job2"
+        return RepeatStatus.FINISHED
+    }
+}

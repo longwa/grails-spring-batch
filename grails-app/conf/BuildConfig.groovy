@@ -43,10 +43,10 @@ grails.project.dependency.resolution = {
 
     plugins {
         build(":tomcat:$grailsVersion",
-              ":release:2.0.3") {
+              ":release:2.1.0") {
             export = false
         }
-        compile ":platform-core:1.0.M6"
+        compile ":platform-core:1.0.RC1"
         compile(":codenarc:0.17") {
             export = false
         }
