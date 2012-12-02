@@ -27,7 +27,6 @@ class SpringBatchGrailsPlugin {
         "grails-app/views/error.gsp"
     ]
 
-    // TODO Fill in these fields
     def title = "Grails Spring Batch Plugin" // Headline display name of the plugin
     def author = "John Engelman"
     def authorEmail = "john.r.engelman@gmail.com"
@@ -35,24 +34,9 @@ class SpringBatchGrailsPlugin {
 Adds the Spring Batch framework to application. Allows for job configuration using Spring Bean DSL. See documentation at https://github.com/johnrengelman/grails-spring-batch for details.
 '''
 
-    // URL to the plugin's documentation
     def documentation = "https://github.com/johnrengelman/grails-spring-batch"
-
-    // Extra (optional) plugin metadata
-
-    // License: one of 'APACHE', 'GPL2', 'GPL3'
     def license = "APACHE"
-
-    // Details of company behind the plugin (if there is one)
-//    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]
-
-    // Any additional developers beyond the author specified above.
-//    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
-
-    // Location of the plugin's issue tracker.
     def issueManagement = [ system: "JIRA", url: "https://github.com/johnrengelman/grails-spring-batch/issues" ]
-
-    // Online location of the plugin's browseable source code.
     def scm = [ url: "https://github.com/johnrengelman/grails-spring-batch" ]
 
     def watchedResources = [
@@ -64,8 +48,10 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
     def doWithConfigOptions = {
         //TODO this only gets exposed in artefacts
         'jmx.enable'(type: Boolean, defaultValue: false)
+        'jmx.name'(type: String, defaultValue: 'jobOperator')
         'jmx.remote.enable'(type: Boolean, defaultValue: false)
         'jmx.remote.rmi.port'(type: Integer, defaultValue: 1099)
+        'jmx.remote.name'(type: String, defaultValue: 'springBatch')
         'dataSource'(type: String, defaultValue: "dataSource")
         'tablePrefix'(type: String, defaultValue: "BATCH")
         'loadTables'(type: Boolean, defaultValue: false)
@@ -74,49 +60,48 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
 
     //From Platform Core
     def doWithConfig = { config ->
-
     }
 
     def doWithWebDescriptor = { xml ->
-
     }
 
     def doWithSpring = {
         def conf = application.config.plugin.springBatch
 
-        def tablePrefix = conf.tablePrefix ?: "BATCH" //TODO can I get the default values from doWithConfigOptions?
-        def dataSourceBean = conf.dataSource ?: "dataSource" //TODO can I get the default values from doWithConfigOptions?
+        def tablePrefix = conf.tablePrefix
+        def dataSourceBean = conf.dataSource
         def loadRequired = loadRequiredSpringBatchBeans.clone()
         loadRequired.delegate = delegate
-        loadRequired.call(dataSourceBean, tablePrefix)
+        loadRequired(dataSourceBean, tablePrefix)
 
         def loadConfig = loadBatchConfig.clone()
         loadConfig.delegate = delegate
-        loadConfig.call()
+        loadConfig()
 
-        def loadJmx = conf.jmx.enable ?: false //TODO can I get the default values from doWithConfigOptions?
-        def loadRemoteJmx = conf.jmx.remote.enable ?: false //TODO can I get the default values from doWithConfigOptions?
+        def loadJmx = conf.jmx.enable
+        def loadRemoteJmx = conf.jmx.remote.enable
 
         if(loadJmx) {
+            def jmxExportName = conf.jmx.name
             def loadJmxClosure = loadSpringBatchJmx.clone()
             loadJmxClosure.delegate = delegate
-            loadJmxClosure.call()
+            loadJmxClosure(jmxExportName)
         }
         if(loadRemoteJmx) {
-            def jmxRemoteRmiPort = conf.jmx.remote.rmi.port ?: 1099 //TODO can I get the default values from doWithConfigOptions?
+            def jmxRemoteRmiPort = conf.jmx.remote.rmi.port
+            def jmxRemoteExportName = conf.jmx.remote.name
             def loadRemoteJmxClosure = loadSpringBatchRemoteJmx.clone()
             loadRemoteJmxClosure.delegate = delegate
-            loadRemoteJmxClosure.call(jmxRemoteRmiPort)
+            loadRemoteJmxClosure(jmxRemoteRmiPort, jmxRemoteExportName)
         }
     }
 
     def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
     }
 
     def doWithApplicationContext = { applicationContext ->
         def conf = application.config.plugin.springBatch
-        String dataSourceName = conf.dataSource ?: "dataSource" //TODO can I get the default values from doWithConfigOptions?
+        String dataSourceName = conf.dataSource
         def database = conf.database
         def loadTables = conf.loadTables
         if(loadTables) {
@@ -176,7 +161,6 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
     }
 
     def onConfigChange = { event ->
-
     }
 
     def loadBatchConfig = { ->
@@ -220,8 +204,8 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
         }
     }
 
-    def loadSpringBatchJmx = { ->
-
+    def loadSpringBatchJmx = { exportName ->
+        def serviceName = "spring:service=batch,bean=${exportName}".toString()
         springBatchExporter(MBeanExporter) {bean ->
             beans = [
                 //TODO GRAILS-6557
@@ -229,23 +213,23 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
 //                    target = ref("jobOperator")
 //                    interceptorNames = "exceptionTranslator"
 //                }
-                "spring:service=batch,bean=jobOperator": ref("jobOperator")
+                (serviceName): ref("jobOperator")
             ]
             assembler = {InterfaceBasedMBeanInfoAssembler interfaceBasedMBeanInfoAssembler ->
                 interfaceMappings = [
-                    "spring:service=batch,bean=jobOperator": "org.springframework.batch.core.launch.JobOperator"
+                    (serviceName): "org.springframework.batch.core.launch.JobOperator"
                 ]
             }
         }
     }
 
-    def loadSpringBatchRemoteJmx = {sbRmiPort ->
+    def loadSpringBatchRemoteJmx = {sbRmiPort, exportName ->
         sbRmiRegistry(RmiRegistryFactoryBean) {
             port = sbRmiPort
         }
         sbRmiServerConnector(ConnectorServerFactoryBean) {
             objectName = "connector:name=rmi"
-            serviceUrl = "service:jmx:rmi://localhost/jndi/rmi://localhost:$sbRmiPort/springBatch"
+            serviceUrl = "service:jmx:rmi://localhost/jndi/rmi://localhost:$sbRmiPort/$exportName".toString()
             threaded = "true"
         }
     }

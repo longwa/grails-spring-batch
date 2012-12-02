@@ -96,6 +96,9 @@ plugin {
     springBatch {
         jmx {
             enable = true
+            remote {
+                enable = true
+            }
         }
         loadTables = true
         database = "h2"
