@@ -93,8 +93,8 @@ The plugin provides the following scripts:
           + Default: springBatch
       + rmi
           + port - the port on which the RMI Registry is attached
-            + Type: Integer
-            + Default: 1099
+              + Type: Integer
+              + Default: 1099
 
 ## Job Definition
 
