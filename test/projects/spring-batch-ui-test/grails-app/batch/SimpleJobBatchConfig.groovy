@@ -10,6 +10,12 @@ beans {
         }
     }
 
+//    batch.job(id: 'simpleUiJob2') {
+//        batch.step(id: 'logStart2') {
+//            batch.tasklet(ref: 'printStartMessage2')
+//        }
+//    }
+
     printStartMessage(PrintStartMessageTasklet) { bean ->
         bean.autowire = "byName"
     }

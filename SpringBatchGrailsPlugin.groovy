@@ -1,3 +1,7 @@
+import grails.plugins.springbatch.ReloadableJobRegistryBeanPostProcessor
+import org.springframework.batch.core.configuration.support.ApplicationContextFactory
+import org.springframework.batch.core.configuration.support.DefaultJobLoader
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.jmx.export.MBeanExporter
 import org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler
 import org.springframework.batch.core.launch.support.SimpleJobOperator
@@ -151,17 +155,27 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
     def onChange = { event ->
         if(event.source instanceof Class && event.source.name.endsWith("BatchConfig")) {
             Class configClass = event.source
-            //TODO need to figure out how to reload beans from the update config file...the event has the compiled class
-            def springRuntimeConfiguration = new WebRuntimeSpringConfiguration(event.ctx, event.application.classLoader)
-            def springGroovyResourcesBeanBuilder = new BeanBuilder(null, springRuntimeConfiguration,event.application.classLoader)
-            springGroovyResourcesBeanBuilder.setBinding(new Binding(CollectionUtils.newMap(
-                "application", event.application,
-                "grailsApplication", event.application))) // GRAILS-7550
+            //Get an instance of the changed class file as a script
             Script script = (Script) configClass.newInstance()
-            script.run()
-            Object beans = script.getProperty("beans");
-            springGroovyResourcesBeanBuilder.beans((Closure<?>)beans)
-            springGroovyResourcesBeanBuilder.registerBeans(springRuntimeConfiguration)
+            //Create a new script binding so we can assign a delegate to it
+            Binding scriptBinding = new Binding()
+            //Allows the script file to delegate the beans DSL to the onChangeEvent
+            scriptBinding.beans = { Closure closure ->
+                delegate.beans(closure)
+            }
+            script.binding = scriptBinding
+            //Execute the script to get the new beans that were defined
+            def beans = script.run()
+            //Register new beans into the application context
+            beans.registerBeans(event.ctx)
+            //This forces the job loader to reload the beans defined in the file that changed
+            //This will probably actually reload all spring batch jobs
+            def jobLoader = new DefaultJobLoader(event.ctx.jobRegistry)
+            jobLoader.reload(new ApplicationContextFactory() {
+                ConfigurableApplicationContext createApplicationContext() {
+                    return event.ctx
+                }
+            })
         }
     }
 
@@ -188,7 +202,11 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
             dataSource = ref(dataSourceBean)
         }
         jobRegistry(MapJobRegistry) { }
-        jobRegistryPostProcessor(JobRegistryBeanPostProcessor) {
+        //Use a custom bean post processor that will unregister the job bean before trying to initializing it again
+        //This could cause some problems if you define a job more than once, you'll probably end up with 1 copy
+        //of the last definition processed instead of getting a DuplicateJobException
+        //Had to do this to get reloading to work
+        jobRegistryPostProcessor(ReloadableJobRegistryBeanPostProcessor) {
             jobRegistry = ref("jobRegistry")
         }
 
