@@ -172,7 +172,7 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
             dataSource = ref(dataSourceBean)
             transactionManager = ref("transactionManager")
             isolationLevelForCreate: "SERIALIZABLE"
-            tablePrefix: "${tablePrefixValue}_".toString()
+            tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
         }
         jobLauncher(SimpleJobLauncher){
             jobRepository = ref("jobRepository")

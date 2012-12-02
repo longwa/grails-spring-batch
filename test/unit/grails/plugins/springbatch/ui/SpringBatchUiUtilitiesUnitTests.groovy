@@ -90,6 +90,7 @@ class SpringBatchUiUtilitiesUnitTests {
         assert [] == pagedList
     }
 
+    @Test
     public void testPaginate_ZeroMax() {
         def pagedList = SpringBatchUiUtilities.paginate(0, 0) {
             return (1..5)
