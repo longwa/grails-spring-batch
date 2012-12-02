@@ -66,35 +66,35 @@ The plugin provides the following scripts:
 ## Plugin configuration
 
 + dataSource - name of datasource to use for Spring Batch data
-++ Type: String
-++ Default: dataSource
+  + Type: String
+  + Default: dataSource
 + tablePrefix - prefix of Spring Batch tables in database. If set to a non-empty string, assumes there is a "_" separating the prefix and the table name
-++ Type: String
-++ Default: BATCH
+  + Type: String
+  + Default: BATCH
 + loadTables - if true, will attempt to execute the Spring Batch DDL for the specified database type during startup. Should set to true in test phases.
-++ Type: Boolean
-++ Default: false
+  + Type: Boolean
+  + Default: false
 + database - The database type to use: db2, derby, h2, hsqldb, mysql, oracle10g, postgresql, sqlserver, sybase
-++ Type: String
-++ Default: undefined
+  + Type: String
+  + Default: undefined
 + jmx
-++ enable - enables export of Spring Batch resources through a local MBean
-+++ Type: Boolean
-+++ Default: false
-++ name - the service name with which to export the resources
-+++ Type: String
-+++ Default: jobOperator
-++ remote
-+++ enable - enables export of Spring Batch resources through a remote RMI Registry (default connection string is service:jmx:rmi://localhost/jndi/rmi://localhost:1099/springBatch)
-++++ Type: Boolean
-++++ Default: false
-+++ name - the service name with which to export the resources
-++++ Type: String
-++++ Default: springBatch
-+++ rmi
-++++ port - the port on which the RMI Registry is attached
-+++++ Type: Integer
-+++++ Default: 1099
+  + enable - enables export of Spring Batch resources through a local MBean
+    + Type: Boolean
+    + Default: false
+  + name - the service name with which to export the resources
+    + Type: String
+    + Default: jobOperator
+  + remote
+    + enable - enables export of Spring Batch resources through a remote RMI Registry (default connection string is service:jmx:rmi://localhost/jndi/rmi://localhost:1099/springBatch)
+      + Type: Boolean
+      + Default: false
+    + name - the service name with which to export the resources
+      + Type: String
+      + Default: springBatch
+    + rmi
+      + port - the port on which the RMI Registry is attached
+        + Type: Integer
+        + Default: 1099
 
 ## Job Definition
 
@@ -132,10 +132,10 @@ After pressing execute, you can go to the application console (i.e. shell), and 
 ## Versions
 
 + v.1.0.RC1
-++ Implement reloading of BatchConfig files.
-++ Add support for configuring the JMX export names using the jmx.name and jmx.remote.name config variables.
-++ Fix support for dynamic loading of MySQL tables during tests.
-++ Add some generic controllers/views for exposing Spring Batch jobs and information
+  + Implement reloading of BatchConfig files.
+  + Add support for configuring the JMX export names using the jmx.name and jmx.remote.name config variables.
+  + Fix support for dynamic loading of MySQL tables during tests.
+  + Add some generic controllers/views for exposing Spring Batch jobs and information
 + v.0.2.2 - Minor tweaks. Changed default table prefix to be upper case since that's what the Spring Batch library expects. Allow closure style config. Some package refactoring.
 + v.0.2.1 - Added jobOperator bean for use in UI, added JMX export, and loading of tables for in memory database
 + v.0.2 - Started over to make everything simplier. Define your configurations in the grails-app/batch folder in scripts named *BatchConfig.groovy. Use the groovy BeanBuilder syntax to define. The plugin provides jobLauncher, jobRepository, and jobExplorer for you.
