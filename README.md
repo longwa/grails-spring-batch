@@ -86,15 +86,15 @@ The plugin provides the following scripts:
       + Default: jobOperator
   + remote
       + enable - enables export of Spring Batch resources through a remote RMI Registry (default connection string is service:jmx:rmi://localhost/jndi/rmi://localhost:1099/springBatch)
-        + Type: Boolean
-        + Default: false
+          + Type: Boolean
+          + Default: false
       + name - the service name with which to export the resources
-        + Type: String
-        + Default: springBatch
+          + Type: String
+          + Default: springBatch
       + rmi
-        + port - the port on which the RMI Registry is attached
-          + Type: Integer
-          + Default: 1099
+          + port - the port on which the RMI Registry is attached
+            + Type: Integer
+            + Default: 1099
 
 ## Job Definition
 
