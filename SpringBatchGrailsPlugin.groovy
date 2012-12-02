@@ -10,18 +10,14 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean
 import org.springframework.batch.core.configuration.support.MapJobRegistry
-import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor
 import org.springframework.remoting.rmi.RmiRegistryFactoryBean
 import org.springframework.jmx.support.ConnectorServerFactoryBean
 import groovy.sql.Sql
 import org.springframework.batch.admin.service.SimpleJobServiceFactoryBean
-import grails.spring.BeanBuilder
-import grails.util.CollectionUtils
-import org.codehaus.groovy.grails.commons.spring.WebRuntimeSpringConfiguration
 
 class SpringBatchGrailsPlugin {
     // the plugin version
-    def version = "0.3"
+    def version = "1.0.RC1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0 > *"
     // the other plugins this plugin depends on
