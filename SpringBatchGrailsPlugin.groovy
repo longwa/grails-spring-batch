@@ -15,23 +15,12 @@ import groovy.sql.Sql
 import org.springframework.batch.admin.service.SimpleJobServiceFactoryBean
 
 class SpringBatchGrailsPlugin {
-    // the plugin version
     def version = "1.0.RC1"
-    // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0 > *"
-    // the other plugins this plugin depends on
-    def dependsOn = [:]
-    // resources that are excluded from plugin packaging
-    def pluginExcludes = [
-        "grails-app/views/error.gsp"
-    ]
-
-    def title = "Grails Spring Batch Plugin" // Headline display name of the plugin
+    def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"
     def authorEmail = "john.r.engelman@gmail.com"
-    def description = '''\
-Adds the Spring Batch framework to application. Allows for job configuration using Spring Bean DSL. See documentation at https://github.com/johnrengelman/grails-spring-batch for details.
-'''
+    def description = 'Adds the Spring Batch framework to application. Allows for job configuration using Spring Bean DSL. See documentation at https://github.com/johnrengelman/grails-spring-batch for details.'
 
     def documentation = "https://github.com/johnrengelman/grails-spring-batch"
     def license = "APACHE"
@@ -55,13 +44,6 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
         'tablePrefix'(type: String, defaultValue: "BATCH")
         'loadTables'(type: Boolean, defaultValue: false)
         'database'(type: String)
-    }
-
-    //From Platform Core
-    def doWithConfig = { config ->
-    }
-
-    def doWithWebDescriptor = { xml ->
     }
 
     def doWithSpring = {
@@ -93,9 +75,6 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
             loadRemoteJmxClosure.delegate = delegate
             loadRemoteJmxClosure(jmxRemoteRmiPort, jmxRemoteExportName)
         }
-    }
-
-    def doWithDynamicMethods = { ctx ->
     }
 
     def doWithApplicationContext = { applicationContext ->
@@ -153,9 +132,6 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
             def jobLoader = new DefaultJobLoader(event.ctx.jobRegistry)
             jobLoader.reload(new ReloadApplicationContextFactory(event.ctx))
         }
-    }
-
-    def onConfigChange = { event ->
     }
 
     def loadBatchConfig = { ->
@@ -228,5 +204,4 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
             threaded = "true"
         }
     }
-
 }

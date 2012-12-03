@@ -1,7 +1,8 @@
 package grails.plugins.springbatch.ui
 
-import org.springframework.batch.admin.service.JobService
 import groovy.transform.EqualsAndHashCode
+
+import org.springframework.batch.admin.service.JobService
 
 @EqualsAndHashCode
 class JobModel {
@@ -13,7 +14,7 @@ class JobModel {
 
     List<JobInstanceModel> instances
 
-    public static JobModel fromService(JobService jobService, String name) {
+    static JobModel fromService(JobService jobService, String name) {
         return new JobModel(
             name: name,
             executionCount: jobService.countJobExecutionsForJob(name),

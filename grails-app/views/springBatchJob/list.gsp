@@ -1,4 +1,3 @@
-<%@ page import="grails.plugins.springbatch.ui.JobModel" %>
 <!doctype html>
 <html>
 	<head>
@@ -20,29 +19,19 @@
 			<table>
 				<thead>
 					<tr>
-
-                        <g:sortableColumn property="name" title="${message(code: 'jobModel.name.label', default: 'Name')}" />
-
+						<g:sortableColumn property="name" title="${message(code: 'jobModel.name.label', default: 'Name')}" />
 						<g:sortableColumn property="executionCount" title="${message(code: 'jobModel.executionCount.label', default: 'Execution Count')}" />
-					
 						<g:sortableColumn property="incrementable" title="${message(code: 'jobModel.incrementable.label', default: 'Is Incrementable')}" />
-					
 						<g:sortableColumn property="launchable" title="${message(code: 'jobModel.launchable.label', default: 'Is Launchable')}" />
-					
 					</tr>
 				</thead>
 				<tbody>
 				<g:each in="${modelInstances}" status="i" var="modelInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-					
 						<td><g:link controller="springBatchJobInstance" action="list" id="${modelInstance.name}">${fieldValue(bean: modelInstance, field: "name")}</g:link></td>
-
-                        <td>${fieldValue(bean: modelInstance, field: "executionCount")}</td>
-					
+						<td>${fieldValue(bean: modelInstance, field: "executionCount")}</td>
 						<td><g:formatBoolean boolean="${modelInstance.incrementable}" /></td>
-					
 						<td><g:formatBoolean boolean="${modelInstance.launchable}" /></td>
-					
 					</tr>
 				</g:each>
 				</tbody>

@@ -10,19 +10,12 @@ class SpringBatchJobInstanceControllerUnitTests {
     def springBatchUiServiceMock
 
     @Before
-    public void setUp() {
+    void setUp() {
         springBatchUiServiceMock = mockFor(SpringBatchUiService)
     }
 
     @Test
-    public void testIndex() {
-        controller.index()
-
-        assert response.redirectUrl.endsWith("/springBatchJobInstance/list")
-    }
-
-    @Test
-    public void testList() {
+    void testList() {
         springBatchUiServiceMock.demand.getJobInstanceUiModel(1..1) {String id, Map params ->
             assert "testJob" == id
             assert 0 == params.offset
@@ -43,7 +36,7 @@ class SpringBatchJobInstanceControllerUnitTests {
     }
 
     @Test
-    public void testListWithParams() {
+    void testListWithParams() {
         springBatchUiServiceMock.demand.getJobInstanceUiModel(1..1) {String id, Map params ->
             assert "testJob" == id
             assert 5 == params.max
@@ -65,14 +58,14 @@ class SpringBatchJobInstanceControllerUnitTests {
     }
 
     @Test
-    public void testListNullId() {
+    void testListNullId() {
         controller.list(null)
 
         assert response.redirectUrl.endsWith("/springBatchJob/index")
     }
 
     @Test
-    public void testListBlankId() {
+    void testListBlankId() {
         controller.list("")
 
         assert response.redirectUrl.endsWith("/springBatchJob/index")

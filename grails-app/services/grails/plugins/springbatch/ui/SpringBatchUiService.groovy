@@ -4,7 +4,7 @@ import org.springframework.batch.admin.service.JobService
 
 class SpringBatchUiService {
 
-    def transactional = false
+    static transactional = false
 
     JobService jobService
 

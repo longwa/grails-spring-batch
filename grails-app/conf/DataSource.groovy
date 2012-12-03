@@ -9,11 +9,11 @@ hibernate {
     cache.use_query_cache = false
     cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory'
 }
-// environment specific settings
+
 environments {
     development {
         dataSource {
-            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+            dbCreate = "create-drop"
             url = "jdbc:h2:mem:devDb;MVCC=TRUE"
         }
     }
@@ -21,10 +21,8 @@ environments {
         dataSource {
             driverClassName = "com.mysql.jdbc.Driver"
             dbCreate = "create-drop"
-            def jdbcUrl = "jdbc:mysql://localhost/springbatch?autoReconnect=true"
-            url = jdbcUrl
+            url = "jdbc:mysql://localhost/springbatch?autoReconnect=true"
             username = ""
-            password = ""
         }
     }
     test {
@@ -37,7 +35,6 @@ environments {
         dataSource {
             dbCreate = "update"
             url = "jdbc:h2:prodDb;MVCC=TRUE"
-            pooled = true
             properties {
                maxActive = -1
                minEvictableIdleTimeMillis=1800000

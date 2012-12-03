@@ -1,14 +1,15 @@
 package grails.plugins.springbatch.ui
 
 import grails.test.mixin.TestFor
-import org.junit.Test
+
 import org.junit.Before
+import org.junit.Test
 import org.springframework.batch.admin.service.JobService
-import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.BatchStatus
-import org.springframework.batch.core.JobParameters
-import org.springframework.batch.core.JobInstance
 import org.springframework.batch.core.ExitStatus
+import org.springframework.batch.core.JobExecution
+import org.springframework.batch.core.JobInstance
+import org.springframework.batch.core.JobParameters
 import org.springframework.batch.core.StepExecution
 
 @TestFor(SpringBatchUiService)
@@ -17,12 +18,12 @@ class SpringBatchUiServiceUnitTests {
     def jobServiceMock
 
     @Before
-    public void setUp() {
+    void setUp() {
         jobServiceMock = mockFor(JobService, true)
     }
 
     @Test
-    public void testGetJobModels() {
+    void testGetJobModels() {
 
         jobServiceMock.demand.countJobs(2) { ->
             return 2
@@ -65,7 +66,7 @@ class SpringBatchUiServiceUnitTests {
     }
 
     @Test
-    public void testGetJobModels_withParams() {
+    void testGetJobModels_withParams() {
 
         jobServiceMock.demand.countJobs(2) { ->
             return 2
@@ -100,7 +101,7 @@ class SpringBatchUiServiceUnitTests {
     }
 
     @Test
-    public void testGetJobInstanceModels() {
+    void testGetJobInstanceModels() {
         def jobExecutionMock = new JobExecution(1)
         jobExecutionMock.status = BatchStatus.COMPLETED
         def jobExecutionMock2 = new JobExecution(2)
@@ -146,7 +147,7 @@ class SpringBatchUiServiceUnitTests {
     }
 
     @Test
-    public void testGetJobInstanceModels_withParams() {
+    void testGetJobInstanceModels_withParams() {
         def jobExecutionMock = new JobExecution(1)
         jobExecutionMock.status = BatchStatus.COMPLETED
         def jobExecutionMock2 = new JobExecution(2)
@@ -186,7 +187,7 @@ class SpringBatchUiServiceUnitTests {
     }
 
     @Test
-    public void testGetJobExecutionModels() {
+    void testGetJobExecutionModels() {
         JobInstance jobInstance = new JobInstance(1, null, "job1")
         JobExecution jobExecution = new JobExecution(jobInstance, 1)
         jobExecution.startTime = new Date()
@@ -219,7 +220,7 @@ class SpringBatchUiServiceUnitTests {
     }
 
     @Test
-    public void testGetJobExecutionModels_withParams() {
+    void testGetJobExecutionModels_withParams() {
         JobInstance jobInstance = new JobInstance(1, null, "job1")
         JobExecution jobExecution = new JobExecution(jobInstance, 1)
         jobExecution.startTime = new Date()
@@ -263,7 +264,7 @@ class SpringBatchUiServiceUnitTests {
     }
 
     @Test
-    public void testGetStepExecutionModels() {
+    void testGetStepExecutionModels() {
         JobExecution jobExecution = new JobExecution(2)
         StepExecution stepExecution = new StepExecution("testStep1", jobExecution, 1)
         stepExecution.startTime = new Date()
@@ -294,7 +295,7 @@ class SpringBatchUiServiceUnitTests {
     }
 
     @Test
-    public void testGetStepExecutionModels_withParams() {
+    void testGetStepExecutionModels_withParams() {
         JobExecution jobExecution = new JobExecution(2)
         StepExecution stepExecution = new StepExecution("testStep1", jobExecution, 1)
         stepExecution.startTime = new Date()
@@ -334,5 +335,4 @@ class SpringBatchUiServiceUnitTests {
 
         jobServiceMock.verify()
     }
-
 }
