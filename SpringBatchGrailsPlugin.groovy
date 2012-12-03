@@ -1,7 +1,6 @@
+import grails.plugins.springbatch.ReloadApplicationContextFactory
 import grails.plugins.springbatch.ReloadableJobRegistryBeanPostProcessor
-import org.springframework.batch.core.configuration.support.ApplicationContextFactory
 import org.springframework.batch.core.configuration.support.DefaultJobLoader
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.jmx.export.MBeanExporter
 import org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler
 import org.springframework.batch.core.launch.support.SimpleJobOperator
@@ -152,11 +151,7 @@ Adds the Spring Batch framework to application. Allows for job configuration usi
             //This forces the job loader to reload the beans defined in the file that changed
             //This will probably actually reload all spring batch jobs
             def jobLoader = new DefaultJobLoader(event.ctx.jobRegistry)
-            jobLoader.reload(new ApplicationContextFactory() {
-                ConfigurableApplicationContext createApplicationContext() {
-                    return event.ctx
-                }
-            })
+            jobLoader.reload(new ReloadApplicationContextFactory(event.ctx))
         }
     }
 
