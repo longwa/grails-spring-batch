@@ -1,10 +1,9 @@
 import grails.util.GrailsNameUtils
 import groovy.sql.Sql
 
-includeTargets << grailsScript("_GrailsInit")
 includeTargets << grailsScript('_GrailsBootstrap')
 
-target(main: "Installs the Spring Batch tables into database") {
+target(createBatchTables: "Installs the Spring Batch tables into database") {
     depends(classpath, checkVersion, bootstrap, loadApp)
     def argsList = argsMap.params
     String db = argsList[0]
@@ -39,7 +38,7 @@ target(main: "Installs the Spring Batch tables into database") {
     printMessage "Done loading spring batch tables"
 }
 
-setDefaultTarget(main)
+setDefaultTarget(createBatchTables)
 
 printMessage = { String message -> event('StatusUpdate', [message]) }
 errorMessage = { String message -> event('StatusError', [message]) }

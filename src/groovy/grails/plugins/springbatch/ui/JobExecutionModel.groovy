@@ -1,10 +1,11 @@
 package grails.plugins.springbatch.ui
 
+import groovy.transform.EqualsAndHashCode
+
+import org.springframework.batch.admin.service.JobService
 import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.ExitStatus
-import org.springframework.batch.admin.service.JobService
 import org.springframework.batch.core.JobExecution
-import groovy.transform.EqualsAndHashCode
 
 @EqualsAndHashCode
 class JobExecutionModel {
@@ -19,7 +20,7 @@ class JobExecutionModel {
 
     List<StepExecutionModel> stepExecutions
 
-    public static JobExecutionModel fromService(JobService jobService, JobExecution jobExecution) {
+    static JobExecutionModel fromService(JobService jobService, JobExecution jobExecution) {
         return new JobExecutionModel(
             id: jobExecution.id,
             instanceId:  jobExecution.jobInstance.id,

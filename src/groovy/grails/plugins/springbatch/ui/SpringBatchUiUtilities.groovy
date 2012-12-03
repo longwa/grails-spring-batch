@@ -2,14 +2,14 @@ package grails.plugins.springbatch.ui
 
 class SpringBatchUiUtilities {
 
-    public static long getDuration(Date start, Date end) {
+    static long getDuration(Date start, Date end) {
         if(!start) {
             throw new IllegalArgumentException("Must provide start")
         }
         return end?.time ? end.time - start.time : new Date().time - start.time
     }
 
-    public static List paginate(int offset, int max, Closure c) {
+    static List paginate(int offset, int max, Closure c) {
         def list = c.call() as List
         return paginateInternal(list, max, offset)
     }

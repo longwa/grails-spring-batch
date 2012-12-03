@@ -4,9 +4,7 @@ class SpringBatchJobInstanceController {
 
     def springBatchUiService
 
-    def index() {
-        redirect(action: 'list')
-    }
+    static defaultAction = 'list'
 
     def list(String id) {
         if(!id) {

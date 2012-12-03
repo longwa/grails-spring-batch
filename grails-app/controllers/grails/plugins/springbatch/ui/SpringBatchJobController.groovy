@@ -4,9 +4,7 @@ class SpringBatchJobController {
 
     def springBatchUiService
 
-    def index() {
-        redirect(action:'list')
-    }
+    static defaultAction = 'list'
 
     def list() {
         params.offset = params.offset ?: 0
