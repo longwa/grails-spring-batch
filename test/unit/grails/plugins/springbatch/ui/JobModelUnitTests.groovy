@@ -1,15 +1,16 @@
 package grails.plugins.springbatch.ui
 
-import org.junit.Test
-import org.springframework.batch.admin.service.JobService
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+
+import org.junit.Test
+import org.springframework.batch.admin.service.JobService
 
 @TestMixin(GrailsUnitTestMixin)
 class JobModelUnitTests {
 
     @Test
-    public void testFromService() {
+    void testFromService() {
         def jobServiceMock = mockFor(JobService)
         jobServiceMock.demand.countJobExecutionsForJob(1..1) {String name ->
             return 5

@@ -14,18 +14,18 @@ class ReloadableJobRegistryBeanPostProcessor extends JobRegistryBeanPostProcesso
      *
      * @param jobRegistry the jobConfigurationRegistry to set
      */
-    public void setJobRegistry(JobRegistry jobRegistry) {
+    void setJobRegistry(JobRegistry jobRegistry) {
         super.setJobRegistry(jobRegistry)
-        this.jobRegistry = jobRegistry;
+        this.jobRegistry = jobRegistry
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    Object postProcessAfterInitialization(bean, String beanName) throws BeansException {
         if (bean instanceof Job) {
-            Job job = (Job) bean;
+            Job job = bean
             jobRegistry.unregister(job.name)
             super.postProcessAfterInitialization(bean, beanName)
         }
-        return bean;
+        return bean
     }
 }

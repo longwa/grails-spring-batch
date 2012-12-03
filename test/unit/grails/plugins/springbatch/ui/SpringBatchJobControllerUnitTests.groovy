@@ -1,8 +1,9 @@
 package grails.plugins.springbatch.ui
 
 import grails.test.mixin.TestFor
-import org.junit.Test
+
 import org.junit.Before
+import org.junit.Test
 
 @TestFor(SpringBatchJobController)
 class SpringBatchJobControllerUnitTests {
@@ -10,19 +11,12 @@ class SpringBatchJobControllerUnitTests {
     def springBatchUiServiceMock
 
     @Before
-    public void setUp() {
+    void setUp() {
         springBatchUiServiceMock = mockFor(SpringBatchUiService)
     }
 
     @Test
-    public void testIndex() {
-        controller.index()
-
-        assert response.redirectUrl.endsWith("/springBatchJob/list")
-    }
-
-    @Test
-    public void testList() {
+    void testList() {
         springBatchUiServiceMock.demand.getJobUiModel(1..1) {Map params ->
             assert 0 == params.offset
             assert 10 == params.max
@@ -42,7 +36,7 @@ class SpringBatchJobControllerUnitTests {
     }
 
     @Test
-    public void testListWithParams() {
+    void testListWithParams() {
         springBatchUiServiceMock.demand.getJobUiModel(1..1) {Map params ->
             assert 10 == params.offset
             assert 5 == params.max

@@ -5,7 +5,7 @@ import org.junit.Test
 class SpringBatchUiUtilitiesUnitTests {
 
     @Test
-    public void testGetDurationWithEnd() {
+    void testGetDurationWithEnd() {
         def start = new Date(1000)
         def end = new Date(5000)
 
@@ -13,19 +13,19 @@ class SpringBatchUiUtilitiesUnitTests {
     }
 
     @Test
-    public void testGetDurationToNow() {
+    void testGetDurationToNow() {
         def start = new Date()
         Thread.sleep(10)
         assert 10 <= SpringBatchUiUtilities.getDuration(start, null)
     }
 
     @Test(expected=IllegalArgumentException)
-    public void testGetDurationNullStart() {
+    void testGetDurationNullStart() {
         SpringBatchUiUtilities.getDuration(null, null)
     }
 
     @Test
-    public void testPaginate() {
+    void testPaginate() {
         def pagedList = SpringBatchUiUtilities.paginate(1, 2) {
             return (1..5)
         }
@@ -36,7 +36,7 @@ class SpringBatchUiUtilitiesUnitTests {
     }
 
     @Test
-    public void testPaginate_MaxLimitedToListSize() {
+    void testPaginate_MaxLimitedToListSize() {
         def pagedList = SpringBatchUiUtilities.paginate(0, 6) {
             return (1..5)
         }
@@ -47,7 +47,7 @@ class SpringBatchUiUtilitiesUnitTests {
     }
 
     @Test
-    public void testPaginate_MaxLimitedToListSize2() {
+    void testPaginate_MaxLimitedToListSize2() {
         def pagedList = SpringBatchUiUtilities.paginate(1, 6) {
             return (1..5)
         }
@@ -58,7 +58,7 @@ class SpringBatchUiUtilitiesUnitTests {
     }
 
     @Test
-    public void testPaginate_OffsetLimitedToListSize() {
+    void testPaginate_OffsetLimitedToListSize() {
         def pagedList = SpringBatchUiUtilities.paginate(6, 1) {
             return (1..5)
         }
@@ -69,7 +69,7 @@ class SpringBatchUiUtilitiesUnitTests {
     }
 
     @Test
-    public void testPaginate_NegativeOffset() {
+    void testPaginate_NegativeOffset() {
         def pagedList = SpringBatchUiUtilities.paginate(-1, 1) {
             return (1..5)
         }
@@ -80,7 +80,7 @@ class SpringBatchUiUtilitiesUnitTests {
     }
 
     @Test
-    public void testPaginate_NegativeMax() {
+    void testPaginate_NegativeMax() {
         def pagedList = SpringBatchUiUtilities.paginate(0, -1) {
             return (1..5)
         }
@@ -91,7 +91,7 @@ class SpringBatchUiUtilitiesUnitTests {
     }
 
     @Test
-    public void testPaginate_ZeroMax() {
+    void testPaginate_ZeroMax() {
         def pagedList = SpringBatchUiUtilities.paginate(0, 0) {
             return (1..5)
         }

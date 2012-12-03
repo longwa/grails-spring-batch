@@ -17,6 +17,5 @@ class ReloadApplicationContextFactoryTests {
         def factory = new ReloadApplicationContextFactory(appContextMock)
         ConfigurableApplicationContext configAppContext = factory.createApplicationContext()
         assert configAppContext == appContextMock
-
     }
 }

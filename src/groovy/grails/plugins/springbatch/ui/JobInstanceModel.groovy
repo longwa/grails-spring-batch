@@ -1,10 +1,11 @@
 package grails.plugins.springbatch.ui
 
-import org.springframework.batch.core.BatchStatus
-import org.springframework.batch.core.JobParameters
-import org.springframework.batch.admin.service.JobService
-import org.springframework.batch.core.JobInstance
 import groovy.transform.EqualsAndHashCode
+
+import org.springframework.batch.admin.service.JobService
+import org.springframework.batch.core.BatchStatus
+import org.springframework.batch.core.JobInstance
+import org.springframework.batch.core.JobParameters
 
 @EqualsAndHashCode
 class JobInstanceModel {
@@ -16,7 +17,7 @@ class JobInstanceModel {
 
     List<JobExecutionModel> executions
 
-    public static JobInstanceModel fromService(JobService jobService, JobInstance jobInstance) {
+    static JobInstanceModel fromService(JobService jobService, JobInstance jobInstance) {
         def jobExecutions = jobService.getJobExecutionsForJobInstance(jobInstance.jobName, jobInstance.id)
         return new JobInstanceModel(
             id: jobInstance.id,

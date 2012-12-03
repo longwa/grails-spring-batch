@@ -2,10 +2,11 @@ package grails.plugins.springbatch.ui
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+
 import org.junit.Test
 import org.springframework.batch.admin.service.JobService
-import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.BatchStatus
+import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobInstance
 import org.springframework.batch.core.JobParameters
 
@@ -13,7 +14,7 @@ import org.springframework.batch.core.JobParameters
 class JobInstanceModelUnitTests {
 
     @Test
-    public void testFromService() {
+    void testFromService() {
         def jobExecutionMock = new JobExecution(1)
         jobExecutionMock.status = BatchStatus.COMPLETED
         def jobExecutionMock2 = new JobExecution(2)

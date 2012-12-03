@@ -1,9 +1,10 @@
 *.zip
 target
 plugin.xml
-web-app/WEB-INF/tld/*.tld
+web-app
 *.iml
 .idea
 *.db
 *.log
 cobertura.ser
+.settings

@@ -2,19 +2,20 @@ package grails.plugins.springbatch.ui
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+
 import org.junit.Test
 import org.springframework.batch.admin.service.JobService
-import org.springframework.batch.core.JobExecution
-import org.springframework.batch.core.JobInstance
 import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.ExitStatus
+import org.springframework.batch.core.JobExecution
+import org.springframework.batch.core.JobInstance
 import org.springframework.batch.core.StepExecution
 
 @TestMixin(GrailsUnitTestMixin)
 class JobExecutionModelUnitTests {
 
     @Test
-    public void testFromService() {
+    void testFromService() {
 
         def jobServiceMock = mockFor(JobService)
         JobInstance jobInstance = new JobInstance(1, null, "simpleJob")
