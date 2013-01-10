@@ -34,7 +34,6 @@ class SpringBatchGrailsPlugin {
 
     //From Platform Core
     def doWithConfigOptions = {
-        //TODO this only gets exposed in artefacts
         'jmx.enable'(type: Boolean, defaultValue: false)
         'jmx.name'(type: String, defaultValue: 'jobOperator')
         'jmx.remote.enable'(type: Boolean, defaultValue: false)
