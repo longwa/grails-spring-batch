@@ -35,7 +35,7 @@ grails.project.dependency.resolution = {
             export = false
         }
 
-        compile ":platform-core:1.0.RC1"
+        compile ":platform-core:1.0.RC2"
         compile(":codenarc:0.17") {
             export = false
         }
