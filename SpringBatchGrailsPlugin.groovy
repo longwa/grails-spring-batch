@@ -15,7 +15,7 @@ import groovy.sql.Sql
 import org.springframework.batch.admin.service.SimpleJobServiceFactoryBean
 
 class SpringBatchGrailsPlugin {
-    def version = "1.0.RC1"
+    def version = "1.0"
     def grailsVersion = "2.0 > *"
     def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"
