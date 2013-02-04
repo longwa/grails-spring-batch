@@ -15,7 +15,7 @@ import groovy.sql.Sql
 import org.springframework.batch.admin.service.SimpleJobServiceFactoryBean
 
 class SpringBatchGrailsPlugin {
-    def version = "1.0.RC1"
+    def version = "1.0.RC2"
     def grailsVersion = "2.0 > *"
     def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"
@@ -34,7 +34,6 @@ class SpringBatchGrailsPlugin {
 
     //From Platform Core
     def doWithConfigOptions = {
-        //TODO this only gets exposed in artefacts
         'jmx.enable'(type: Boolean, defaultValue: false)
         'jmx.name'(type: String, defaultValue: 'jobOperator')
         'jmx.remote.enable'(type: Boolean, defaultValue: false)
