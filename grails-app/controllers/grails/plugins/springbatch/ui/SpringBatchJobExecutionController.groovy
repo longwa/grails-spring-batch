@@ -9,7 +9,7 @@ class SpringBatchJobExecutionController {
     def list(Long id, String jobName) {
         if(!id || !jobName) {
             //TODO Add flash error
-            redirect(controller: "springBatchJob", action: "index")
+            redirect(controller: "springBatchJob", action: "list")
         } else {
             params.offset = params.offset ?: 0
             params.max = params.max ?: 10
