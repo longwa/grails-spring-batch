@@ -1,13 +1,15 @@
 package grails.plugins.springbatch.ui
 
 import org.springframework.batch.admin.service.JobService
+import org.springframework.batch.core.launch.JobOperator
 
 class SpringBatchUiService {
 
     static transactional = false
 
     JobService jobService
-
+	JobOperator jobOperator
+	
     List<JobModel> getJobModels(Map params = [:]) {
         int jobCount = jobService.countJobs()
         def offset = params.offset ?: 0
@@ -60,6 +62,19 @@ class SpringBatchUiService {
         }
         jobExecutionModelList
     }
+	
+	void stopAllJobExecutions(String jobName){
+		Set<Long> executions = jobOperator.getRunningExecutions(jobName);
+		log.info("Attempting to stop ${executions.size()} job executions for $jobName")
+		
+		executions.each{
+			try{
+				jobOperator.stop(it)
+			}catch(Exception e){
+				log.debug(e)
+			}
+		}
+	}
 
     Map getJobExecutionUiModel(String jobName, Long jobInstanceId, Map params = [:]) {
         def model = [:]

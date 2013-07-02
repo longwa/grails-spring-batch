@@ -24,6 +24,7 @@
 						<g:sortableColumn property="jobExecutionCount" title="${message(code: 'jobInstanceModel.jobExecutionCount.label', default: 'Job Execution Count')}" />
 						<g:sortableColumn property="lastJobExecutionStatus" title="${message(code: 'jobInstanceModel.lastJobExecutionStatus.label', default: 'Last Job Execution Status')}" />
 						<g:sortableColumn property="jobParameters" title="${message(code: 'jobInstanceModel.jobParameters.label', default: 'Job Parameters')}" />
+						<th/>
 					</tr>
 				</thead>
 				<tbody>
@@ -34,6 +35,7 @@
 						<td>${fieldValue(bean: jobInstanceModelInstance, field: "jobExecutionCount")}</td>
 						<td>${fieldValue(bean: jobInstanceModelInstance, field: "lastJobExecutionStatus")}</td>
 						<td>${fieldValue(bean: jobInstanceModelInstance, field: "jobParameters")}</td>
+						<td><g:if test="${jobInstanceModelInstance.stoppable }"><g:link action="stopAllExecutions" id="${jobName}">${message(code: 'jobInstanceModel.jobExecutions.stop.label', default: "Stop")}</g:link></g:if></td>
 					</tr>
 				</g:each>
 				</tbody>

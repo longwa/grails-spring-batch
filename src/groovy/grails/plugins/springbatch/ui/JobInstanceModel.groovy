@@ -27,4 +27,8 @@ class JobInstanceModel {
             executions: jobExecutions
         )
     }
+	
+	boolean isStoppable(){
+		return lastJobExecutionStatus == BatchStatus.STARTED
+	}
 }
