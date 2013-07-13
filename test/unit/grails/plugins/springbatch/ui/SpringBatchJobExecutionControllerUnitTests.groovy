@@ -63,20 +63,20 @@ class SpringBatchJobExecutionControllerUnitTests {
     void testListNoId() {
         controller.list(null, "testJob")
 
-        assert response.redirectUrl.endsWith("/springBatchJob/index")
+        assert response.redirectUrl.endsWith("/springBatchJob/list")
     }
 
     @Test
     void testListNullJobName() {
         controller.list(1, null)
 
-        assert response.redirectUrl.endsWith("/springBatchJob/index")
+        assert response.redirectUrl.endsWith("/springBatchJob/list")
     }
 
     @Test
     void testListBlankJobName() {
         controller.list(1, "")
 
-        assert response.redirectUrl.endsWith("/springBatchJob/index")
+        assert response.redirectUrl.endsWith("/springBatchJob/list")
     }
 }

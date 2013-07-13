@@ -1,5 +1,6 @@
 *.zip
 target
+target-eclipse
 plugin.xml
 web-app
 *.iml
@@ -10,3 +11,4 @@ web-app
 *.log
 cobertura.ser
 .settings
+*.sha1

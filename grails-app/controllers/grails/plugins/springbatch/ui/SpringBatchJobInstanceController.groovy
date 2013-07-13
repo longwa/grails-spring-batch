@@ -16,4 +16,13 @@ class SpringBatchJobInstanceController {
             springBatchUiService.getJobInstanceUiModel(id, params)
         }
     }
+	
+	def stopAllExecutions(String id) {
+		if(!id) {
+			render 'No job selected to stop'
+		} else {
+			springBatchUiService.stopAllJobExecutions(id)
+			redirect(action:'list')
+		}
+	}
 }

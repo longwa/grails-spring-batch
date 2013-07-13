@@ -61,6 +61,6 @@ class SpringBatchStepExecutionControllerUnitTests {
     void testListNoId() {
         controller.list(null)
 
-        assert response.redirectUrl.endsWith("/springBatchJob/index")
+        assert response.redirectUrl.endsWith("/springBatchJob/list")
     }
 }

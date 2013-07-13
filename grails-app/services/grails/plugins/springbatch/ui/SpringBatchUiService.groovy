@@ -1,13 +1,15 @@
 package grails.plugins.springbatch.ui
 
 import org.springframework.batch.admin.service.JobService
+import org.springframework.batch.core.launch.JobOperator
 
 class SpringBatchUiService {
 
     static transactional = false
 
     JobService jobService
-
+	JobOperator jobOperator
+	
     List<JobModel> getJobModels(Map params = [:]) {
         int jobCount = jobService.countJobs()
         def offset = params.offset ?: 0
@@ -49,9 +51,9 @@ class SpringBatchUiService {
 
     List<JobExecutionModel> getJobExecutionModels(String jobName, Long jobInstanceId, Map params = [:]) {
         def jobExecutions = jobService.getJobExecutionsForJobInstance(jobName, jobInstanceId)
-        def jobExecutionCount = jobExecutions.size()
-        def offset = params.offset ?: 0
-        def max = params.max ?: jobExecutionCount
+        int jobExecutionCount = jobExecutions.size()
+        int offset = params.offset?.toInteger() ?: 0
+        int max = params.max?.toInteger() ?: jobExecutionCount
 
         def jobExecutionModelList = SpringBatchUiUtilities.paginate(offset, max) {
             jobExecutions.collect {
@@ -60,6 +62,19 @@ class SpringBatchUiService {
         }
         jobExecutionModelList
     }
+	
+	void stopAllJobExecutions(String jobName){
+		Set<Long> executions = jobOperator.getRunningExecutions(jobName);
+		log.info("Attempting to stop ${executions.size()} job executions for $jobName")
+		
+		executions.each{
+			try{
+				jobOperator.stop(it)
+			}catch(Exception e){
+				log.debug(e)
+			}
+		}
+	}
 
     Map getJobExecutionUiModel(String jobName, Long jobInstanceId, Map params = [:]) {
         def model = [:]
@@ -72,9 +87,9 @@ class SpringBatchUiService {
 
     List<StepExecutionModel> getStepExecutionModels(Long jobExecutionId, Map params=[:]) {
         def stepExecutions = jobService.getStepExecutions(jobExecutionId)
-        def stepExecutionCount = stepExecutions.size()
-        def offset = params.offset ?: 0
-        def max = params.max ?: stepExecutionCount
+        int stepExecutionCount = stepExecutions.size()
+        int offset = params.offset?.toInteger() ?: 0
+        int max = params.max?.toInteger() ?: stepExecutionCount
 
         def stepExecutionModelList = SpringBatchUiUtilities.paginate(offset, max) {
             stepExecutions.collect {
