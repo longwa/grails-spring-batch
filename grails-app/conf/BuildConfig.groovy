@@ -16,9 +16,6 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
-        runtime('mysql:mysql-connector-java:5.1.22') {
-            export = false
-        }
 
         def excludes = {
             excludes 'junit', 'spring-aop', 'spring-core', 'spring-oxm', 'spring-test', 'spring-tx', 'slf4j-log4j12', 'log4j'
