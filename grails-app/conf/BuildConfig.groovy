@@ -1,6 +1,9 @@
 grails.project.work.dir = 'target'
 grails.project.source.level = 1.6
 
+springBatchVersion = '2.1.9.RELEASE'
+springBatchAdminVersion = '1.2.2.RELEASE'
+
 grails.project.dependency.resolution = {
 
     inherits 'global'
@@ -21,13 +24,13 @@ grails.project.dependency.resolution = {
             excludes 'junit', 'spring-aop', 'spring-core', 'spring-oxm', 'spring-test', 'spring-tx', 'slf4j-log4j12', 'log4j'
         }
 
-        compile 'org.springframework.batch:spring-batch-core:2.1.8.RELEASE',
-                'org.springframework.batch:spring-batch-infrastructure:2.1.8.RELEASE',
-                'org.springframework.batch:spring-batch-admin-resources:1.2.1.RELEASE',
-                'org.springframework.batch:spring-batch-admin-manager:1.2.1.RELEASE',
+        compile "org.springframework.batch:spring-batch-core:${springBatchVersion}",
+                "org.springframework.batch:spring-batch-infrastructure:${springBatchVersion}",
+                "org.springframework.batch:spring-batch-admin-resources:${springBatchAdminVersion}",
+                "org.springframework.batch:spring-batch-admin-manager:${springBatchAdminVersion}",
                excludes
 
-        test 'org.springframework.batch:spring-batch-test:2.1.8.RELEASE', excludes
+        test "org.springframework.batch:spring-batch-test:${springBatchVersion}", excludes
     }
 
     plugins {
