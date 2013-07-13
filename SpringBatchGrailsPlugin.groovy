@@ -14,6 +14,9 @@ import org.springframework.jmx.support.ConnectorServerFactoryBean
 import groovy.sql.Sql
 import org.springframework.batch.admin.service.SimpleJobServiceFactoryBean
 
+import java.sql.Connection
+import java.sql.Statement
+
 class SpringBatchGrailsPlugin {
     def version = "1.0"
     def grailsVersion = "2.0 > *"
@@ -87,23 +90,25 @@ class SpringBatchGrailsPlugin {
             if(database) {
                 def ds = applicationContext.getBean(dataSourceName)
                 def sql = new Sql(ds)
-                sql.withTransaction { conn ->
+                sql.withTransaction { Connection conn ->
+                    Statement statement = conn.createStatement()
                     def script = "org/springframework/batch/core/schema-drop-${database}.sql"
                     def text = applicationContext.classLoader.getResourceAsStream(script).text
-                    text.split(";").each { statement ->
-                        if(statement.trim()) {
-                            sql.execute(statement)
+                    text.split(";").each { line ->
+                        if(line.trim()) {
+                            statement.execute(line.trim())
                         }
                     }
 
                     script = "org/springframework/batch/core/schema-${database}.sql"
                     text = applicationContext.classLoader.getResourceAsStream(script).text
-                    text.split(";").each { statement ->
-                        if(statement.trim()) {
-                            sql.execute(statement)
+                    text.split(";").each { line ->
+                        if(line.trim()) {
+                            statement.execute(line.trim())
                         }
                     }
-
+                    statement.close()
+                    conn.commit()
                 }
                 sql.close()
             } else {

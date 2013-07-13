@@ -6,10 +6,7 @@ This plugin adds the Spring Batch framework to a Grails project. It's intent is 
 
 The Grails Spring Batch plugin is built using Grails 2.x, it currently has not been tested against Grails 1.3.x and will not install in those versions.
 
-To install the plugin,
-<pre><code>grails install plugin spring-batch</code></pre>
-
-or add the following entry to your BuildConfig.groovy file in the plugins sections:
+To install the plugin, add the following entry to your BuildConfig.groovy file in the plugins sections:
 <pre><code>compile ':spring-batch:1.0'</code></pre>
 
 Once the plugin is installed, you can define your Spring Batch job configuration in a Groovy script file in your application's grails-app/batch directory. The script's filename must end with BatchConfig (i.e. SimpleJobBatchConfig.groovy). Define your Spring Bach job using the Grails BeanBuilder syntax (just like in the resources.groovy file).
@@ -76,7 +73,7 @@ The plugin provides the following scripts:
   + Default: false
 + database - The database type to use: db2, derby, h2, hsqldb, mysql, oracle10g, postgresql, sqlserver, sybase
   + Type: String
-  + Default: undefined
+  + Default: h2
 + jmx
   + enable - enables export of Spring Batch resources through a local MBean
       + Type: Boolean

@@ -1,6 +1,9 @@
 import grails.util.GrailsNameUtils
 import groovy.sql.Sql
 
+import java.sql.Connection
+import java.sql.Statement
+
 includeTargets << grailsScript('_GrailsBootstrap')
 
 target(createBatchTables: "Installs the Spring Batch tables into database") {
@@ -32,8 +35,16 @@ target(createBatchTables: "Installs the Spring Batch tables into database") {
         dsConfig.password,
         dsConfig.driverClassName
     )
-    sql.execute(scriptContents)
-    sql.commit()
+    sql.withTransaction { Connection conn ->
+        Statement statement = conn.createStatement()
+        scriptContents.split(';').each { line ->
+            if(line.trim()) {
+                statement.execute(line.trim())
+            }
+        }
+        statement.close()
+        conn.commit()
+    }
     sql.close()
     printMessage "Done loading spring batch tables"
 }
