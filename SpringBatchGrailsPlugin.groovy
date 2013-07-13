@@ -42,7 +42,9 @@ class SpringBatchGrailsPlugin {
         'dataSource'(type: String, defaultValue: "dataSource")
         'tablePrefix'(type: String, defaultValue: "BATCH")
         'loadTables'(type: Boolean, defaultValue: false)
-        'database'(type: String)
+        'database'(type: String, defaultValue: 'h2', validator: { v ->
+            v ? null : 'batch.specify.database.type'
+        })
     }
 
     def doWithSpring = {
@@ -52,7 +54,7 @@ class SpringBatchGrailsPlugin {
         def dataSourceBean = conf.dataSource
         def loadRequired = loadRequiredSpringBatchBeans.clone()
         loadRequired.delegate = delegate
-        loadRequired(dataSourceBean, tablePrefix)
+        loadRequired(dataSourceBean, tablePrefix, conf.dataase)
 
         def loadConfig = loadBatchConfig.clone()
         loadConfig.delegate = delegate
@@ -85,23 +87,24 @@ class SpringBatchGrailsPlugin {
             if(database) {
                 def ds = applicationContext.getBean(dataSourceName)
                 def sql = new Sql(ds)
-
-                def script = "org/springframework/batch/core/schema-drop-${database}.sql"
-                def text = applicationContext.classLoader.getResourceAsStream(script).text
-                text.split(";").each { statement ->
-                    if(statement.trim()) {
-                        sql.execute(statement)
+                sql.withTransaction { conn ->
+                    def script = "org/springframework/batch/core/schema-drop-${database}.sql"
+                    def text = applicationContext.classLoader.getResourceAsStream(script).text
+                    text.split(";").each { statement ->
+                        if(statement.trim()) {
+                            sql.execute(statement)
+                        }
                     }
-                }
 
-                script = "org/springframework/batch/core/schema-${database}.sql"
-                text = applicationContext.classLoader.getResourceAsStream(script).text
-                text.split(";").each { statement ->
-                    if(statement.trim()) {
-                        sql.execute(statement)
+                    script = "org/springframework/batch/core/schema-${database}.sql"
+                    text = applicationContext.classLoader.getResourceAsStream(script).text
+                    text.split(";").each { statement ->
+                        if(statement.trim()) {
+                            sql.execute(statement)
+                        }
                     }
+
                 }
-                sql.commit()
                 sql.close()
             } else {
                 log.error("Must specify plugin.springBatch.database variable if plugin.springBatch.loadTables = true")
@@ -137,12 +140,13 @@ class SpringBatchGrailsPlugin {
         loadBeans 'classpath*:/batch/*BatchConfig.groovy'
     }
 
-    def loadRequiredSpringBatchBeans = { def dataSourceBean, def tablePrefixValue ->
+    def loadRequiredSpringBatchBeans = { def dataSourceBean, def tablePrefixValue, def dbType ->
         jobRepository(JobRepositoryFactoryBean) {
             dataSource = ref(dataSourceBean)
             transactionManager = ref("transactionManager")
             isolationLevelForCreate: "SERIALIZABLE"
             tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
+            databaseType: dbType
         }
         jobLauncher(SimpleJobLauncher){
             jobRepository = ref("jobRepository")
@@ -150,6 +154,7 @@ class SpringBatchGrailsPlugin {
         }
         jobExplorer(JobExplorerFactoryBean) {
             dataSource = ref(dataSourceBean)
+            tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
         }
         jobRegistry(MapJobRegistry) { }
         //Use a custom bean post processor that will unregister the job bean before trying to initializing it again
@@ -171,6 +176,7 @@ class SpringBatchGrailsPlugin {
             jobLauncher = ref("jobLauncher")
             jobLocator = ref("jobRegistry")
             dataSource = ref(dataSourceBean)
+            tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
         }
     }
 
