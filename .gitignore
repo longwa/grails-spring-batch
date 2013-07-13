@@ -3,6 +3,8 @@ target
 plugin.xml
 web-app
 *.iml
+*.ipr
+*.iws
 .idea
 *.db
 *.log
