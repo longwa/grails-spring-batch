@@ -18,7 +18,6 @@ To launch a job from your application do the following:
 grails-app/batch/SimpleJob.groovy
 ```
 beans {
-    xmlns batch:"http://www.springframework.org/schema/batch"
 
     batch.job(id: 'simpleJob') {
         batch.step(id: 'logStart') {
@@ -95,8 +94,12 @@ The plugin provides the following scripts:
 
 ## Job Definition
 
-The plugin expects your job configuration to be defined using the Grails BeanBuilder DSL in the grails-app/batch directory. End each configuration name with "BatchConfig" (i.e. JobBatchConfig.groovy). These groovy files will be copied into your classpath and imported. To use the Spring Batch namespace in your config file, declare the following:
-<pre><code>xmlns batch:"http://www.springframework.org/schema/batch"</code></pre>
+The plugin expects your job configuration to be defined using the Grails BeanBuilder DSL in the grails-app/batch directory.
+End each configuration name with "BatchConfig" (i.e. JobBatchConfig.groovy).
+These groovy files will be copied into your classpath and imported.
+The plugin automatically registers the Spring Batch namespace under the handle 'batch'.
+To use a different namespace in your config file, declare the following:
+<pre><code>xmlns mybatchns:"http://www.springframework.org/schema/batch"</code></pre>
 inside the beans {} closure.
 
 ## Sample Project
@@ -135,6 +138,7 @@ After pressing execute, you can go to the application console (i.e. shell), and 
   + Update to Spring Batch Admin 1.2.2.RELEASE
   + Fix controller redirect errors
   + Fix compiler failure on plugin removal
+  + Automatically register the batch namespace into the Spring Bean Builder
 + v.1.0.RC2
   + Dependent plugin updates
 + v.1.0.RC1
@@ -150,4 +154,7 @@ After pressing execute, you can go to the application console (i.e. shell), and 
 
 ## Feature Backlog
 
++ Upgrade to Spring Batch 2.2.0.RELEASE - will require a minimum Grails version of 2.1.1 (due to Spring requirements)
++ Provide artifact based configuration and annotations in addition to DSL configuration
++ Implement a Spring Batch DSL similar to Spring Integration DSL.
 + Auto-detect simple classes like listeners and policies and expose them automatically as beans.

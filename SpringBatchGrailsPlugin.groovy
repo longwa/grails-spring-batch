@@ -1,5 +1,6 @@
 import grails.plugins.springbatch.ReloadApplicationContextFactory
 import grails.plugins.springbatch.ReloadableJobRegistryBeanPostProcessor
+import grails.spring.BeanBuilder
 import org.springframework.batch.core.configuration.support.DefaultJobLoader
 import org.springframework.jmx.export.MBeanExporter
 import org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler
@@ -61,6 +62,7 @@ class SpringBatchGrailsPlugin {
 
         def loadConfig = loadBatchConfig.clone()
         loadConfig.delegate = delegate
+        xmlns(batch:"http://www.springframework.org/schema/batch")
         loadConfig()
 
         def loadJmx = conf.jmx.enable
