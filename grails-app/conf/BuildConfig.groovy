@@ -1,6 +1,9 @@
 grails.project.work.dir = 'target'
 grails.project.source.level = 1.6
 
+//Upgrading to SB 2.2.0.RELEASE will require a dependency on Grails 2.1.1
+//This is because SB 2.2.0.RELEASE requires Spring 3.1.2.RELEASE which was introduced in
+//Grails 2.1.1
 springBatchVersion = '2.1.9.RELEASE'
 springBatchAdminVersion = '1.2.2.RELEASE'
 
