@@ -8,8 +8,7 @@ includeTargets << grailsScript('_GrailsBootstrap')
 
 target(createBatchTables: "Installs the Spring Batch tables into database") {
     depends(classpath, checkVersion, bootstrap, loadApp)
-    def argsList = argsMap.params
-    String db = argsList[0]
+    String db = config.plugin.springBatch.database
     if(!db) {
         errorMessage "\nERROR: must specify the database type [db2, derby, h2, hsqldb, mysql, oracle10g, postgresql, sqlserver, sybase]"
         exit 1
