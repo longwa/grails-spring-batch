@@ -2,6 +2,7 @@ package springbatchtest
 
 import org.junit.Test
 import groovy.sql.Sql
+import org.springframework.batch.core.Job
 
 class SpringBatchBeansLoadedTests extends GroovyTestCase {
 
@@ -22,6 +23,7 @@ class SpringBatchBeansLoadedTests extends GroovyTestCase {
         jobBeans.each {bean ->
             assert grailsApplication.mainContext.getBean(bean)
         }
+        assert grailsApplication.mainContext.getBean('simpleJob') instanceof Job
     }
 
     @Test
