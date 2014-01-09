@@ -38,15 +38,9 @@ grails.project.dependency.resolution = {
             export = false
         }
 
-        compile ":platform-core:1.0.RC5"
-        compile(":codenarc:0.18.1") {
-            export = false
-        }
+        compile ":platform-core:1.0.RC6"
 
         runtime(":hibernate:$grailsVersion") {
-            export = false
-        }
-        test(":code-coverage:1.2.6") {
             export = false
         }
     }
