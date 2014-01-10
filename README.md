@@ -6,17 +6,20 @@ This plugin adds the Spring Batch framework to a Grails project. It's intent is 
 
 The Grails Spring Batch plugin is built using Grails 2.x, it currently has not been tested against Grails 1.3.x and will not install in those versions.
 
-To install the plugin, add the following entry to your BuildConfig.groovy file in the plugins sections:
-<pre><code>compile ':spring-batch:1.0'</code></pre>
+To install the plugin, add the following entry to your `BuildConfig.groovy` file in the plugins sections:
+```groovy
+compile ':spring-batch:1.0'
+```
 
-Once the plugin is installed, you can define your Spring Batch job configuration in a Groovy script file in your application's grails-app/batch directory. The script's filename must end with BatchConfig (i.e. SimpleJobBatchConfig.groovy). Define your Spring Bach job using the Grails BeanBuilder syntax (just like in the resources.groovy file).
+Once the plugin is installed, you can define your Spring Batch job configuration in a Groovy script file in your application's `grails-app/batch` directory. The script's filename must end with BatchConfig (i.e. `SimpleJobBatchConfig.groovy`). Define your Spring Bach job using the Grails BeanBuilder syntax (just like in the `resources.groovy` file).
 
 To launch a job from your application do the following:
-1. Inject the Spring Batch Job Launcher and the job you defined in your configuration file into the controller or service (or lookup it up from the grailsApplication.mainContext)
+
+1. Inject the Spring Batch Job Launcher and the job you defined in your configuration file into the controller or service (or lookup it up from the `grailsApplication.mainContext`)
 2. Call the `jobLauncher.launch()` method with a reference to your job and a `JobParameters` object. Spring Batch will take care of the rest
 
-grails-app/batch/SimpleJob.groovy
-```
+`grails-app/batch/SimpleJob.groovy`
+```groovy
 beans {
 
     batch.job(id: 'simpleJob') {
@@ -32,8 +35,8 @@ beans {
 }
 ```
 
-grails-app/services/foo/FooService
-```
+`grails-app/services/foo/FooService`
+```groovy
 class FooService {
    def jobLauncher
    def simpleJob
@@ -54,7 +57,7 @@ The plugin creates the following Spring Beans:
 * jobRegistryPostProcessor (ReloadableJobRegistryBeanPostProcessor)
 * jobOperator (SimpleJobOperator)
 
-These beans use the defined dataSource bean for your application and expected the Spring Batch tables to be available in this dataSource and prefixed with "BATCH_".
+These beans use the defined dataSource bean for your application and expected the Spring Batch tables to be available in this dataSource and prefixed with `BATCH_`.
 
 The plugin provides the following scripts:
 * CreateBatchTables - takes 1 argument that matches a supported DB for Spring Batch: db2, derby, h2, hsqldb, mysql, oracle10g, postgresql, sqlserver, sybase
@@ -64,7 +67,7 @@ The plugin provides the following scripts:
 + dataSource - name of datasource to use for Spring Batch data
   + Type: String
   + Default: dataSource
-+ tablePrefix - prefix of Spring Batch tables in database. If set to a non-empty string, assumes there is a "_" separating the prefix and the table name
++ tablePrefix - prefix of Spring Batch tables in database. If set to a non-empty string, assumes there is a `_` separating the prefix and the table name
   + Type: String
   + Default: BATCH
 + loadTables - if true, will attempt to execute the Spring Batch DDL for the specified database type during startup. Should set to true in test phases.
@@ -95,36 +98,39 @@ The plugin provides the following scripts:
 ## Job Definition
 
 The plugin expects your job configuration to be defined using the Grails BeanBuilder DSL in the grails-app/batch directory.
-End each configuration name with "BatchConfig" (i.e. JobBatchConfig.groovy).
+End each configuration name with `BatchConfig` (i.e. `JobBatchConfig.groovy`).
 These groovy files will be copied into your classpath and imported.
-The plugin automatically registers the Spring Batch namespace under the handle 'batch'.
+The plugin automatically registers the Spring Batch namespace under the handle `batch`.
 To use a different namespace in your config file, declare the following:
-<pre><code>xmlns mybatchns:"http://www.springframework.org/schema/batch"</code></pre>
+```groovy
+xmlns mybatchns:"http://www.springframework.org/schema/batch"
+```
+
 inside the beans {} closure.
 
 ## Sample Project
 
-A sample / test project is included with the original plugin source, available at test/projects/spring-batch-test.  To get running, follow the instructions below:  
+A sample / test project is included with the original plugin source, available at `test/projects/spring-batch-test`.  To get running, follow the instructions below:  
 
-* Zip up the github repository, unzip it into directory called grails-spring-batch.  Then go into test/projects/spring-batch-test directory.  
+* Zip up the github repository, unzip it into directory called grails-spring-batch.  Then go into `test/projects/spring-batch-test` directory.  
 * The default project uses h2, so run the command 
 ```    grails create-batch-tables
 ```
 
 * After that start the application (grails run-app), you will find it at http://localhost:8080/spring-batch-test/
 * Check db tables were created.  Go to dbconsole at http://localhost:8080/spring-batch-test/dbconsole/.  
-   Substitute jdbc string to connect to the devDb: jdbc:h2:mem:devDb;MVCC=TRUE.
+   Substitute jdbc string to connect to the devDb: `jdbc:h2:mem:devDb;MVCC=TRUE`.
    Connect and make sure a bunch of tables that start with BATCH* exist.   All of the tables will have zero entries until the first run. 
 * Run Included Simple Job.  Go to console, http://localhost:8080/spring-batch-test/console.  Type in or paste the following code into console window:  
 
-```
+```groovy
     import org.springframework.batch.core.JobParameters
 
     simpleJob = ctx.simpleJob
     ctx.jobLauncher.run(simpleJob, new JobParameters());
 ```
 
-After pressing execute, you can go to the application console (i.e. shell), and you should see text "Starting Job".  That means the batch job ran fine.  You can view the definition and modify at ROOT/test\projects\spring-batch-test\grails-app\batch\SimpleJobBatchConfig.groovy.
+After pressing execute, you can go to the application console (i.e. shell), and you should see text `Starting Job`.  That means the batch job ran fine.  You can view the definition and modify at `ROOT/test\projects\spring-batch-test\grails-app\batch\SimpleJobBatchConfig.groovy`.
 
 * See run record in the db.   Running select queries on batch tables will now show you information written about the run. 
 
