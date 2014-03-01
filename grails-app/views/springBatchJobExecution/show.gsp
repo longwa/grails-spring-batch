@@ -49,7 +49,7 @@
 				</tbody>
 			</table>
 			<div class="pagination">
-				<g:paginate total="${modelTotal}" id="$jobExecutionId" />
+				<g:paginate total="${modelInstances.resultsTotalCount}" id="$jobExecutionId" />
 			</div>
 		</div>
 	</body>

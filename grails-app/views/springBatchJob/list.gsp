@@ -16,6 +16,9 @@
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>
+			<g:if test="${flash.error}">
+			<div class="errors" role="status">${flash.error}</div>
+			</g:if>
 			<table>
 				<thead>
 					<tr>
@@ -28,7 +31,7 @@
 				<tbody>
 				<g:each in="${modelInstances}" status="i" var="modelInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-						<td><g:link controller="springBatchJobInstance" action="list" id="${modelInstance.name}">${fieldValue(bean: modelInstance, field: "name")}</g:link></td>
+						<td><g:link controller="springBatchJob" action="show" id="${modelInstance.name}">${fieldValue(bean: modelInstance, field: "name")}</g:link></td>
 						<td>${fieldValue(bean: modelInstance, field: "executionCount")}</td>
 						<td><g:formatBoolean boolean="${modelInstance.incrementable}" /></td>
 						<td><g:formatBoolean boolean="${modelInstance.launchable}" /></td>
@@ -37,7 +40,7 @@
 				</tbody>
 			</table>
 			<div class="pagination">
-				<g:paginate total="${modelTotal}" />
+				<g:paginate total="${modelInstances.resultsTotalCount}" />
 			</div>
 		</div>
 	</body>

@@ -1,22 +1,23 @@
+import grails.plugins.springbatch.springbatchadmin.patch.PatchedSimpleJobServiceFactoryBean
 import grails.plugins.springbatch.ReloadApplicationContextFactory
 import grails.plugins.springbatch.ReloadableJobRegistryBeanPostProcessor
-import grails.spring.BeanBuilder
-import org.springframework.batch.core.configuration.support.DefaultJobLoader
-import org.springframework.jmx.export.MBeanExporter
-import org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler
-import org.springframework.batch.core.launch.support.SimpleJobOperator
-import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
-import org.springframework.batch.core.launch.support.SimpleJobLauncher
-import org.springframework.core.task.SimpleAsyncTaskExecutor
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean
-import org.springframework.batch.core.configuration.support.MapJobRegistry
-import org.springframework.remoting.rmi.RmiRegistryFactoryBean
-import org.springframework.jmx.support.ConnectorServerFactoryBean
 import groovy.sql.Sql
-import org.springframework.batch.admin.service.SimpleJobServiceFactoryBean
 
 import java.sql.Connection
 import java.sql.Statement
+
+import org.springframework.batch.core.configuration.support.DefaultJobLoader
+import org.springframework.batch.core.configuration.support.MapJobRegistry
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
+import org.springframework.batch.core.launch.support.SimpleJobLauncher
+import org.springframework.batch.core.launch.support.SimpleJobOperator
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean
+import org.springframework.core.task.SimpleAsyncTaskExecutor
+import org.springframework.core.task.SyncTaskExecutor
+import org.springframework.jmx.export.MBeanExporter
+import org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler
+import org.springframework.jmx.support.ConnectorServerFactoryBean
+import org.springframework.remoting.rmi.RmiRegistryFactoryBean
 
 class SpringBatchGrailsPlugin {
     def version = "1.0"
@@ -155,10 +156,23 @@ class SpringBatchGrailsPlugin {
             tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
             databaseType: dbType
         }
+		
+		/*
+		 * Async launcher to use by default
+		 */
         jobLauncher(SimpleJobLauncher){
             jobRepository = ref("jobRepository")
             taskExecutor = { SimpleAsyncTaskExecutor executor -> }
         }
+
+		/*
+		 * Additional Job Launcher to support synchronous scheduling
+		 */
+		syncJobLauncher(SimpleJobLauncher){
+			jobRepository = ref("jobRepository")
+			taskExecutor = { SyncTaskExecutor executor -> }
+		}
+		
         jobExplorer(JobExplorerFactoryBean) {
             dataSource = ref(dataSourceBean)
             tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
@@ -178,7 +192,7 @@ class SpringBatchGrailsPlugin {
             jobRegistry = ref("jobRegistry")
             jobExplorer = ref("jobExplorer")
         }
-        jobService(SimpleJobServiceFactoryBean) {
+        jobService(PatchedSimpleJobServiceFactoryBean) {
             jobRepository = ref("jobRepository")
             jobLauncher = ref("jobLauncher")
             jobLocator = ref("jobRegistry")

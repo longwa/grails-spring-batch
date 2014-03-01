@@ -5,10 +5,12 @@ import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.scope.context.ChunkContext
 
-class PrintStartMessageTasklet implements Tasklet {
-
+class PrintMessageTasklet implements Tasklet {
+	
+	String mesg
+	
     RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
-        println "Starting Job"
+        println mesg
         return RepeatStatus.FINISHED
     }
 }

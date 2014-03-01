@@ -1,5 +1,6 @@
 package grails.plugins.springbatch.ui
 
+import grails.plugins.springbatch.model.StepExecutionModel;
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 
