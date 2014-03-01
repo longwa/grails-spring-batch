@@ -12,7 +12,8 @@ class SpringBatchJobExecutionController {
 			redirect(controller: "springBatchJob", action: "list")
 		} else {
 			[jobExecution: springBatchUiService.jobExecutionModel(id),
-				modelInstances: springBatchUiService.getStepExecutionModels(id, params)]
+				modelInstances: springBatchUiService.getStepExecutionModels(id, params),
+				jobExecutionId:id]
 		}
 	}
 }
