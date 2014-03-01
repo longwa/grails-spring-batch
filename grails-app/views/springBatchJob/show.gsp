@@ -2,29 +2,26 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'jobModel.label', default: 'Spring Batch Job')}" />
-		<title><g:message code="default.show.label" args="[entityName]" /></title>
+		<title><g:message code="batch.job.show.label"/> ${job.name}</title>
 	</head>
 	<body>
 		<div class="nav" role="navigation">
 			<ul>
 				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 				<li><g:link action="list" >List</g:link></li>
-				<g:if test="job.launchable}"><li><g:link action="launch" id="${job.name}">Launch Job</g:link></li></g:if>
-				<li><g:link action="stopAllExecutions" id="${job.name}">Stop All Executions</g:link></li>
+				<g:if test="job.launchable}"><li><g:link action="launch" id="${job.name}">
+					<g:message code="batch.job.launch.label"/></g:link></li></g:if>
+				<li><g:link action="stopAllExecutions" id="${job.name}">
+					<g:message code="batch.job.stopall.label"/></g:link></li>
 			</ul>
 		</div>
 		<div id="show-jobModel" class="content scaffold-show" role="main">
-			<h1><g:message code="default.show.label" args="[entityName]" /></h1>
+			<h1><g:message code="batch.job.show.label" /> ${job.name}</h1>
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>
 
 			<ol class="property-list example">
-				<li class="fieldcontain">
-					<span id="name-label" class="property-label">Name</span>
-						<span class="property-value" aria-labelledby="name-label">${job.name}</span>
-				</li>
 				<li class="fieldcontain">
 					<span id="jobInstanceCount-label" class="property-label">Job Instance Count</span>
 						<span class="property-value" aria-labelledby="jobInstanceCount-label">${job.jobInstanceCount}</span>
@@ -32,10 +29,6 @@
 				<li class="fieldcontain">
 					<span id="executionCount-label" class="property-label">Job Execution Count</span>
 						<span class="property-value" aria-labelledby="executionCount-label">${job.executionCount}</span>
-				</li>
-				<li class="fieldcontain">
-					<span id="launchable-label" class="property-label">Launchable</span>
-						<span class="property-value" aria-labelledby="launchable-label">${job.launchable}</span>
 				</li>
 				<li class="fieldcontain">
 					<span id="incrementable-label" class="property-label">Incrementable</span>
