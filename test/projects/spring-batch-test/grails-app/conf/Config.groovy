@@ -97,7 +97,7 @@ plugin {
         jmx {
             enable = true
             remote {
-                enable = true
+                enable = false
             }
         }
         loadTables = true
