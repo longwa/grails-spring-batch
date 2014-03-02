@@ -136,6 +136,8 @@ class SpringBatchUiService {
 					duration: SpringBatchUiUtilities.getDuration(jobExecution.startTime, jobExecution.endTime),
 					status: jobExecution.status,
 					exitStatus: jobExecution.exitStatus,
+					jobName: jobExecution.jobInstance.jobName,
+					instanceId: jobExecution.jobInstance.id
 				)
 	}
 

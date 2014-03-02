@@ -19,6 +19,7 @@ class SpringBatchJobInstanceController {
 		}
 	
 		[jobInstance: springBatchUiService.jobInstanceModel(id), 
-			modelInstances: springBatchUiService.getJobExecutionModels(jobName, id, params)]
+			modelInstances: springBatchUiService.getJobExecutionModels(jobName, id, params),
+			jobName: jobName]
 	}
 }

@@ -2,21 +2,21 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<title><g:message code="batch.job.show.label"/> ${job.name}</title>
+		<title><g:message code="batch.job.show.label" args="[job.name]"/></title>
 	</head>
 	<body>
 		<div class="nav" role="navigation">
 			<ul>
 				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 				<li><g:link action="list" >List</g:link></li>
-				<g:if test="job.launchable}"><li><g:link action="launch" id="${job.name}">
+				<g:if test="${job.launchable}"><li><g:link action="launch" id="${job.name}">
 					<g:message code="batch.job.launch.label"/></g:link></li></g:if>
 				<li><g:link action="stopAllExecutions" id="${job.name}">
 					<g:message code="batch.job.stopall.label"/></g:link></li>
 			</ul>
 		</div>
 		<div id="show-jobModel" class="content scaffold-show" role="main">
-			<h1><g:message code="batch.job.show.label" /> ${job.name}</h1>
+			<h1><g:message code="batch.job.show.label" args="[job.name]" /></h1>
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>
@@ -26,27 +26,26 @@
 
 			<ol class="property-list example">
 				<li class="fieldcontain">
-					<span id="jobInstanceCount-label" class="property-label">Job Instance Count</span>
+					<span id="jobInstanceCount-label" class="property-label"><g:message code="batch.job.jobInstanceCount.label"/></span>
 						<span class="property-value" aria-labelledby="jobInstanceCount-label">${job.jobInstanceCount}</span>
 				</li>
 				<li class="fieldcontain">
-					<span id="executionCount-label" class="property-label">Job Execution Count</span>
+					<span id="executionCount-label" class="property-label"><g:message code="batch.job.executionCount.label"/></span>
 						<span class="property-value" aria-labelledby="executionCount-label">${job.executionCount}</span>
 				</li>
 				<li class="fieldcontain">
-					<span id="incrementable-label" class="property-label">Incrementable</span>
+					<span id="incrementable-label" class="property-label"><g:message code="batch.job.incrementable.label"/></span>
 						<span class="property-value" aria-labelledby="incrementable-label">${job.incrementable}</span>
 				</li>
 			</ol>
 			
-			<h2>Instances</h2>
+			<h2><g:message code="batch.job.instances.label"/></h2>
 			<table>
 				<thead>
 					<tr>
-						<g:sortableColumn property="id" title="${message(code: 'jobInstanceModel.id.label', default: 'Id')}" />
-						<g:sortableColumn property="jobExecutionCount" title="${message(code: 'jobInstanceModel.jobExecutionCount.label', default: 'Execution Count')}" />
-						<g:sortableColumn property="lastJobExecutionStatus" title="${message(code: 'jobInstanceModel.lastJobExecutionStatus.label', default: 'Last Execution Status')}" />
-						<th/>
+						<g:sortableColumn property="id" title="${message(code: 'batch.jobInstance.id.label', default: 'Id')}" />
+						<g:sortableColumn property="jobExecutionCount" title="${message(code: 'batch.jobInstance.jobExecutionCount.label', default: 'Execution Count')}" />
+						<g:sortableColumn property="lastJobExecutionStatus" title="${message(code: 'batch.jobInstance.lastJobExecutionStatus.label', default: 'Last Execution Status')}" />
 					</tr>
 				</thead>
 				<tbody>
@@ -55,7 +54,6 @@
 						<td><g:link controller="springBatchJobInstance" action="show" id="${jobInstanceModelInstance.id}" params="[jobName: job.name]">${fieldValue(bean: jobInstanceModelInstance, field: "id")}</g:link></td>
 						<td>${fieldValue(bean: jobInstanceModelInstance, field: "jobExecutionCount")}</td>
 						<td>${fieldValue(bean: jobInstanceModelInstance, field: "lastJobExecutionStatus")}</td>
-						<td><g:if test="${jobInstanceModelInstance.stoppable }"><g:link action="stopAllExecutions" id="${job.name}">${message(code: 'jobInstanceModel.jobExecutions.stop.label', default: "Stop")}</g:link></g:if></td>
 					</tr>
 				</g:each>
 				</tbody>

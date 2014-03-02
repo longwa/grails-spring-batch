@@ -15,4 +15,7 @@ class JobExecutionModel {
     Long duration
     BatchStatus status
     ExitStatus exitStatus
+	
+	String jobName
+	Long instanceId
 }

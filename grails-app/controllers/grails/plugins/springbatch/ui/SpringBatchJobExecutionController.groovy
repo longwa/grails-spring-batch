@@ -1,8 +1,11 @@
 package grails.plugins.springbatch.ui
 
+import org.springframework.batch.core.JobExecutionException
+
 class SpringBatchJobExecutionController {
 
     def springBatchUiService
+	def springBatchService
 
     static defaultAction = 'show'
 	
@@ -12,8 +15,35 @@ class SpringBatchJobExecutionController {
 			redirect(controller: "springBatchJob", action: "list")
 		} else {
 			[jobExecution: springBatchUiService.jobExecutionModel(id),
-				modelInstances: springBatchUiService.getStepExecutionModels(id, params),
-				jobExecutionId:id]
+				modelInstances: springBatchUiService.getStepExecutionModels(id, params)]
+		}
+	}
+
+	def restart(Long id) {
+		if(!id) {
+			flash.error = "Please supply a job execution id"
+			redirect(controller: "springBatchJob", action: "list")
+		} else {
+			try{
+				springBatchService.restart(id)
+			}catch (JobExecutionException jee){
+				flash.error = jee.message
+			}
+			redirect(action: "show", id:id)
+		}
+	}
+
+	def stop(Long id) {
+		if(!id) {
+			flash.error = "Please supply a job execution id"
+			redirect(controller: "springBatchJob", action: "list")
+		} else {
+			try{
+				springBatchService.stop(id)
+			}catch (JobExecutionException jee){
+				flash.error = jee.message
+			}
+			redirect(action: "show", id:id)
 		}
 	}
 }

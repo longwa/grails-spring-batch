@@ -39,6 +39,14 @@ class SpringBatchService {
 		jobService.getJobExecution(jobExecutionId)
 	}
 	
+	void restart(Long jobExecutionId){
+		jobService.restart(jobExecutionId)
+	}
+
+	void stop(Long jobExecutionId){
+		jobService.stop(jobExecutionId)
+	}
+
 	void stopAllJobExecutions(String jobName){
 		Set<Long> executions = jobOperator.getRunningExecutions(jobName);
 		log.info("Attempting to stop ${executions.size()} job executions for $jobName")
