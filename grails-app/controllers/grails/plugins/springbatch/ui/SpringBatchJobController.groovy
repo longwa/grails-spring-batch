@@ -34,7 +34,9 @@ class SpringBatchJobController {
 			flash.error = result.message
 		}
 		
-		redirect(action:'show', id:id)
+		String action = (params.a=='l')?'list':'show'
+		
+		redirect(action:action, id:id)
 	}
 
 	def stopAllExecutions(String id) {

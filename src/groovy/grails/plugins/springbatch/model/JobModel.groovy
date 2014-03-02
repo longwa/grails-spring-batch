@@ -10,7 +10,7 @@ class JobModel {
     Integer executionCount
     Integer jobInstanceCount
 
-    Collection<String> stepNames
+    Collection<String> stepNames  // These appear to come from the job service in a non-useful order
 
     Boolean launchable
     Boolean incrementable

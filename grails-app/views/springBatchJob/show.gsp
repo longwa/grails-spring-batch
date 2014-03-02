@@ -20,6 +20,9 @@
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>
+			<g:if test="${flash.error}">
+			<div class="errors" role="status">${flash.error}</div>
+			</g:if>
 
 			<ol class="property-list example">
 				<li class="fieldcontain">
@@ -35,13 +38,14 @@
 						<span class="property-value" aria-labelledby="incrementable-label">${job.incrementable}</span>
 				</li>
 			</ol>
-
+			
+			<h2>Instances</h2>
 			<table>
 				<thead>
 					<tr>
-						<g:sortableColumn property="id" title="${message(code: 'jobInstanceModel.id.label', default: 'ID')}" />
-						<g:sortableColumn property="jobExecutionCount" title="${message(code: 'jobInstanceModel.jobExecutionCount.label', default: 'Job Execution Count')}" />
-						<g:sortableColumn property="lastJobExecutionStatus" title="${message(code: 'jobInstanceModel.lastJobExecutionStatus.label', default: 'Last Job Execution Status')}" />
+						<g:sortableColumn property="id" title="${message(code: 'jobInstanceModel.id.label', default: 'Id')}" />
+						<g:sortableColumn property="jobExecutionCount" title="${message(code: 'jobInstanceModel.jobExecutionCount.label', default: 'Execution Count')}" />
+						<g:sortableColumn property="lastJobExecutionStatus" title="${message(code: 'jobInstanceModel.lastJobExecutionStatus.label', default: 'Last Execution Status')}" />
 						<th/>
 					</tr>
 				</thead>

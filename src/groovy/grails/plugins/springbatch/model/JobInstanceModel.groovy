@@ -18,7 +18,7 @@ class JobInstanceModel {
 
 	List<JobExecutionModel> executions
 	
-	// :TODO JobParameters
+	Map jobParameters
 	
 	boolean isStoppable(){
 		return lastJobExecutionStatus == BatchStatus.STARTED
