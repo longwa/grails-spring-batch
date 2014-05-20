@@ -15,6 +15,8 @@ class SpringBatchService {
 	
 	static transactional = false
 	
+	def grailsApplication
+	
 	/**
 	 * Asynchronous Job launcher - default - used for controllers
 	 */
@@ -61,12 +63,16 @@ class SpringBatchService {
 	}
 	
 	
+	String defaultJobLauncher = 'jobLauncher'
+	
 	/**
 	 *
 	 * @param jobName
-	 * @param async true if from controller, false if from quartz
+	 * @param jobLauncherName - initially configured choices "jobLauncher" and "syncJobLauncher"
 	 */
-	Map launch(String jobName, JobParameters jobParams, boolean async = true) {
+	Map launch(String jobName, JobParameters jobParams, 
+			String jobLauncherName = "jobLauncher") {
+		
 		Job job
 		try{
 			job = jobRegistry.getJob(jobName)
@@ -74,8 +80,18 @@ class SpringBatchService {
 			return [success: false, message:"Did not find Spring Batch Job: $jobName"]
 		}
 		
-		JobLauncher selectedLauncher = async ? jobLauncher : syncJobLauncher
-	
+		JobLauncher selectedLauncher 
+		if(jobLauncherName) {
+			selectedLauncher = grailsApplication.mainContext.getBean(jobLauncherName)
+		}
+		if(!selectedLauncher) {
+			selectedLauncher = grailsApplication.mainContext.getBean(defaultJobLauncher)
+			log.warn "JobLaucher $jobLauncherName selected but not found, trying $defaultJobLauncher"
+		}
+		if(!selectedLauncher) {
+			return [success: false, message:"Invalid jobLauncher $jobLauncherName selected"]
+		}
+		
 		try{
 			selectedLauncher.run(job, jobParams)
 		}catch(JobInstanceAlreadyCompleteException jiace){

@@ -26,7 +26,7 @@ class SpringBatchJobController {
 	def launch(String id){
 		JobParameters jobParams = springBatchUiService.buildJobParametersFromRequest(params)
 		
-		Map result = springBatchService.launch(id, jobParams, Boolean.valueOf(params.async))
+		Map result = springBatchService.launch(id, jobParams, params.jobLauncherName)
 
 		if(result.success){
 			flash.message = result.message
