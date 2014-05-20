@@ -24,20 +24,34 @@ class Schedule {
 	
 	@Scheduled(fixedDelay=30000L)
 	void simpleAsyncJobTrigger(){
+		trigger('simpleAsyncJob', 'jobLauncher')
+	}
+	
+	@Scheduled(fixedDelay=30000L)
+	void simpleSyncJob1Trigger(){
+		trigger('simpleSyncJob1', 'syncJobLauncher')
+	}
+	
+	@Scheduled(fixedDelay=30000L)
+	void simpleSyncJob2Trigger(){
+		trigger('simpleSyncJob2', 'syncJobLauncher')
+	}
+	
+	void trigger(String jobName, String launcherName) {
 		if(!ready) {
-			log.info("Attempted to trigger, but app is not fully initialized")
+			log.info("Attempted to trigger $jobName, but app is not fully initialized")
 			return
 		}
 		
-		LOGGER.info("Triggering SimpleAsyncJob...")
+		LOGGER.info("Triggering $jobName")
 		
 		try{
-			springBatchService.launch("simpleAsyncJob", null, 'jobLauncher')
+			springBatchService.launch(jobName, null, launcherName)
 		}catch(Exception e){
 			LOGGER.error("Job Failure", e)
 		}
 		
-		LOGGER.info("Completing trigger of SimpleAsyncJob...")
+		LOGGER.info("Completing trigger of $jobName")
 	}
 	
 	boolean ready = false

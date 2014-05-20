@@ -6,27 +6,27 @@ beans {
 
     batch.job(id: 'simpleAsyncJob') {
         batch.step(id: 'jobStart', next:'jobWait') {
-            batch.tasklet(ref: 'printStartMessage')
+            batch.tasklet(ref: 'simpleAsyncJobPrintStartMessage')
         }
 		batch.step(id: 'jobWait', next:'jobEnd') {
-			batch.tasklet(ref: 'wait10Seconds')
+			batch.tasklet(ref: 'simpleAsyncJobWait10Seconds')
 		}
         batch.step(id: 'jobEnd' ) {
-            batch.tasklet(ref: 'printEndMessage')
+            batch.tasklet(ref: 'simpleAsyncJobPrintEndMessage')
         }
     }
 
-    printStartMessage(PrintMessageTasklet) { bean ->
+    simpleAsyncJobPrintStartMessage(PrintMessageTasklet) { bean ->
         bean.autowire = "byName"
 		mesg = 'Starting Simple Async Job'
     }
 	
-	wait10Seconds(WaitTasklet) { bean ->
+	simpleAsyncJobWait10Seconds(WaitTasklet) { bean ->
 		bean.autowire = "byName"
 		waitTimeInSeconds = 10
 	}
 
-    printEndMessage(PrintMessageTasklet) { bean ->
+    simpleAsyncJobPrintEndMessage(PrintMessageTasklet) { bean ->
         bean.autowire = "byName"
 		mesg = 'Finishing Simple Async Job'
     }
