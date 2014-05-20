@@ -49,7 +49,7 @@ grails.json.legacy.builder = false
 // enabled native2ascii conversion of i18n properties files
 grails.enable.native2ascii = true
 // packages to include in Spring bean scanning
-grails.spring.bean.packages = []
+grails.spring.bean.packages = [ "scheduling" ]
 // whether to disable processing of multi part requests
 grails.web.disable.multipart=false
 
@@ -88,6 +88,7 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+	info 'grails.app', 'scheduling'
 }
 
 plugin {
@@ -111,3 +112,13 @@ environments {
         }
     }
 }
+
+//Ignore spring batch tables, which have no domain objects
+grails.plugin.databasemigration.ignoredObjects = ['BATCH_JOB_EXECUTION',
+	'BATCH_JOB_EXECUTION_CONTEXT','BATCH_JOB_EXECUTION_SEQ',
+	'BATCH_JOB_INSTANCE','BATCH_JOB_PARAMS','BATCH_JOB_SEQ',
+	'BATCH_STEP_EXECUTION', 'BATCH_STEP_EXECUTION_CONTEXT',
+	'BATCH_STEP_EXECUTION_SEQ',
+	'IDX_BATCH_JOB_INSTANCE_JOB_NAME_JOB_KEY','JOB_INST_UN',
+	'IDX_BATCH_STEP_EXECUTION_STEP_NAME_JOB_EXECUTION_ID',
+	'IDX_BATCH_STEP_EXECUTION_VERSION']
