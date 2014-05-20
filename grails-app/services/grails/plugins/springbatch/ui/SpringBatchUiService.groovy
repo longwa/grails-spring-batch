@@ -76,10 +76,10 @@ class SpringBatchUiService {
 		}
 		
 		if(!entries){
-			entries .put('date', new JobParameter(new Date().getDateTimeString()))
+			entries = springBatchService.defaultJobParameters()
 		}
 		
-		return new JobParameters(entries)
+		return springBatchService.mapToJobParameters(entries)
 	}
 
 

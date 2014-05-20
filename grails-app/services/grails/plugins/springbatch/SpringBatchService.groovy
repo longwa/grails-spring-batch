@@ -4,6 +4,7 @@ import org.springframework.batch.admin.service.JobService
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobInstance
+import org.springframework.batch.core.JobParameter
 import org.springframework.batch.core.JobParameters
 import org.springframework.batch.core.configuration.JobRegistry
 import org.springframework.batch.core.launch.JobLauncher
@@ -86,10 +87,15 @@ class SpringBatchService {
 		}
 		if(!selectedLauncher) {
 			selectedLauncher = grailsApplication.mainContext.getBean(defaultJobLauncher)
-			log.warn "JobLaucher $jobLauncherName selected but not found, trying $defaultJobLauncher"
+			log.info "JobLaucher $jobLauncherName selected but not found, trying $defaultJobLauncher"
 		}
 		if(!selectedLauncher) {
 			return [success: false, message:"Invalid jobLauncher $jobLauncherName selected"]
+		}
+		
+		if(!jobParams) {
+			log.info "No job parameters provided for job, defaulting to date"
+			jobParams = mapToJobParameters(defaultJobParameters())
 		}
 		
 		try{
@@ -101,4 +107,11 @@ class SpringBatchService {
 		return [success: true, message:"Spring Batch Job($jobName) launched from EtlService"]
 	}
 	
+	Map defaultJobParameters() {
+		['date': new JobParameter(new Date().getDateTimeString())]
+	}
+	
+	JobParameters mapToJobParameters(Map map) {
+		return new JobParameters(map)
+	}
 }
