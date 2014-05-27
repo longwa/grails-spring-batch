@@ -5,13 +5,13 @@ beans {
     xmlns batch:"http://www.springframework.org/schema/batch"
 
     batch.job(id: 'simpleSyncJob1') {
-        batch.step(id: 'jobStart', next:'jobWait') {
+        batch.step(id: 'simpleSyncJob1Start', next:'simpleSyncJob1Wait') {
             batch.tasklet(ref: 'simpleSyncJob1PrintStartMessage')
         }
-		batch.step(id: 'jobWait', next:'jobEnd') {
+		batch.step(id: 'simpleSyncJob1Wait', next:'simpleSyncJob1End') {
 			batch.tasklet(ref: 'simpleSyncJob1Wait10Seconds')
 		}
-        batch.step(id: 'jobEnd' ) {
+        batch.step(id: 'simpleSyncJob1End' ) {
             batch.tasklet(ref: 'simpleSyncJob1PrintEndMessage')
         }
     }
