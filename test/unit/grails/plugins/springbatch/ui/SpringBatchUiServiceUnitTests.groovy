@@ -1,7 +1,11 @@
 package grails.plugins.springbatch.ui
 
 import grails.plugins.springbatch.SpringBatchService
-import grails.test.mixin.TestFor
+import grails.plugins.springbatch.model.JobExecutionModel
+import grails.plugins.springbatch.model.JobInstanceModel
+import grails.plugins.springbatch.model.JobModel
+import grails.plugins.springbatch.model.StepExecutionModel
+import grails.test.mixin.*
 
 import org.junit.Before
 import org.junit.Test
@@ -77,7 +81,7 @@ class SpringBatchUiServiceUnitTests {
 
         jobServiceMock.verify()
     }
-
+	
     @Test
     void testGetJobModels_withParams() {
 
@@ -122,6 +126,42 @@ class SpringBatchUiServiceUnitTests {
 
         jobServiceMock.verify()
     }
+	
+	@Test
+	void testJobModel() {
+		def jobServiceMock = mockFor(JobService)
+		jobServiceMock.demand.countJobExecutionsForJob(1..1) {String name ->
+			return 5
+		}
+		jobServiceMock.demand.countJobInstances(1){String name ->
+			return 2
+		}
+		jobServiceMock.demand.getStepNamesForJob(1){String name ->
+			return ['step1', 'step2']
+		}
+		jobServiceMock.demand.isLaunchable(1..1) {String name ->
+			return true
+		}
+		jobServiceMock.demand.isIncrementable(1..1) {String name ->
+			return false
+		}
+		springBatchServiceMock.demand.hasRunningExecutions(1){String name ->
+			return true
+		}
+		
+		service.jobService = jobServiceMock.createMock()
+		service.springBatchService = springBatchServiceMock.createMock()
+
+		JobModel model = service.jobModel("testJob")
+
+		assert model
+		assert "testJob" == model.name
+		assert 5 == model.executionCount
+		assert model.launchable
+		assert !model.incrementable
+
+		jobServiceMock.verify()
+	}
 
     @Test
     void testGetJobInstanceModels() {
@@ -231,6 +271,52 @@ class SpringBatchUiServiceUnitTests {
         jobServiceMock.verify()
     }
 
+	
+    @Test
+    void testJobInstanceModel() {
+        def jobParameters1 = new JobParameters()
+        def jobInstance1 = new JobInstance(1, jobParameters1, "job1")
+        def jobParameters2 = new JobParameters()
+        def jobInstance2 = new JobInstance(2, jobParameters2, "job1")
+        
+		def jobExecutionMock = new JobExecution(1)
+		jobExecutionMock.with {
+			status = BatchStatus.COMPLETED
+			startTime = new Date()
+			endTime = new Date()
+			jobInstance = jobInstance1
+		}
+        def jobExecutionMock2 = new JobExecution(2)
+		jobExecutionMock2.with {
+			status = BatchStatus.FAILED
+			startTime = new Date()
+			endTime = new Date()
+			jobInstance = jobInstance2
+        }
+		
+        def executionList = [jobExecutionMock, jobExecutionMock2]
+
+        jobServiceMock.demand.getJobExecutionsForJobInstance(1..1) {String name, Long id ->
+            return executionList
+        }
+
+        def jobParameters = new JobParameters()
+        def jobInstance = new JobInstance(1, jobParameters, "testJob")
+		
+		service.jobService = jobServiceMock.createMock()
+
+        JobInstanceModel jobInstanceModel = service.jobInstanceModel(jobInstance)
+
+        assert jobInstanceModel
+        assert 1 == jobInstanceModel.id
+        assert 2 == jobInstanceModel.jobExecutionCount
+        assert 2 == executionList.size()
+        assert jobParameters.parameters.size() == jobInstanceModel.jobParameters.size()
+        assert BatchStatus.COMPLETED == jobInstanceModel.lastJobExecutionStatus
+
+        jobServiceMock.verify()
+    }
+
     @Test
     void testGetJobExecutionModels() {
         JobInstance jobInstance = new JobInstance(1, null, "job1")
@@ -303,7 +389,43 @@ class SpringBatchUiServiceUnitTests {
         
         jobServiceMock.verify()
     }
+	
+	@Test
+	void testJobExecutionModel() {
 
+		def jobServiceMock = mockFor(JobService)
+		JobInstance jobInstance = new JobInstance(1, null, "simpleJob")
+		JobExecution jobExecution = new JobExecution(jobInstance, 1)
+		jobExecution.startTime = new Date()
+		jobExecution.endTime = dateWithDuration(new Date(), 10000)
+		jobExecution.status = BatchStatus.COMPLETED
+		jobExecution.exitStatus = ExitStatus.COMPLETED
+
+		StepExecution stepExecution = new StepExecution("step1", jobExecution)
+		stepExecution.startTime = new Date()
+		stepExecution.endTime = dateWithDuration(stepExecution.startTime, 20000)
+		jobExecution.addStepExecutions([stepExecution])
+		
+		service.jobService = jobServiceMock.createMock()
+
+		JobExecutionModel jobExecutionModel = service.jobExecutionModel(jobExecution)
+
+		assert jobExecutionModel
+		assert jobExecution.id == jobExecutionModel.id
+		assert jobExecution.jobInstance.id == jobExecutionModel.instanceId
+		assert jobExecution.jobInstance.jobName == jobExecutionModel.jobName
+		assert jobExecution.startTime == jobExecutionModel.startDateTime
+		assert jobExecution.endTime == dateWithDuration(jobExecutionModel.startDateTime, jobExecutionModel.duration)
+		assert jobExecution.status == jobExecutionModel.status
+		assert jobExecution.exitStatus == jobExecutionModel.exitStatus
+
+		/*assert jobExecution.stepExecutions.collect {
+		  StepExecutionModel.fromService(jobServiceMock.createMock() as JobService, it)
+		} == jobExecutionModel.stepExecutions*/
+
+		jobServiceMock.verify()
+	}
+	
     @Test
     void testGetStepExecutionModels() {
         JobExecution jobExecution = new JobExecution(2)
@@ -372,6 +494,22 @@ class SpringBatchUiServiceUnitTests {
         assert 2 == stepExecutionUiModel.resultsTotalCount
         assert 1 == stepExecutionUiModel.results.size()
 
+		StepExecutionModel stepExecutionModel = stepExecutionUiModel.results[0]
+		assert stepExecutionModel
+		assert stepExecution2.stepName == stepExecutionModel.name
+		assert stepExecution2.startTime == stepExecutionModel.startDateTime
+		assert stepExecution2.endTime == dateWithDuration(stepExecutionModel.startDateTime, stepExecutionModel.duration)
+		assert stepExecution2.status == stepExecutionModel.status
+		assert stepExecution2.readCount == stepExecutionModel.reads
+		assert stepExecution2.writeCount == stepExecutionModel.writes
+		assert stepExecution2.skipCount == stepExecutionModel.skips
+		assert stepExecution2.exitStatus == stepExecutionModel.exitStatus
+		
         jobServiceMock.verify()
     }
+	
+
+	private Date dateWithDuration(Date date, long duration) {
+		new Date(date.time + duration)
+	}
 }

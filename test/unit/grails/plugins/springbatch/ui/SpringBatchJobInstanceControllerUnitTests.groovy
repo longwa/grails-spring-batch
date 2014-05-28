@@ -1,6 +1,9 @@
 package grails.plugins.springbatch.ui
 
-import grails.test.mixin.TestFor
+import grails.plugins.springbatch.model.JobExecutionModel
+import grails.plugins.springbatch.model.JobInstanceModel
+import grails.test.mixin.*
+
 import org.junit.Before
 import org.junit.Test
 
@@ -15,58 +18,42 @@ class SpringBatchJobInstanceControllerUnitTests {
     }
 
     @Test
-    void testList() {
-        springBatchUiServiceMock.demand.getJobInstanceUiModel(1..1) {String id, Map params ->
-            assert "testJob" == id
-            assert 0 == params.offset
-            assert 10 == params.max
-            return [modelInstances: [], modelTotal: 0]
+    void testShow() {
+        springBatchUiServiceMock.demand.jobInstanceModel(1..1) {String id->
+			return new JobInstanceModel()
         }
+		springBatchUiServiceMock.demand.getJobExecutionModels(1..1) {String jobName, Long id, Map params ->
+            return new PagedResult<JobExecutionModel>(resultsTotalCount:0, results:[])
+        }
+        
         controller.springBatchUiService = springBatchUiServiceMock.createMock()
 
-        def results = controller.list("testJob")
+        def results = controller.show("testJob", 1L)
 
-        assert results.modelInstances == []
-        assert results.modelTotal == 0
+		assert results.modelInstances.results.size() == 0
+		assert results.modelInstances.resultsTotalCount == 0
 
-        assert params.max == 10
-        assert params.offset == 0
         springBatchUiServiceMock.verify()
 
-    }
-
-    @Test
-    void testListWithParams() {
-        springBatchUiServiceMock.demand.getJobInstanceUiModel(1..1) {String id, Map params ->
-            assert "testJob" == id
-            assert 5 == params.max
-            assert 10 == params.offset
-            return [modelInstances: [], modelTotal: 0]
-        }
-        controller.springBatchUiService = springBatchUiServiceMock.createMock()
-
-        params.max = 5
-        params.offset = 10
-        def results = controller.list("testJob")
-
-        assert results.modelInstances == []
-        assert results.modelTotal == 0
-
-        assert params.max == 5
-        assert params.offset == 10
-        springBatchUiServiceMock.verify()
     }
 
     @Test
     void testListNullId() {
-        controller.list(null)
+        controller.show('myJob', null)
+
+        assert response.redirectUrl.endsWith("/springBatchJob/show/myJob")
+    }
+
+    @Test
+    void testListNullJobName() {
+        controller.show(null, null)
 
         assert response.redirectUrl.endsWith("/springBatchJob/list")
     }
 
     @Test
-    void testListBlankId() {
-        controller.list("")
+    void testListBlankJobName() {
+        controller.show("", null)
 
         assert response.redirectUrl.endsWith("/springBatchJob/list")
     }

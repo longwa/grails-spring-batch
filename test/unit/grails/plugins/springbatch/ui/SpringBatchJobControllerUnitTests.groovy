@@ -1,6 +1,7 @@
 package grails.plugins.springbatch.ui
 
-import grails.test.mixin.TestFor
+import grails.plugins.springbatch.model.JobModel
+import grails.test.mixin.*
 
 import org.junit.Before
 import org.junit.Test
@@ -17,42 +18,17 @@ class SpringBatchJobControllerUnitTests {
 
     @Test
     void testList() {
-        springBatchUiServiceMock.demand.getJobUiModel(1..1) {Map params ->
-            assert 0 == params.offset
-            assert 10 == params.max
-            return [modelInstances: [], modelTotal: 0]
+        springBatchUiServiceMock.demand.getJobModels(1..1) {Map params ->
+            return new PagedResult<JobModel>(resultsTotalCount:0, results:[])
         }
         controller.springBatchUiService = springBatchUiServiceMock.createMock()
 
         def results = controller.list()
 
-        assert results.modelInstances == []
-        assert results.modelTotal == 0
+        assert results.modelInstances.results.size() == 0
+        assert results.modelInstances.resultsTotalCount == 0
 
-        assert params.max == 10
-        assert params.offset == 0
         springBatchUiServiceMock.verify()
 
-    }
-
-    @Test
-    void testListWithParams() {
-        springBatchUiServiceMock.demand.getJobUiModel(1..1) {Map params ->
-            assert 10 == params.offset
-            assert 5 == params.max
-            return [modelInstances: [], modelTotal: 0]
-        }
-        controller.springBatchUiService = springBatchUiServiceMock.createMock()
-
-        params.max = 5
-        params.offset = 10
-        def results = controller.list()
-
-        assert results.modelInstances == []
-        assert results.modelTotal == 0
-
-        assert params.max == 5
-        assert params.offset == 10
-        springBatchUiServiceMock.verify()
     }
 }
