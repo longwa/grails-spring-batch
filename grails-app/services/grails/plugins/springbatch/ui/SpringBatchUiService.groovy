@@ -44,7 +44,8 @@ class SpringBatchUiService {
 			jobInstanceCount: jobService.countJobInstances(jobName),
 			stepNames: jobService.getStepNamesForJob(jobName),
 			launchable: jobService.isLaunchable(jobName),
-			incrementable: jobService.isIncrementable(jobName))
+			incrementable: jobService.isIncrementable(jobName),
+			currentlyRunning: springBatchService.hasRunningExecutions(jobName))
 	}
 	
 	PagedResult<JobModel> getJobModels(Map params) {

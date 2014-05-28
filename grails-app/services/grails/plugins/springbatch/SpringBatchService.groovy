@@ -22,11 +22,17 @@ class SpringBatchService {
 	 * Asynchronous Job launcher - default - used for controllers
 	 */
 	JobLauncher jobLauncher
-
+	
 	/**
 	 * Synchronous Job launcher - used for quartz jobs
 	 */
 	JobLauncher syncJobLauncher
+	
+	/**
+	 * The spring bean name of the the job launcher to use by default
+	 */
+	String defaultJobLauncher = 'jobLauncher'
+	
 	
 	JobRegistry jobRegistry
 	
@@ -51,7 +57,7 @@ class SpringBatchService {
 	}
 
 	void stopAllJobExecutions(String jobName){
-		Set<Long> executions = jobOperator.getRunningExecutions(jobName);
+		Set<Long> executions = jobOperator.getRunningExecutions(jobName)
 		log.info("Attempting to stop ${executions.size()} job executions for $jobName")
 		
 		executions.each{
@@ -63,8 +69,14 @@ class SpringBatchService {
 		}
 	}
 	
-	
-	String defaultJobLauncher = 'jobLauncher'
+	boolean hasRunningExecutions(String jobName) {
+		try {
+			Set<Long> executions = jobOperator.getRunningExecutions(jobName)
+			return !(executions?.isEmpty())
+		}catch(NoSuchJobException nsje) {
+			return false
+		}
+	}
 	
 	/**
 	 *

@@ -14,6 +14,8 @@ class JobModel {
 
     Boolean launchable
     Boolean incrementable
+	
+	Boolean currentlyRunning
 
     // lastJobParameters
 }

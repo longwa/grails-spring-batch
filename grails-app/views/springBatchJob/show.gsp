@@ -37,6 +37,10 @@
 					<span id="incrementable-label" class="property-label"><g:message code="batch.job.incrementable.label"/></span>
 						<span class="property-value" aria-labelledby="incrementable-label">${job.incrementable}</span>
 				</li>
+				<li class="fieldcontain">
+					<span id="currentlyRunning-label" class="property-label"><g:message code="batch.job.currentlyRunning.label"/></span>
+						<span class="property-value" aria-labelledby="currentlyRunning-label">${job.currentlyRunning}</span>
+				</li>
 			</ol>
 			
 			<h2><g:message code="batch.job.instances.label"/></h2>

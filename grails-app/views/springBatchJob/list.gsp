@@ -25,6 +25,7 @@
 						<g:sortableColumn property="name" title="${message(code: 'jobModel.name.label', default: 'Name')}" />
 						<g:sortableColumn property="executionCount" title="${message(code: 'jobModel.executionCount.label', default: 'Execution Count')}" />
 						<g:sortableColumn property="launchable" title="${message(code: 'jobModel.launchable.label', default: 'Is Launchable')}" />
+						<g:sortableColumn property="currentlyRunning" title="${message(code: 'batch.job.currentlyRunning.label', default: 'Running')}" />
 					</tr>
 				</thead>
 				<tbody>
@@ -36,6 +37,7 @@
 							<g:link action="launch" id="${modelInstance.name}" 
 								class="launchJobButton" params="[a: 'l']">
 							<g:message code="batch.job.launch.label"/></g:link></g:if></td>
+						<td>${fieldValue(bean: modelInstance, field: "currentlyRunning")}</td>
 					</tr>
 				</g:each>
 				</tbody>
