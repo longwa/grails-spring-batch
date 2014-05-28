@@ -19,7 +19,7 @@ class SpringBatchBeansLoadedTests extends GroovyTestCase {
 
     @Test
     public void testJobConfigurationLoaded() {
-        def jobBeans = ['simpleJob', 'logStart', 'printStartMessage']
+        def jobBeans = ['simpleJob', 'jobStart', 'printStartMessage']
         jobBeans.each {bean ->
             assert grailsApplication.mainContext.getBean(bean)
         }

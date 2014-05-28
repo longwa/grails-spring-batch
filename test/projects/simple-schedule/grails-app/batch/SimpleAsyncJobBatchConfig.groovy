@@ -23,7 +23,7 @@ beans {
 	
 	simpleAsyncJobWait10Seconds(WaitTasklet) { bean ->
 		bean.autowire = "byName"
-		waitTimeInSeconds = 10
+		waitTimeInSeconds = 30
 	}
 
     simpleAsyncJobPrintEndMessage(PrintMessageTasklet) { bean ->

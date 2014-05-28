@@ -10,7 +10,8 @@ class SpringBatchJobController {
     static defaultAction = 'list'
 
     def list() {
-        [modelInstances : springBatchUiService.getJobModels(params)]
+        [modelInstances : springBatchUiService.getJobModels(params),
+			ready: springBatchService.ready]
     }
 	
 	def show(String id) {
@@ -26,7 +27,11 @@ class SpringBatchJobController {
 	def launch(String id){
 		JobParameters jobParams = springBatchUiService.buildJobParametersFromRequest(params)
 		
-		Map result = springBatchService.launch(id, jobParams, params.jobLauncherName)
+		boolean canBeConcurrent = params.canBeConcurrent ? 
+				params.canBeConcurrent.toBoolean() : true
+		
+		Map result = springBatchService.launch(id, canBeConcurrent, jobParams, 
+				params.jobLauncherName)
 
 		if(result.success){
 			flash.message = result.message
@@ -37,6 +42,16 @@ class SpringBatchJobController {
 		String action = (params.a=='l')?'list':'show'
 		
 		redirect(action:action, id:id)
+	}
+	
+	def enableLaunching() {
+		springBatchService.ready = true
+		redirect action:'list'
+	}
+	
+	def disableLaunching() {
+		springBatchService.ready = false
+		redirect action:'list'
 	}
 
 	def stopAllExecutions(String id) {

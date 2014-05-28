@@ -9,6 +9,13 @@
 		<div class="nav" role="navigation">
 			<ul>
 				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+				<li><g:if test="${ready}">
+						<g:link controller="springBatchJob" action="disableLaunching">
+							<g:message code="batch.disableLaunching"/></g:link></g:if>
+					<g:else>
+						<g:link controller="springBatchJob" action="enableLaunching">
+							<g:message code="batch.enableLaunching"/></g:link></g:else>
+				</li>
 			</ul>
 		</div>
 		<div id="list-jobModel" class="content scaffold-list" role="main">

@@ -54,7 +54,7 @@
 						<g:sortableColumn property="duration" title="${message(code: 'batch.stepExecution.duration.label', default: 'Duration')}" />
 						<g:sortableColumn property="status" title="${message(code: 'batch.stepExecution.status.label', default: 'Status')}" />
 						<g:sortableColumn property="reads" title="${message(code: 'batch.stepExecution.reads.label', default: 'Reads')}" />
-						<g:sortableColumn property="writes" title="${message(code: 'batch.stepExecution.reads.label', default: 'Writes')}" />
+						<g:sortableColumn property="writes" title="${message(code: 'batch.stepExecution.writes.label', default: 'Writes')}" />
 						<g:sortableColumn property="skips" title="${message(code: 'batch.stepExecution.skips.label', default: 'Skips')}" />
 						<g:sortableColumn property="exitCode" title="${message(code: 'batch.stepExecution.exitStatus.exitCode.label', default: 'Exit Code')}" />
 					</tr>
