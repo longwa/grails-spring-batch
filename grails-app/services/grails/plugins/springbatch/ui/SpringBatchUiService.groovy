@@ -39,6 +39,11 @@ class SpringBatchUiService {
 	 * Populate the jobModel from the jobService
 	 */
 	JobModel jobModel(String jobName){
+		if(!jobName) {
+			log.debug("No jobName submitted")
+			return null
+		}
+		
 		new JobModel(name: jobName,
 			executionCount: jobService.countJobExecutionsForJob(jobName),
 			jobInstanceCount: jobService.countJobInstances(jobName),
