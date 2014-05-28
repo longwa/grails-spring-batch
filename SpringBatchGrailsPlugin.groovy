@@ -20,7 +20,7 @@ import org.springframework.jmx.support.ConnectorServerFactoryBean
 import org.springframework.remoting.rmi.RmiRegistryFactoryBean
 
 class SpringBatchGrailsPlugin {
-    def version = "1.0"
+    def version = "2.0"
     def grailsVersion = "2.0 > *"
     def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"
@@ -29,6 +29,9 @@ class SpringBatchGrailsPlugin {
 
     def documentation = "https://github.com/johnrengelman/grails-spring-batch"
     def license = "APACHE"
+	def developers = [
+		[name: "Daniel Bower", email: "daniel.bower@infinum.com"],
+		]
     def issueManagement = [ system: "JIRA", url: "https://github.com/johnrengelman/grails-spring-batch/issues" ]
     def scm = [ url: "https://github.com/johnrengelman/grails-spring-batch" ]
 
