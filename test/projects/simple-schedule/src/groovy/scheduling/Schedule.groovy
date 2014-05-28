@@ -39,7 +39,11 @@ class Schedule {
 	
 	void trigger(String jobName, String launcherName) {
 		if(!ready) {
-			log.info("Attempted to trigger $jobName, but app is not fully initialized")
+			LOGGER.info("Attempted to trigger $jobName, but app is not fully initialized")
+			return
+		}
+		if(grailsApplication.config.scheduler.disabled) {
+			LOGGER.info("Attempted to trigger $jobName, but scheduler is disabled")
 			return
 		}
 		

@@ -91,6 +91,11 @@ log4j = {
 	info 'grails.app', 'scheduling'
 }
 
+/**
+ * Can disable the scheduler here
+ */
+//scheduler.disabled = true
+
 plugin {
     springBatch {
         jmx {
