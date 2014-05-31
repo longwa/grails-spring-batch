@@ -16,6 +16,8 @@ class JobModel {
     Boolean incrementable
 	
 	Boolean currentlyRunning
+	
+	JobExecutionModel mostRecentJobExecution
 
     // lastJobParameters
 }

@@ -9,8 +9,8 @@ class DurationTagLib {
 		
 		if(!attrs.duration) {
 			String errorMsg = 'Duration attribute is required for batch:durationPrint tag'
-			log.error (errorMsg)
-			throwTagError(errorMsg)
+			log.debug (errorMsg)
+			return
 		}
 		
 		Long duration = 0L

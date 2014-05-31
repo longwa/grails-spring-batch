@@ -41,15 +41,38 @@
 					<span id="currentlyRunning-label" class="property-label"><g:message code="batch.job.currentlyRunning.label"/></span>
 						<span class="property-value" aria-labelledby="currentlyRunning-label">${job.currentlyRunning}</span>
 				</li>
+				<li class="fieldcontain">
+					<span id="steps-label" class="property-label"><g:message code="batch.job.steps.label"/></span>
+						<ul>
+							<g:each in="${job.stepNames}" var="stepName">
+								<li>${stepName}</li>
+							</g:each>
+						</ul>
+				</li>
+				<li class="fieldcontain">
+					<span id="mostRecentExecution-label" class="property-label"><g:message code="batch.job.mostRecentJobExecution.label"/></span>
+					<g:link controller="springBatchJobExecution" action="show" id="${job.mostRecentJobExecution.id}">
+						<g:message code="batch.jobExecution.startDateTime.label"/> - 
+							<span class="property-value" aria-labelledby="startDateTime-label">${job.mostRecentJobExecution.startDateTime}</span>    
+						<g:message code="batch.jobExecution.duration.label"/> - 
+							<span class="property-value" aria-labelledby="duration-label">
+								<batch:durationPrint duration="${job.mostRecentJobExecution.duration}"/></span>    
+						<g:message code="batch.jobExecution.status.label"/> - 
+							<span class="property-value" aria-labelledby="status-label">${job.mostRecentJobExecution.status}</span>    
+						<g:message code="batch.jobExecution.exitStatus.label"/> - 
+							<span class="property-value" aria-labelledby="exitStatus-label">${job.mostRecentJobExecution.exitStatus.exitCode}</span>
+					</g:link>
+				</li>
+				
 			</ol>
 			
 			<h2><g:message code="batch.job.instances.label"/></h2>
 			<table>
 				<thead>
 					<tr>
-						<g:sortableColumn property="id" title="${message(code: 'batch.jobInstance.id.label', default: 'Id')}" />
-						<g:sortableColumn property="jobExecutionCount" title="${message(code: 'batch.jobInstance.jobExecutionCount.label', default: 'Execution Count')}" />
-						<g:sortableColumn property="lastJobExecutionStatus" title="${message(code: 'batch.jobInstance.lastJobExecutionStatus.label', default: 'Last Execution Status')}" />
+						<g:sortableColumn property="id" title="${message(code: 'batch.jobInstance.id.label')}" />
+						<g:sortableColumn property="jobExecutionCount" title="${message(code: 'batch.jobInstance.jobExecutionCount.label')}" />
+						<g:sortableColumn property="lastJobExecutionStatus" title="${message(code: 'batch.jobInstance.lastJobExecutionStatus.label')}" />
 					</tr>
 				</thead>
 				<tbody>

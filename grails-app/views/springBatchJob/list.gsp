@@ -30,21 +30,28 @@
 				<thead>
 					<tr>
 						<g:sortableColumn property="name" title="${message(code: 'jobModel.name.label', default: 'Name')}" />
-						<g:sortableColumn property="executionCount" title="${message(code: 'jobModel.executionCount.label', default: 'Execution Count')}" />
-						<g:sortableColumn property="launchable" title="${message(code: 'jobModel.launchable.label', default: 'Is Launchable')}" />
 						<g:sortableColumn property="currentlyRunning" title="${message(code: 'batch.job.currentlyRunning.label', default: 'Running')}" />
+						<g:sortableColumn property="executionCount" title="${message(code: 'jobModel.executionCount.label', default: 'Execution Count')}" />
+						<td>Most Recent Execution</td>
+						<g:sortableColumn property="launchable" title="${message(code: 'jobModel.launchable.label', default: 'Is Launchable')}" />
 					</tr>
 				</thead>
 				<tbody>
 				<g:each in="${modelInstances}" status="i" var="modelInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 						<td><g:link controller="springBatchJob" action="show" id="${modelInstance.name}">${fieldValue(bean: modelInstance, field: "name")}</g:link></td>
+						<td>${fieldValue(bean: modelInstance, field: "currentlyRunning")}</td>
 						<td>${fieldValue(bean: modelInstance, field: "executionCount")}</td>
+						<td><g:if test="${modelInstance.mostRecentJobExecution}">
+								<g:link controller="springBatchJobExecution" action="show" id="${modelInstance.mostRecentJobExecution.id}">
+									${modelInstance.mostRecentJobExecution.startDateTime} - ${modelInstance.mostRecentJobExecution.status} - ${modelInstance.mostRecentJobExecution.exitStatus.exitCode} 
+								</g:link>
+							</g:if>
+						</td>
 						<td><g:if test="modelInstance.launchable}">
 							<g:link action="launch" id="${modelInstance.name}" 
 								class="launchJobButton" params="[a: 'l']">
 							<g:message code="batch.job.launch.label"/></g:link></g:if></td>
-						<td>${fieldValue(bean: modelInstance, field: "currentlyRunning")}</td>
 					</tr>
 				</g:each>
 				</tbody>

@@ -1,5 +1,6 @@
 package grails.plugins.springbatch.ui
 
+import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.JobExecutionException
 
 class SpringBatchJobExecutionController {
@@ -26,6 +27,7 @@ class SpringBatchJobExecutionController {
 		} else {
 			try{
 				springBatchService.restart(id)
+				flash.message = "Restarted Job Execution"
 			}catch (JobExecutionException jee){
 				flash.error = jee.message
 			}
@@ -40,6 +42,7 @@ class SpringBatchJobExecutionController {
 		} else {
 			try{
 				springBatchService.stop(id)
+				flash.message = "Stopped Job Execution"
 			}catch (JobExecutionException jee){
 				flash.error = jee.message
 			}

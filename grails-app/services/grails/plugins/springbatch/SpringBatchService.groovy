@@ -1,5 +1,10 @@
 package grails.plugins.springbatch
 
+import groovy.sql.Sql
+
+import javax.sql.DataSource
+
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.spring.GrailsContextEvent
 import org.springframework.batch.admin.service.JobService
 import org.springframework.batch.core.Job
@@ -7,6 +12,7 @@ import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobInstance
 import org.springframework.batch.core.JobParameter
 import org.springframework.batch.core.JobParameters
+import org.springframework.batch.core.StepExecution
 import org.springframework.batch.core.configuration.JobRegistry
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.launch.JobOperator
@@ -20,7 +26,7 @@ class SpringBatchService implements  ApplicationListener {
 	
 	static transactional = false
 	
-	def grailsApplication
+	GrailsApplication grailsApplication
 	
 	/**
 	 * true when the grails app has added dynamic methods to classes
@@ -62,6 +68,17 @@ class SpringBatchService implements  ApplicationListener {
 	}
 	
 	/**
+	 * Fetch the JobExecution by id
+	 */
+	StepExecution stepExecution(Long jobExecutionId, Long stepExecutionId){
+		jobService.getStepExecution(jobExecutionId, stepExecutionId)
+	}
+	
+	Collection<StepExecution> previousStepExecutions(String jobName, String stepName, int start, int max){
+		jobService.listStepExecutionsForStep(jobName, stepName, start, max)
+	}
+	
+	/**
 	 * Restart the JobExecution
 	 */
 	void restart(Long jobExecutionId){
@@ -95,14 +112,24 @@ class SpringBatchService implements  ApplicationListener {
 	 * True if there are any running executions for the Job
 	 */
 	boolean hasRunningExecutions(String jobName) {
+		
 		try {
-			Set<Long> executions = jobOperator.getRunningExecutions(jobName)
-			return !(executions?.isEmpty())
-		}catch(NoSuchJobException nsje) {
+			//Set<Long> executions = jobOperator.getRunningExecutions(jobName)
+			//return !(executions?.isEmpty())
+			
+			def result = batchSql.firstRow(
+"""select count(bje.job_execution_id) as 'executionCount'
+from ${batchTablePrefix}job_execution bje
+  inner join ${batchTablePrefix}job_instance bji on bje.job_instance_id = bji.job_instance_id
+where bji.job_name = ?
+  and bje.status in ('STARTING', 'STARTED')""".toString(), [jobName])
+			return result['executionCount'] > 0
+						
+		}catch(Exception nsje) {
+			log.info("Failed to acquire running executions for $jobName")
 			return false
 		}
 	}
-	
 	
 	/**
 	 * Launch a job
@@ -190,5 +217,25 @@ class SpringBatchService implements  ApplicationListener {
 			ready = false
 			log.info("No longer accepting Batch Jobs, shutting down.")
 		}
+	}
+	
+	
+	private DataSource _batchDataSource
+	private DataSource getBatchDataSource() {
+		if(!_batchDataSource) {
+			_batchDataSource = grailsApplication.mainContext.getBean(grailsApplication.config.plugin.springBatch.dataSource)
+		}
+		return _batchDataSource
+	}
+	private String _batchTablePrefix
+	private String getBatchTablePrefix() {
+		if(null==_batchTablePrefix) {
+			_batchTablePrefix = grailsApplication.config.plugin.springBatch.tablePrefix ? (grailsApplication.config.plugin.springBatch.tablePrefix + '_') : 'BATCH_'
+		}
+		return _batchTablePrefix
+	}
+	
+	private Sql getBatchSql() {
+		return new Sql(batchDataSource)
 	}
 }

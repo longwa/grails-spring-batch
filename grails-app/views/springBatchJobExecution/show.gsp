@@ -32,7 +32,7 @@
 				</li>
 				<li class="fieldcontain">
 					<span id="duration-label" class="property-label"><g:message code="batch.jobExecution.duration.label"/></span>
-						<span class="property-value" aria-labelledby="duration-label">${jobExecution.duration}</span>
+						<span class="property-value" aria-labelledby="duration-label"><batch:durationPrint duration="${jobExecution.duration}"/></span>
 				</li>
 				<li class="fieldcontain">
 					<span id="status-label" class="property-label"><g:message code="batch.jobExecution.status.label"/></span>
@@ -40,7 +40,7 @@
 				</li>
 				<li class="fieldcontain">
 					<span id="exitStatus-label" class="property-label"><g:message code="batch.jobExecution.exitStatus.label"/></span>
-						<span class="property-value" aria-labelledby="exitStatus-label">${jobExecution.exitStatus}</span>
+						<span class="property-value" aria-labelledby="exitStatus-label">${jobExecution.exitStatus.exitCode}</span>
 				</li>
 			</ol>
 			
@@ -62,10 +62,10 @@
 				<tbody>
 				<g:each in="${modelInstances}" status="i" var="stepExecutionModelInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-						<td>${fieldValue(bean: stepExecutionModelInstance, field: "id")}</td>
+						<td><g:link controller="springBatchStepExecution" action="show" id="${stepExecutionModelInstance.id}" params="${[jobExecutionId:jobExecution.id]}">${fieldValue(bean: stepExecutionModelInstance, field: "id")}</g:link></td>
 						<td>${fieldValue(bean: stepExecutionModelInstance, field: "name")}</td>
 						<td><g:formatDate date="${stepExecutionModelInstance.startDateTime}" /></td>
-						<td>${fieldValue(bean: stepExecutionModelInstance, field: "duration")}</td>
+						<td><batch:durationPrint duration="${stepExecutionModelInstance?.duration}"/></td>
 						<td>${fieldValue(bean: stepExecutionModelInstance, field: "status")}</td>
 						<td>${fieldValue(bean: stepExecutionModelInstance, field: "reads")}</td>
 						<td>${fieldValue(bean: stepExecutionModelInstance, field: "writes")}</td>

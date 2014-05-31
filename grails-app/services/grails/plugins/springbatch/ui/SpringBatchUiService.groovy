@@ -7,17 +7,11 @@ import grails.plugins.springbatch.model.JobModel
 import grails.plugins.springbatch.model.StepExecutionModel
 
 import org.springframework.batch.admin.service.JobService
-import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobInstance
 import org.springframework.batch.core.JobParameter
 import org.springframework.batch.core.JobParameters
 import org.springframework.batch.core.StepExecution
-import org.springframework.batch.core.configuration.JobRegistry
-import org.springframework.batch.core.launch.JobLauncher
-import org.springframework.batch.core.launch.JobOperator
-import org.springframework.batch.core.launch.NoSuchJobException
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException
 
 /**
  * Manage ui model
@@ -37,20 +31,41 @@ class SpringBatchUiService {
 
 	/**
 	 * Populate the jobModel from the jobService
+	 * @param jobName
+	 * @param fullVersion - defaults to true for the full Version of the model, 
+	 * otherwise generates a lite version of the model
 	 */
-	JobModel jobModel(String jobName){
+	JobModel jobModel(String jobName, boolean fullVersion = true){
 		if(!jobName) {
 			log.debug("No jobName submitted")
 			return null
 		}
 		
+		Integer countJobExecutions = jobService.countJobExecutionsForJob(jobName)
+		Integer countJobInstances = jobService.countJobInstances(jobName)
+		Boolean launchable = jobService.isLaunchable(jobName)
+		Boolean incrementable = jobService.isIncrementable(jobName)
+		Boolean currentlyRunning = springBatchService.hasRunningExecutions(jobName)
+		Collection stepNames = null
+		
+		List<JobExecution> mostRecentJobExecutions = jobService.listJobExecutionsForJob(jobName, 0, 1)
+		JobExecutionModel mostRecentJobExecutionModel = null
+		if(mostRecentJobExecutions) {
+			mostRecentJobExecutionModel = jobExecutionModel(mostRecentJobExecutions[0])
+		}
+			
+		if(fullVersion) {
+			stepNames = jobService.getStepNamesForJob(jobName)
+		}
+		
 		new JobModel(name: jobName,
-			executionCount: jobService.countJobExecutionsForJob(jobName),
-			jobInstanceCount: jobService.countJobInstances(jobName),
-			stepNames: jobService.getStepNamesForJob(jobName),
-			launchable: jobService.isLaunchable(jobName),
-			incrementable: jobService.isIncrementable(jobName),
-			currentlyRunning: springBatchService.hasRunningExecutions(jobName))
+			executionCount: countJobExecutions,
+			jobInstanceCount: countJobInstances,
+			stepNames: stepNames,
+			launchable: launchable,
+			incrementable: incrementable,
+			currentlyRunning: currentlyRunning,
+			mostRecentJobExecution: mostRecentJobExecutionModel)
 	}
 	
 	PagedResult<JobModel> getJobModels(Map params) {
@@ -59,9 +74,9 @@ class SpringBatchUiService {
 		initPaging(params, jobCount)
 		
 		Collection<String> jobs = jobService.listJobs(params.offset, params.max)
-
+		
 		Collection<JobModel> jobModels = jobs.collect { String name ->
-			jobModel(name)
+			jobModel(name, false)
 		}
 		
 		jobModels.sort(true){JobModel a,JobModel b ->
@@ -170,6 +185,40 @@ class SpringBatchUiService {
 		return new PagedResult<JobExecutionModel>(resultsTotalCount: jobExecutionCount,
 				results: jobExecutionModels)
 	}
+
+
+
+	StepExecutionModel stepExecutionModel(Long jobExecutionId, Long stepExecutionId){
+		stepExecutionModel(springBatchService.stepExecution(jobExecutionId, stepExecutionId))
+	}
+	
+	StepExecutionModel stepExecutionModel(StepExecution stepExecution){
+		log.info(" jobExecutionId: ${stepExecution.jobExecutionId},  jobExecution: ${stepExecution.jobExecution}")
+		
+		new StepExecutionModel(
+			id: stepExecution.id,
+			jobExecutionId: stepExecution.jobExecutionId,
+			name: stepExecution.stepName,
+			startDateTime: stepExecution.startTime,
+			duration: SpringBatchUiUtilities.getDuration(stepExecution.startTime, stepExecution.endTime),
+			status: stepExecution.status,
+			reads: stepExecution.readCount,
+			writes: stepExecution.writeCount,
+			skips: stepExecution.skipCount,
+			exitStatus: stepExecution.exitStatus,
+			jobName: stepExecution.jobExecution?.jobInstance?.jobName,
+			commitCount: stepExecution.commitCount,
+			endTime: stepExecution.endTime,
+			failureExceptions: stepExecution.failureExceptions,
+			filterCount: stepExecution.filterCount,
+			lastUpdated: stepExecution.lastUpdated,
+			processSkipCount: stepExecution.processSkipCount,
+			readSkipCount: stepExecution.readSkipCount,
+			rollbackCount: stepExecution.rollbackCount,
+			summary: stepExecution.summary,
+			writeSkipCount: stepExecution.writeSkipCount
+		)
+	}
 	
 	PagedResult<StepExecutionModel> getStepExecutionModels(Long jobExecutionId, Map params) {
 		def stepExecutions = jobService.getStepExecutions(jobExecutionId)
@@ -178,21 +227,35 @@ class SpringBatchUiService {
 		initPaging(params, stepExecutionCount)
 
 		Collection<StepExecutionModel> stepExecutionModels = SpringBatchUiUtilities.paginate(params.offset, params.max) {
-			stepExecutions.collect {StepExecution stepExecution ->
-				new StepExecutionModel(
-					id: stepExecution.id,
-					jobExecutionId: stepExecution.jobExecutionId,
-					name: stepExecution.stepName,
-					startDateTime: stepExecution.startTime,
-					duration: SpringBatchUiUtilities.getDuration(stepExecution.startTime, stepExecution.endTime),
-					status: stepExecution.status,
-					reads: stepExecution.readCount,
-					writes: stepExecution.writeCount,
-					skips: stepExecution.skipCount,
-					exitStatus: stepExecution.exitStatus
-				)
+			stepExecutions.collect {stepExecutionModel(it)}
+		}
+		return new PagedResult<JobExecutionModel>(resultsTotalCount: stepExecutionCount,
+				results: stepExecutionModels)
+	}
+	
+	PagedResult<StepExecutionModel> previousStepExecutionModels(
+			StepExecutionModel stepExecution, Map params){
+		
+		if(!stepExecution) {
+			return new PagedResult(results:[], resultsTotalCount:0)
+		}
+			
+		int stepExecutionCount = jobService.countStepExecutionsForStep(
+				stepExecution.jobName, stepExecution.name)
+		
+		initPaging(params, stepExecutionCount)
+		
+		Collection<StepExecutionModel> stepExecutionModels = []
+		
+		Collection previousSteps = springBatchService.previousStepExecutions(
+					stepExecution.jobName, stepExecution.name, params.offset, params.max)
+		
+		if(previousSteps) {
+			stepExecutionModels = previousSteps.collect{
+				stepExecutionModel(it)
 			}
 		}
+		
 		return new PagedResult<JobExecutionModel>(resultsTotalCount: stepExecutionCount,
 				results: stepExecutionModels)
 	}

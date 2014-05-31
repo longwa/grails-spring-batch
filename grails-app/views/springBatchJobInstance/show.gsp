@@ -52,7 +52,7 @@
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 						<td><g:link controller="springBatchJobExecution" action="show" id="${jobExecutionModelInstance.id}">${fieldValue(bean: jobExecutionModelInstance, field: "id")}</g:link></td>
 						<td><g:formatDate date="${jobExecutionModelInstance.startDateTime}" /></td>
-						<td>${fieldValue(bean: jobExecutionModelInstance, field: "duration")}</td>
+						<td><batch:durationPrint duration="${jobExecutionModelInstance.duration}"/></td>
 						<td>${fieldValue(bean: jobExecutionModelInstance, field: "status")}</td>
 						<td>${fieldValue(bean: jobExecutionModelInstance, field: "exitStatus.exitCode")}</td>
 					</tr>

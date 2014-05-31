@@ -51,9 +51,6 @@ class SpringBatchUiServiceUnitTests {
 		jobServiceMock.demand.countJobInstances(2){String name ->
 			return 2
 		}
-		jobServiceMock.demand.getStepNamesForJob(2){String name ->
-			return ['step1', 'step2']
-		}
         jobServiceMock.demand.isLaunchable(2) {String name ->
             assert (name == "job1" || name == "job2")
             if(name == "job1") {
@@ -69,6 +66,9 @@ class SpringBatchUiServiceUnitTests {
 		springBatchServiceMock.demand.hasRunningExecutions(2){String name ->
 			return true
 		}
+		jobServiceMock.demand.listJobExecutionsForJob(2){String name, int start, int max ->
+			return null
+		}
 
         service.jobService = jobServiceMock.createMock()
 		service.springBatchService = springBatchServiceMock.createMock()
@@ -80,6 +80,7 @@ class SpringBatchUiServiceUnitTests {
         assert 2 == jobUiModel.results.size()
 
         jobServiceMock.verify()
+		springBatchServiceMock.verify()
     }
 	
     @Test
@@ -100,10 +101,7 @@ class SpringBatchUiServiceUnitTests {
 		jobServiceMock.demand.countJobInstances(1){String name ->
 			return 2
 		}
-		jobServiceMock.demand.getStepNamesForJob(1){String name ->
-			return ['step1', 'step2']
-		}
-        jobServiceMock.demand.isLaunchable(1) {String name ->
+		jobServiceMock.demand.isLaunchable(1) {String name ->
             assert name == "job2"
             return false
         }
@@ -113,6 +111,9 @@ class SpringBatchUiServiceUnitTests {
         }
 		springBatchServiceMock.demand.hasRunningExecutions(1){String name ->
 			return true
+		}
+		jobServiceMock.demand.listJobExecutionsForJob(1){String name, int start, int max ->
+			return null
 		}
 
         service.jobService = jobServiceMock.createMock()
@@ -125,6 +126,7 @@ class SpringBatchUiServiceUnitTests {
         assert 1 == jobUiModel.results.size()
 
         jobServiceMock.verify()
+		springBatchServiceMock.verify()
     }
 	
 	@Test
@@ -136,9 +138,6 @@ class SpringBatchUiServiceUnitTests {
 		jobServiceMock.demand.countJobInstances(1){String name ->
 			return 2
 		}
-		jobServiceMock.demand.getStepNamesForJob(1){String name ->
-			return ['step1', 'step2']
-		}
 		jobServiceMock.demand.isLaunchable(1..1) {String name ->
 			return true
 		}
@@ -147,6 +146,12 @@ class SpringBatchUiServiceUnitTests {
 		}
 		springBatchServiceMock.demand.hasRunningExecutions(1){String name ->
 			return true
+		}
+		jobServiceMock.demand.listJobExecutionsForJob(1){String name, int start, int max ->
+			return null
+		}
+		jobServiceMock.demand.getStepNamesForJob(1){String name ->
+			return ['step1', 'step2']
 		}
 		
 		service.jobService = jobServiceMock.createMock()
@@ -161,6 +166,7 @@ class SpringBatchUiServiceUnitTests {
 		assert !model.incrementable
 
 		jobServiceMock.verify()
+		springBatchServiceMock.verify()
 	}
 
     @Test
