@@ -43,12 +43,9 @@
 				</li>
 				<li class="fieldcontain">
 					<span id="steps-label" class="property-label"><g:message code="batch.job.steps.label"/></span>
-						<ul>
-							<g:each in="${job.stepNames}" var="stepName">
-								<li>${stepName}</li>
-							</g:each>
-						</ul>
+					<span class="property-value" aria-labelledby="currentlyRunning-label">${job.stepNames.join(', ')}</span>
 				</li>
+				<g:if test="${job.mostRecentJobExecution}">
 				<li class="fieldcontain">
 					<span id="mostRecentExecution-label" class="property-label"><g:message code="batch.job.mostRecentJobExecution.label"/></span>
 					<g:link controller="springBatchJobExecution" action="show" id="${job.mostRecentJobExecution.id}">
@@ -63,6 +60,7 @@
 							<span class="property-value" aria-labelledby="exitStatus-label">${job.mostRecentJobExecution.exitStatus.exitCode}</span>
 					</g:link>
 				</li>
+				</g:if>
 				
 			</ol>
 			

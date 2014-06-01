@@ -118,7 +118,7 @@ class SpringBatchService implements  ApplicationListener {
 			//return !(executions?.isEmpty())
 			
 			def result = batchSql.firstRow(
-"""select count(bje.job_execution_id) as 'executionCount'
+"""select count(bje.job_execution_id) as "executionCount" 
 from ${batchTablePrefix}job_execution bje
   inner join ${batchTablePrefix}job_instance bji on bje.job_instance_id = bji.job_instance_id
 where bji.job_name = ?
@@ -126,7 +126,7 @@ where bji.job_name = ?
 			return result['executionCount'] > 0
 						
 		}catch(Exception nsje) {
-			log.info("Failed to acquire running executions for $jobName")
+			log.info("Failed to acquire running executions for $jobName", nsje)
 			return false
 		}
 	}
