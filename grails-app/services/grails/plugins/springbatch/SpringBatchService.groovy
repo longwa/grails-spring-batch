@@ -7,6 +7,7 @@ import javax.sql.DataSource
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.spring.GrailsContextEvent
 import org.springframework.batch.admin.service.JobService
+import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobInstance
@@ -204,6 +205,27 @@ where bji.job_name = ?
 		return new JobParameters(map)
 	}
 	
+	/**
+	 * For job x, give me the last time it ran and whether it failed or not
+	 * 
+	 * This method gives some of the same info as the SpringBatchUiService.jobModel,
+	 * but might be more useful for automated monitoring.
+	 */
+	Map jobStatus(String jobName) {
+		List<JobExecution> mostRecentJobExecutions = jobService.listJobExecutionsForJob(jobName, 0, 1)
+		if(!mostRecentJobExecutions) {
+			return [success:false]
+		}
+		
+		JobExecution mostRecent = mostRecentJobExecutions[0]
+		
+		boolean success = !mostRecent.status.isUnsuccessful()
+		boolean running = mostRecent.status.isRunning()
+		Date executionStartTime = mostRecent.startTime
+		Date executionEndTime = mostRecent.endTime
+		
+		return [success:success, running:running, executionStartTime:executionStartTime, executionEndTime: executionEndTime]
+	}
 
 	/**
 	 * Spring event listener to detect when the app is ready for job launching

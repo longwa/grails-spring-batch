@@ -1,5 +1,7 @@
 package grails.plugins.springbatch.ui
 
+import grails.converters.JSON
+
 import org.springframework.batch.core.JobParameters
 
 class SpringBatchJobController {
@@ -9,6 +11,29 @@ class SpringBatchJobController {
 	
     static defaultAction = 'list'
 
+	def status() {
+		if(!params.job) {
+			render ([success:false, message:'No job submitted for status check']) as JSON
+			return
+		}
+		
+		Map statuses = [:]
+		
+		if(params.job instanceof String) {
+			String job = params.job
+			statuses.put( job, springBatchService.jobStatus(job))
+		}else if(params.job instanceof String[]) {
+			params.job.each{ String job ->
+				statuses.put( job, springBatchService.jobStatus(job))
+			}
+		}else {
+			render ([success:false, message:"Class: ${params.job.class.name}"])
+			return
+		}
+		
+		render ([success:true, data:statuses])
+	}
+	
     def list() {
         [modelInstances : springBatchUiService.getJobModels(params),
 			ready: springBatchService.ready]
