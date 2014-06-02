@@ -37,7 +37,7 @@ class Schedule {
 	}
 	
 	void trigger(String jobName, boolean canBeConcurrent = true, String launcherName = null) {
-		if(grailsApplication.config.scheduler.disabled) {
+		if(isDisabled()) {
 			LOGGER.info("Attempted to trigger $jobName, but scheduler is disabled")
 			return
 		}
@@ -50,11 +50,22 @@ class Schedule {
 			if(result.success) {
 				LOGGER.info("Completed trigger of $jobName.  Result: $result")
 			}else {
-			LOGGER.error("Job Launch Failed.  Result: $result")
+				if(result.failurePriority == 'high') {
+					LOGGER.error("Job Launch Failed.  Result: $result")
+				}else {
+					LOGGER.warn("Job Launch Failed.  Result: $result")
+				}
 			}
 		}catch(Exception e){
 			LOGGER.error("Job Launch Failed with Exception.  ", e)
 		}
 	}
 
+	void setStatus(boolean enabled) {
+		grailsApplication.config.scheduler.disabled = !enabled
+	}
+	
+	boolean isDisabled() {
+		return grailsApplication.config.scheduler.disabled
+	}
 }

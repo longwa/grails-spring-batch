@@ -146,7 +146,9 @@ where bji.job_name = ?
 		
 		// Is the app ready?
 		if(!ready) {
-			return [success:false, message:"Attempted to launch $jobName, but app is not ready"]
+			return [success:false, 
+					message:"Attempted to launch $jobName, but app is not ready or job processing is disabled.",
+					failurePriority: 'low']
 		}
 		
 		// Select Job
@@ -154,12 +156,15 @@ where bji.job_name = ?
 		try{
 			job = jobRegistry.getJob(jobName)
 		}catch(NoSuchJobException nsje){
-			return [success: false, message:"Did not find Spring Batch Job: $jobName"]
+			return [success: false, message:"Did not find Spring Batch Job: $jobName",
+					failurePriority: 'high']
 		}
 		
 		// Can we run more than one at a time?
 		if(!canBeConcurrent && hasRunningExecutions(jobName)) {
-			return [success: false, message:"Attempted to launch $jobName, but it is currently running.  Aborting launch."]
+			return [success: false, 
+					message:"Attempted to launch $jobName, but it is currently running.  Aborting launch.",
+					failurePriority: 'low']
 		}
 		
 		// Select Job Launcher
@@ -172,7 +177,8 @@ where bji.job_name = ?
 			log.debug "JobLaucher $jobLauncherName selected but not found, trying $defaultJobLauncher"
 		}
 		if(!selectedLauncher) {
-			return [success: false, message:"Invalid jobLauncher $jobLauncherName selected"]
+			return [success: false, message:"Invalid jobLauncher $jobLauncherName selected",
+					failurePriority: 'high']
 		}
 		
 		// Select Job Parameters
@@ -185,7 +191,7 @@ where bji.job_name = ?
 		try{
 			selectedLauncher.run(job, jobParams)
 		}catch(JobInstanceAlreadyCompleteException jiace){
-			return[success: false, message: jiace.message]
+			return[success: false, message: jiace.message, failurePriority: 'high']
 		}
 		
 		return [success: true, message:"Spring Batch Job($jobName) launched from EtlService"]

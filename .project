@@ -26,7 +26,18 @@
 		<link>
 			<name>.link_to_grails_plugins</name>
 			<type>2</type>
-			<location>/data/7200/code/infinum/workspace/grails-spring-batch/target/plugins</location>
+			<location>/data/allegro/code/infinum/workspace/grails-spring-batch/target/plugins</location>
 		</link>
 	</linkedResources>
+	<filteredResources>
+		<filter>
+			<id>1401293364662</id>
+			<name>test/projects</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
 </projectDescription>
