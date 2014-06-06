@@ -58,7 +58,7 @@ class SpringBatchGrailsPlugin {
         def dataSourceBean = conf.dataSource
         def loadRequired = loadRequiredSpringBatchBeans.clone()
         loadRequired.delegate = delegate
-        loadRequired(dataSourceBean, tablePrefix, conf.dataase)
+        loadRequired(dataSourceBean, tablePrefix, conf.database)
 
         def loadConfig = loadBatchConfig.clone()
         loadConfig.delegate = delegate
