@@ -48,16 +48,16 @@ grails.project.dependency.resolution = {
 			exclude "junit"
 		}
     }
-	
-	codenarc.ruleSetFiles="file:grails-app/conf/CodeNarcRules.groovy"
-	codenarc.processTestUnit=false
-	codenarc.processTestIntegration=false
-	codenarc.reports = {
-		xmlReport('xml') {
-			outputFile = 'target/CodeNarc-Report.xml'
-		}
-		htmlReport('html') {
-			outputFile = 'target/CodeNarc-Report.html'
-		}
+}
+
+codenarc.ruleSetFiles="file:grails-app/conf/CodeNarcRules.groovy"
+codenarc.processTestUnit=false
+codenarc.processTestIntegration=false
+codenarc.reports = {
+	xmlReport('xml') {
+		outputFile = 'target/CodeNarc-Report.xml'
+	}
+	htmlReport('html') {
+		outputFile = 'target/CodeNarc-Report.html'
 	}
 }
