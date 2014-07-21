@@ -2,7 +2,7 @@
 target
 target-eclipse
 plugin.xml
-web-app
+/web-app
 *.iml
 *.ipr
 *.iws
