@@ -112,7 +112,9 @@ class SpringBatchService implements  ApplicationListener {
 	void stopAllJobExecutions(){
 		Collection<String> jobs = jobService.listJobs(0, jobService.countJobs())
 		jobs.each{
-			stopAllJobExecutions(it)
+			if(hasRunningExecutions(it)){
+				stopAllJobExecutions(it)
+			}
 		}
 	}
 	
