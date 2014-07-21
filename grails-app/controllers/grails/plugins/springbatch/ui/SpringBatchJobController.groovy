@@ -81,7 +81,9 @@ class SpringBatchJobController {
 
 	def stopAllExecutions(String id) {
 		if(!id) {
-			flash.error = 'No job selected to stop'
+			springBatchService.stopAllJobExecutions()
+			
+			flash.message = 'Stopping all Job Executions for all Jobs'
 			redirect(action:"list")
 		} else {
 			springBatchService.stopAllJobExecutions(id)

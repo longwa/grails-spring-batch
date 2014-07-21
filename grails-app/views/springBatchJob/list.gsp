@@ -16,6 +16,8 @@
 						<g:link controller="springBatchJob" action="enableLaunching">
 							<g:message code="batch.enableLaunching"/></g:link></g:else>
 				</li>
+				<li><g:link action="stopAllExecutions">
+					<g:message code="batch.job.stopall.label"/></g:link></li>
 			</ul>
 		</div>
 		<div id="list-jobModel" class="content scaffold-list" role="main">
