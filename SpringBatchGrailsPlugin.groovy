@@ -20,7 +20,7 @@ import org.springframework.jmx.support.ConnectorServerFactoryBean
 import org.springframework.remoting.rmi.RmiRegistryFactoryBean
 
 class SpringBatchGrailsPlugin {
-    def version = "2.0.3"
+    def version = "2.0.4"
     def grailsVersion = "2.0 > *"
     def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"

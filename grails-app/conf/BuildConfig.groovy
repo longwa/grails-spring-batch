@@ -50,7 +50,7 @@ grails.project.dependency.resolution = {
     }
 }
 
-codenarc.ruleSetFiles="file:grails-app/conf/CodeNarcRules.groovy"
+codenarc.ruleSetFiles="file:grails-app/conf/GrailsSpringBatchCodeNarcRules.groovy"
 codenarc.processTestUnit=false
 codenarc.processTestIntegration=false
 codenarc.reports = {
