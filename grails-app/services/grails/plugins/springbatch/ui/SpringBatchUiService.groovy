@@ -193,7 +193,7 @@ class SpringBatchUiService {
 	}
 	
 	StepExecutionModel stepExecutionModel(StepExecution stepExecution){
-		log.info(" jobExecutionId: ${stepExecution.jobExecutionId},  jobExecution: ${stepExecution.jobExecution}")
+		log.debug(" jobExecutionId: ${stepExecution.jobExecutionId},  jobExecution: ${stepExecution.jobExecution}")
 		
 		new StepExecutionModel(
 			id: stepExecution.id,
