@@ -221,16 +221,21 @@ class SpringBatchUiService {
 	}
 	
 	PagedResult<StepExecutionModel> getStepExecutionModels(Long jobExecutionId, Map params) {
-		def stepExecutions = jobService.getStepExecutions(jobExecutionId)
-		int stepExecutionCount = stepExecutions.size()
+		try{
+			def stepExecutions = jobService.getStepExecutions(jobExecutionId)
+			int stepExecutionCount = stepExecutions.size()
 
-		initPaging(params, stepExecutionCount)
+			initPaging(params, stepExecutionCount)
 
-		Collection<StepExecutionModel> stepExecutionModels = SpringBatchUiUtilities.paginate(params.offset, params.max) {
-			stepExecutions.collect {stepExecutionModel(it)}
+			Collection<StepExecutionModel> stepExecutionModels = SpringBatchUiUtilities.paginate(params.offset, params.max) {
+				stepExecutions.collect {stepExecutionModel(it)}
+			}
+			return new PagedResult<JobExecutionModel>(resultsTotalCount: stepExecutionCount,
+					results: stepExecutionModels)
+		}catch(Exception e){
+			log.error("Failed to fetch Step Executions for JobExecution: $jobExecutionId", e)
+			return new PagedResult<JobExecutionModel>(results:[])
 		}
-		return new PagedResult<JobExecutionModel>(resultsTotalCount: stepExecutionCount,
-				results: stepExecutionModels)
 	}
 	
 	PagedResult<StepExecutionModel> previousStepExecutionModels(

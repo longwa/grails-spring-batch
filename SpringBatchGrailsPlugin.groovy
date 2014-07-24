@@ -20,7 +20,7 @@ import org.springframework.jmx.support.ConnectorServerFactoryBean
 import org.springframework.remoting.rmi.RmiRegistryFactoryBean
 
 class SpringBatchGrailsPlugin {
-    def version = "2.0.4"
+    def version = "2.0.6"
     def grailsVersion = "2.0 > *"
     def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"
@@ -58,11 +58,11 @@ class SpringBatchGrailsPlugin {
     def doWithSpring = {
         def conf = application.config.plugin.springBatch
 
-        def tablePrefix = conf.tablePrefix
+        String tablePrefix = conf.tablePrefix ? (conf.tablePrefix + '_' ) : ''
         def dataSourceBean = conf.dataSource
         def loadRequired = loadRequiredSpringBatchBeans.clone()
         loadRequired.delegate = delegate
-        loadRequired(dataSourceBean, tablePrefix, conf.dataase)
+        loadRequired(dataSourceBean, tablePrefix, conf.database)
 
         def loadConfig = loadBatchConfig.clone()
         loadConfig.delegate = delegate
@@ -151,13 +151,14 @@ class SpringBatchGrailsPlugin {
         loadBeans 'classpath*:/batch/*BatchConfig.groovy'
     }
 
-    def loadRequiredSpringBatchBeans = { def dataSourceBean, def tablePrefixValue, def dbType ->
-        jobRepository(JobRepositoryFactoryBean) {
+    def loadRequiredSpringBatchBeans = { def dataSourceBean, def tablePrefixVal, def dbType ->
+
+		jobRepository(JobRepositoryFactoryBean) {
             dataSource = ref(dataSourceBean)
             transactionManager = ref("transactionManager")
-            isolationLevelForCreate: "SERIALIZABLE"
-            tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
-            databaseType: dbType
+            tablePrefix = tablePrefixVal
+            databaseType = dbType
+            //isolationLevelForCreate = "SERIALIZABLE"
         }
 		
 		/*
@@ -178,7 +179,7 @@ class SpringBatchGrailsPlugin {
 		
         jobExplorer(JobExplorerFactoryBean) {
             dataSource = ref(dataSourceBean)
-            tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
+            tablePrefix = tablePrefixVal
         }
         jobRegistry(MapJobRegistry) { }
         //Use a custom bean post processor that will unregister the job bean before trying to initializing it again
@@ -200,7 +201,7 @@ class SpringBatchGrailsPlugin {
             jobLauncher = ref("jobLauncher")
             jobLocator = ref("jobRegistry")
             dataSource = ref(dataSourceBean)
-            tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
+            tablePrefix = tablePrefixVal
         }
     }
 
