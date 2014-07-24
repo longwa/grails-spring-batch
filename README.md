@@ -8,10 +8,10 @@ The Grails Spring Batch plugin is built using Grails 2.x, it currently has not b
 
 To install the plugin, add the following entry to your `BuildConfig.groovy` file in the plugins sections:
 ```groovy
-compile ':spring-batch:1.0'
+compile ':spring-batch:2.0.8'
 ```
 
-Once the plugin is installed, you can define your Spring Batch job configuration in a Groovy script file in your application's `grails-app/batch` directory. The script's filename must end with BatchConfig (i.e. `SimpleJobBatchConfig.groovy`). Define your Spring Bach job using the Grails BeanBuilder syntax (just like in the `resources.groovy` file).
+Once the plugin is installed, you can define your Spring Batch job configuration in a Groovy script file in your application's `grails-app/batch` directory. The script's filename must end with BatchConfig (i.e. `SimpleJobBatchConfig.groovy`). Define your Spring Batch job using the Grails BeanBuilder syntax (just like in the `resources.groovy` file).
 
 To launch a job from your application do the following:
 
@@ -73,6 +73,9 @@ The plugin provides the following scripts:
 + loadTables - if true, will attempt to execute the Spring Batch DDL for the specified database type during startup. Should set to true in test phases.
   + Type: Boolean
   + Default: false
++ maxVarCharLength- Messages in the job_execution, step_execution, and job_execution_context are truncated to this value.  If you increase it above its default of 2500, you'll need to adjust your table constraints accordingly.
+  + Type: Integer
+  + Default: 2500
 + database - The database type to use: db2, derby, h2, hsqldb, mysql, oracle10g, postgresql, sqlserver, sybase
   + Type: String
   + Default: h2

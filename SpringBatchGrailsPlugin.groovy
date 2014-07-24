@@ -19,8 +19,11 @@ import org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler
 import org.springframework.jmx.support.ConnectorServerFactoryBean
 import org.springframework.remoting.rmi.RmiRegistryFactoryBean
 
+import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao
+
+
 class SpringBatchGrailsPlugin {
-    def version = "2.0.7"
+    def version = "2.0.8"
     def grailsVersion = "2.0 > *"
     def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"
@@ -49,6 +52,7 @@ class SpringBatchGrailsPlugin {
         'jmx.remote.name'(type: String, defaultValue: 'springBatch')
         'dataSource'(type: String, defaultValue: "dataSource")
         'tablePrefix'(type: String, defaultValue: "BATCH")
+        'maxVarCharLength'(type: Integer, defaultValue: AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH)
         'loadTables'(type: Boolean, defaultValue: false)
         'database'(type: String, defaultValue: 'h2', validator: { v ->
             v ? null : 'batch.specify.database.type'
@@ -60,9 +64,10 @@ class SpringBatchGrailsPlugin {
 
         String tablePrefix = conf.tablePrefix ? (conf.tablePrefix + '_' ) : ''
         def dataSourceBean = conf.dataSource
+		def maxVarCharLength = conf.maxVarCharLength
         def loadRequired = loadRequiredSpringBatchBeans.clone()
         loadRequired.delegate = delegate
-        loadRequired(dataSourceBean, tablePrefix, conf.database)
+        loadRequired(dataSourceBean, tablePrefix, conf.database, maxVarCharLength)
 
         def loadConfig = loadBatchConfig.clone()
         loadConfig.delegate = delegate
@@ -151,13 +156,15 @@ class SpringBatchGrailsPlugin {
         loadBeans 'classpath*:/batch/*BatchConfig.groovy'
     }
 
-    def loadRequiredSpringBatchBeans = { def dataSourceBean, def tablePrefixVal, def dbType ->
+    def loadRequiredSpringBatchBeans = { def dataSourceBean, String tablePrefixVal, 
+			String dbType, int maxVarCharLengthVal ->
 
 		jobRepository(JobRepositoryFactoryBean) {
             dataSource = ref(dataSourceBean)
             transactionManager = ref("transactionManager")
             tablePrefix = tablePrefixVal
             databaseType = dbType
+            maxVarCharLength = maxVarCharLengthVal
             //isolationLevelForCreate = "SERIALIZABLE"
         }
 		
