@@ -40,12 +40,12 @@ class SpringBatchJobController {
     }
 	
 	def show(String id) {
-		if(!id) {
-			flash.error = "Please supply a job name"
-			redirect(controller: "springBatchJob", action: "list")
-		} else {
+		if(id) {
 			[job: springBatchUiService.jobModel(id),
 				jobModelInstances: springBatchUiService.getJobInstanceModels(id, params)]
+		} else {
+			flash.error = "Please supply a job name"
+			redirect(controller: "springBatchJob", action: "list")
 		}
 	}
 
@@ -80,16 +80,16 @@ class SpringBatchJobController {
 	}
 
 	def stopAllExecutions(String id) {
-		if(!id) {
-			springBatchService.stopAllJobExecutions()
-			
-			flash.message = 'Stopping all Job Executions for all Jobs'
-			redirect(action:"list")
-		} else {
+		if(id) {
 			springBatchService.stopAllJobExecutions(id)
 			
 			flash.message = "Stopped all Job Executions for Job $id"
 			redirect(action:'show', id:id)
+		} else {
+			springBatchService.stopAllJobExecutions()
+			
+			flash.message = 'Stopping all Job Executions for all Jobs'
+			redirect(action:"list")
 		}
 	}
 }

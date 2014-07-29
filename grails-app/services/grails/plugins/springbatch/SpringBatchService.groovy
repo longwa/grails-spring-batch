@@ -7,7 +7,6 @@ import javax.sql.DataSource
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.spring.GrailsContextEvent
 import org.springframework.batch.admin.service.JobService
-import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobInstance
@@ -210,7 +209,7 @@ where bji.job_name = ?
 	 * Job parameters to use by default
 	 */
 	Map defaultJobParameters() {
-		['date': new JobParameter(new Date().getDateTimeString())]
+		['date': new JobParameter(new Date().dateTimeString)]
 	}
 	
 	/**
@@ -259,9 +258,7 @@ where bji.job_name = ?
 	
 	private DataSource _batchDataSource
 	private DataSource getBatchDataSource() {
-		if(!_batchDataSource) {
-			_batchDataSource = grailsApplication.mainContext.getBean(grailsApplication.config.plugin.springBatch.dataSource)
-		}
+		_batchDataSource = _batchDataSource ?: grailsApplication.mainContext.getBean(grailsApplication.config.plugin.springBatch.dataSource)
 		return _batchDataSource
 	}
 	private String _batchTablePrefix

@@ -2,8 +2,6 @@ package grails.plugins.springbatch.ui
 
 import grails.plugins.springbatch.model.StepExecutionModel
 
-import org.springframework.batch.admin.service.JobService
-
 class SpringBatchStepExecutionController {
 
     def springBatchUiService

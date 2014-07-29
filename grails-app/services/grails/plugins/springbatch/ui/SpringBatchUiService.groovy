@@ -25,7 +25,7 @@ class SpringBatchUiService {
 
 	JobService jobService
 	
-	private NaturalSort naturalSort = new NaturalSort()
+	private final NaturalSort naturalSort = new NaturalSort()
 
 
 
@@ -96,9 +96,7 @@ class SpringBatchUiService {
 			}
 		}
 		
-		if(!entries){
-			entries = springBatchService.defaultJobParameters()
-		}
+		entries = entries?: springBatchService.defaultJobParameters()
 		
 		return springBatchService.mapToJobParameters(entries)
 	}
@@ -115,7 +113,7 @@ class SpringBatchUiService {
 				jobService.getJobExecutionsForJobInstance(
 						jobInstance.jobName, jobInstance.id)
 		
-		Collection<JobExecutionModel> jobExecutionModels = jobExecutions.collect(){JobExecution jobExecution ->
+		Collection<JobExecutionModel> jobExecutionModels = jobExecutions.collect {JobExecution jobExecution ->
 			jobExecutionModel(jobExecution)
 		}
 		

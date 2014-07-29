@@ -28,17 +28,17 @@ import org.springframework.batch.core.step.StepLocator
 class PatchedSimpleJobService extends SimpleJobService {
 
 	
-	private static Log logger = LogFactory.getLog(PatchedSimpleJobService)
+	private static final Log LOGGER = LogFactory.getLog(PatchedSimpleJobService)
 	
-	private SearchableJobInstanceDao jobInstanceDao;
+	private final SearchableJobInstanceDao jobInstanceDao
 
-	private SearchableJobExecutionDao jobExecutionDao;
+	private final SearchableJobExecutionDao jobExecutionDao
 	
-	private ListableJobLocator jobLocator;
+	private final ListableJobLocator jobLocator
 
-	private SearchableStepExecutionDao stepExecutionDao;
+	private final SearchableStepExecutionDao stepExecutionDao
 	
-	public PatchedSimpleJobService(SearchableJobInstanceDao jobInstanceDao, 
+	PatchedSimpleJobService(SearchableJobInstanceDao jobInstanceDao, 
 			SearchableJobExecutionDao jobExecutionDao,
 			SearchableStepExecutionDao stepExecutionDao, 
 			JobRepository jobRepository, JobLauncher jobLauncher,
@@ -47,61 +47,61 @@ class PatchedSimpleJobService extends SimpleJobService {
 		super(jobInstanceDao, jobExecutionDao, stepExecutionDao, jobRepository,
 				jobLauncher, jobLocator, executionContextDao)
 		
-		this.jobInstanceDao = jobInstanceDao;
-		this.jobExecutionDao = jobExecutionDao;
-		this.stepExecutionDao = stepExecutionDao;
-		this.jobLocator = jobLocator;
+		this.jobInstanceDao = jobInstanceDao
+		this.jobExecutionDao = jobExecutionDao
+		this.stepExecutionDao = stepExecutionDao
+		this.jobLocator = jobLocator
 	}
 
 	@Override
-	public Collection<StepExecution> getStepExecutions(Long jobExecutionId) throws NoSuchJobExecutionException {
+	Collection<StepExecution> getStepExecutions(Long jobExecutionId) throws NoSuchJobExecutionException {
 		
-		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
+		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId)
 		if (jobExecution == null) {
-		throw new NoSuchJobExecutionException("No JobExecution with id=" + jobExecutionId);
+		throw new NoSuchJobExecutionException("No JobExecution with id=" + jobExecutionId)
 		}
 		
-		stepExecutionDao.addStepExecutions(jobExecution);
+		stepExecutionDao.addStepExecutions(jobExecution)
 		
 		/**
 		 * This patch was applied in  commit bd0ed8ff9c01e63d5b56f6ed64d38c3ef26e13f8 of the spring batch admin project
 		 */
-		//String jobName = jobExecution.getJobInstance() == null ? null : jobExecution.getJobInstance().getJobName();
-		String jobName = jobExecution.getJobInstance() == null ? jobInstanceDao.getJobInstance(jobExecution).getJobName() : jobExecution.getJobInstance().getJobName();
-		Collection<String> missingStepNames = new LinkedHashSet<String>();
+		//String jobName = jobExecution.getJobInstance() == null ? null : jobExecution.getJobInstance().getJobName()
+		String jobName = jobExecution.jobInstance == null ? jobInstanceDao.getJobInstance(jobExecution).jobName : jobExecution.jobInstance.jobName
+		Collection<String> missingStepNames = new LinkedHashSet<String>()
 		
 		if (jobName != null) {
-		missingStepNames.addAll(stepExecutionDao.findStepNamesForJobExecution(jobName, "*:partition*"));
-		logger.debug("Found step executions in repository: " + missingStepNames);
+		missingStepNames.addAll(stepExecutionDao.findStepNamesForJobExecution(jobName, "*:partition*"))
+		LOGGER.debug("Found step executions in repository: " + missingStepNames)
 		}
 		
-		Job job = null;
+		Job job = null
 		try {
-		job = jobLocator.getJob(jobName);
+		job = jobLocator.getJob(jobName)
 		}
 		catch (NoSuchJobException e) {
 		// expected
 		}
 		if (job instanceof StepLocator) {
-		Collection<String> stepNames = ((StepLocator) job).getStepNames();
-		missingStepNames.addAll(stepNames);
-		logger.debug("Added step executions from job: " + missingStepNames);
+		Collection<String> stepNames = ((StepLocator) job).stepNames
+		missingStepNames.addAll(stepNames)
+		LOGGER.debug("Added step executions from job: " + missingStepNames)
 		}
 		
-		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-		String stepName = stepExecution.getStepName();
+		for (StepExecution stepExecution : jobExecution.stepExecutions) {
+		String stepName = stepExecution.stepName
 		if (missingStepNames.contains(stepName)) {
-		missingStepNames.remove(stepName);
+		missingStepNames.remove(stepName)
 		}
-		logger.debug("Removed step executions from job execution: " + missingStepNames);
+		LOGGER.debug("Removed step executions from job execution: " + missingStepNames)
 		}
 		
 		for (String stepName : missingStepNames) {
-		StepExecution stepExecution = jobExecution.createStepExecution(stepName);
-		stepExecution.setStatus(BatchStatus.UNKNOWN);
+		StepExecution stepExecution = jobExecution.createStepExecution(stepName)
+		stepExecution.setStatus(BatchStatus.UNKNOWN)
 		}
 		
-		return jobExecution.getStepExecutions();
+		return jobExecution.stepExecutions
 		
 		}
 }

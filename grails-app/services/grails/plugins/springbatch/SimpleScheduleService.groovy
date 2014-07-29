@@ -1,7 +1,6 @@
 package grails.plugins.springbatch
 
-import org.codehaus.groovy.grails.commons.GrailsApplication;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.codehaus.groovy.grails.commons.GrailsApplication
 
 /**
  * This service facilitates usage of the SpringBatchService with headless clients

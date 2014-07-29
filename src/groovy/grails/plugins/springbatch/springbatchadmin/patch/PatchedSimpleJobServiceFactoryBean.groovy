@@ -1,14 +1,14 @@
 package grails.plugins.springbatch.springbatchadmin.patch
 
-import org.springframework.batch.admin.service.JobService;
-import org.springframework.batch.admin.service.SimpleJobService;
+import org.springframework.batch.admin.service.JobService
+import org.springframework.batch.admin.service.SimpleJobService
 import org.springframework.batch.admin.service.SimpleJobServiceFactoryBean
-import org.springframework.batch.core.configuration.JobLocator;
-import org.springframework.batch.core.configuration.ListableJobLocator;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.batch.core.configuration.JobLocator
+import org.springframework.batch.core.configuration.ListableJobLocator
+import org.springframework.batch.core.launch.JobLauncher
+import org.springframework.batch.core.repository.JobRepository
+import org.springframework.beans.factory.FactoryBean
+import org.springframework.beans.factory.InitializingBean
 
 /**
  * The only purpose of this class is to create a patched version of the SimpleJobService.
@@ -69,7 +69,7 @@ class PatchedSimpleJobServiceFactoryBean implements FactoryBean<JobService>, Ini
 	}
 
 	void setJobLocator(ListableJobLocator jobLocator) {
-		this.jobLocator = jobLocator;
+		this.jobLocator = jobLocator
 		simpleJobServiceFactoryBean.jobLocator = jobLocator
 	}
 }
