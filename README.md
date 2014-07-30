@@ -62,7 +62,8 @@ springBatchService.launch('myJobName')
 ```
 
 The method signature for such is:
-```Map launch(String jobName, boolean canBeConcurrent=true, JobParameters jobParams = null, String jobLauncherName = null)
+```groovy
+Map launch(String jobName, boolean canBeConcurrent=true, JobParameters jobParams = null, String jobLauncherName = null)
 ```
 There are defaults for the last 3 parameters.  
  * When canBeConcurrent is set to false, The plugin will look to see if this job is already executing and abort launch if running.  When true, it will always launch a new job.
@@ -74,7 +75,9 @@ The return value is a map containing whether the job was successful, and a messa
 
 ## Monitoring
 You can check the status of the last execution of a job with springBatchService:
+```groovy
 springBatchService.status('myJobName')
+```
 Which will return a map with [success:successRun, running:isRunningNow, executionStartTime:lastExecutionStartTime, executionEndTime: lastExecutionEndTime]
 
 
