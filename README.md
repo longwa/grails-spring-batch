@@ -177,8 +177,10 @@ After pressing execute, you can go to the application console (i.e. shell), and 
 An additional test project is included at `test/projects/simple-schedule`.  The purpose of which is to demonstrate how to add basic Spring Scheduling to your project.  You are free though to use any scheduler with the plugin.  
 
 You can run it by cloning the grails-spring-batch repository to your system, go to the yourCloneDirectory/test/projects/simple-schedule directory and run the command:
-```    grails run-app
 ```
+    grails run-app
+```
+
 You can view: 
 The schedule in src/groovy/scheduling/Schedule.groovy,
 The required configuration in grails-app/conf/Config.groovy
