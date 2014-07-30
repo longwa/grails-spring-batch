@@ -151,7 +151,8 @@ A sample / test project is included with the original plugin source, available a
 
 * Zip up the github repository, unzip it into directory called grails-spring-batch.  Then go into `test/projects/spring-batch-test` directory.  
 * The default project uses h2, so run the command 
-```    grails create-batch-tables
+```
+    grails create-batch-tables
 ```
 
 * After that start the application (grails run-app), you will find it at http://localhost:8080/spring-batch-test/
