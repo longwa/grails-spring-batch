@@ -47,6 +47,37 @@ class FooService {
 }
 ```
 
+
+## Alternative Method for starting a job:
+Once you've defined your job, you can choose to start it using the SpringBatchService.  
+
+To do so, inject the springBatchService into your artifact with:
+```groovy
+def springBatchService
+```
+
+You can then start your service:
+```groovy
+springBatchService.launch('myJobName')
+```
+
+The method signature for such is:
+```Map launch(String jobName, boolean canBeConcurrent=true, JobParameters jobParams = null, String jobLauncherName = null)
+```
+There are defaults for the last 3 parameters.  
+ * When canBeConcurrent is set to false, The plugin will look to see if this job is already executing and abort launch if running.  When true, it will always launch a new job.
+ * If no jobParams are submitted, a default JobParameters is created with a map [date: new Date()]
+ * If you want to override the jobLauncher, you can do so with the jobLauncher Bean Name - initially configured choices configured by the plugin are "jobLauncher" and "syncJobLauncher".  The default is the "jobLauncher" bean
+
+The return value is a map containing whether the job was successful, and a message regarding either why it failed or what job was started
+
+
+## Monitoring
+You can check the status of the last execution of a job with springBatchService:
+springBatchService.status('myJobName')
+Which will return a map with [success:successRun, running:isRunningNow, executionStartTime:lastExecutionStartTime, executionEndTime: lastExecutionEndTime]
+
+
 ## Supported Features
 
 The plugin creates the following Spring Beans:
@@ -111,7 +142,7 @@ xmlns mybatchns:"http://www.springframework.org/schema/batch"
 
 inside the beans {} closure.
 
-## Sample Project
+## Sample Project Spring-Batch-Test
 
 A sample / test project is included with the original plugin source, available at `test/projects/spring-batch-test`.  To get running, follow the instructions below:  
 
@@ -138,8 +169,37 @@ After pressing execute, you can go to the application console (i.e. shell), and 
 * See run record in the db.   Running select queries on batch tables will now show you information written about the run. 
 
 
-## Versions
+## Sample Project Simple-Schedule
+An additional test project is included at `test/projects/simple-schedule`.  The purpose of which is to demonstrate how to add basic Spring Scheduling to your project.  You are free though to use any scheduler with the plugin.  
 
+You can run it by cloning the grails-spring-batch repository to your system, go to the yourCloneDirectory/test/projects/simple-schedule directory and run the command:
+```    grails run-app
+```
+You can view: 
+The schedule in src/groovy/scheduling/Schedule.groovy,
+The required configuration in grails-app/conf/Config.groovy
+The example jobs are in grails-app/batch/*JobBatchConfig.groovy
+
+The jobs will run fairly frequently to demonstrate the difference between async and sync jobs.  Be aware that sync jobs block the scheduler when running.
+
+
+## Versions
++ v.2.0.8
+  + Added ability to configure size of exit messages for job executions, step executions and contexts
+  + Added ability to start/restart/stop jobs in more locations
+  + Refactored / cleaned up UI in an attempt to expose more information from the api, and make the controllers slightly more rest-like.  
+  + Fixed some bugs with paging, and a null pointer from the spring-batch-admin library.  
+  + Added more test data to test project.  
+  + Added sorting to job names.  
+  + Modify UI to use grails i18n support in more locations
+  + Create simple-schedule example project showing how to use basic scheduling available from the plugin
+  + Handle null job parameters on start/restart requests
+  + Added duration taglib to convert differences between long values as natural time duration
+  + Display whether a job is currently running.
+  + Add to views info regarding step executions
+  + Add method to get the status of a job for use with uptime
+  + Add Codenarc configuration
+  + Allow user to stop all executions for all jobs.
 + v.1.0
   + upgrade plugin to Grails 2.2.3
   + Dependent plugin updates

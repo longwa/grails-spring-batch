@@ -148,6 +148,7 @@ where bji.job_name = ?
 	 * is already executing and abort launch.  When true, it will always launch a new job
 	 * @param jobParams
 	 * @param jobLauncherName - initially configured choices "jobLauncher" and "syncJobLauncher"
+	 * @return map containing whether the job was successful, and a message regarding either why it failed or what job was started
 	 */
 	Map launch(String jobName, boolean canBeConcurrent=true, 
 			JobParameters jobParams = null, String jobLauncherName = null) {
