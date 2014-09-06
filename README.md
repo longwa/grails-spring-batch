@@ -1,6 +1,6 @@
 # GRAILS SPRING BATCH PLUGIN
 
-This plugin adds the Spring Batch framework to a Grails project. It's intent is to minimize/eliminate the need for verbose XML files to configure Spring Batch jobs. 
+This plugin adds the Spring Batch framework to a Grails project. It's intent is to minimize/eliminate the need for verbose XML files to configure Spring Batch jobs.
 
 ## Getting Started
 
@@ -8,7 +8,7 @@ The Grails Spring Batch plugin is built using Grails 2.x, it currently has not b
 
 To install the plugin, add the following entry to your `BuildConfig.groovy` file in the plugins sections:
 ```groovy
-compile ':spring-batch:2.0.8'
+compile ':spring-batch:2.0.0'
 ```
 
 Once the plugin is installed, you can define your Spring Batch job configuration in a Groovy script file in your application's `grails-app/batch` directory. The script's filename must end with BatchConfig (i.e. `SimpleJobBatchConfig.groovy`). Define your Spring Batch job using the Grails BeanBuilder syntax (just like in the `resources.groovy` file).
@@ -150,7 +150,7 @@ inside the beans {} closure.
 A sample / test project is included with the original plugin source, available at `test/projects/spring-batch-test`.  To get running, follow the instructions below:  
 
 * Zip up the github repository, unzip it into directory called grails-spring-batch.  Then go into `test/projects/spring-batch-test` directory.  
-* The default project uses h2, so run the command 
+* The default project uses h2, so run the command
 ```
     grails create-batch-tables
 ```
@@ -158,7 +158,7 @@ A sample / test project is included with the original plugin source, available a
 * After that start the application (grails run-app), you will find it at http://localhost:8080/spring-batch-test/
 * Check db tables were created.  Go to dbconsole at http://localhost:8080/spring-batch-test/dbconsole/.  
    Substitute jdbc string to connect to the devDb: `jdbc:h2:mem:devDb;MVCC=TRUE`.
-   Connect and make sure a bunch of tables that start with BATCH* exist.   All of the tables will have zero entries until the first run. 
+   Connect and make sure a bunch of tables that start with BATCH* exist.   All of the tables will have zero entries until the first run.
 * Run Included Simple Job.  Go to console, http://localhost:8080/spring-batch-test/console.  Type in or paste the following code into console window:  
 
 ```groovy
@@ -170,7 +170,7 @@ A sample / test project is included with the original plugin source, available a
 
 After pressing execute, you can go to the application console (i.e. shell), and you should see text `Starting Job`.  That means the batch job ran fine.  You can view the definition and modify at `ROOT/test\projects\spring-batch-test\grails-app\batch\SimpleJobBatchConfig.groovy`.
 
-* See run record in the db.   Running select queries on batch tables will now show you information written about the run. 
+* See run record in the db.   Running select queries on batch tables will now show you information written about the run.
 
 
 ## Sample Project Simple-Schedule
@@ -181,7 +181,7 @@ You can run it by cloning the grails-spring-batch repository to your system, go 
     grails run-app
 ```
 
-You can view: 
+You can view:
 The schedule in src/groovy/scheduling/Schedule.groovy,
 The required configuration in grails-app/conf/Config.groovy
 The example jobs are in grails-app/batch/*JobBatchConfig.groovy
@@ -190,7 +190,7 @@ The jobs will run fairly frequently to demonstrate the difference between async 
 
 
 ## Versions
-+ v.2.0.8
++ v.2.0.0 (thanks to [Daniel Bower](https://github.com/danieldbower))
   + Added ability to configure size of exit messages for job executions, step executions and contexts
   + Added ability to start/restart/stop jobs in more locations
   + Refactored / cleaned up UI in an attempt to expose more information from the api, and make the controllers slightly more rest-like.  
