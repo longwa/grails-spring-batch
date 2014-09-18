@@ -23,7 +23,7 @@ import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDa
 
 
 class SpringBatchGrailsPlugin {
-    def version = "2.0.8"
+    def version = "2.0.0"
     def grailsVersion = "2.0 > *"
     def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"
@@ -32,9 +32,9 @@ class SpringBatchGrailsPlugin {
 
     def documentation = "https://github.com/johnrengelman/grails-spring-batch"
     def license = "APACHE"
-	def developers = [
-		[name: "Daniel Bower", email: "daniel.bower@infinum.com"],
-		]
+    def developers = [
+        [name: "Daniel Bower", email: "daniel.bower@infinum.com"],
+    ]
     def issueManagement = [ system: "JIRA", url: "https://github.com/johnrengelman/grails-spring-batch/issues" ]
     def scm = [ url: "https://github.com/johnrengelman/grails-spring-batch" ]
 
@@ -64,7 +64,7 @@ class SpringBatchGrailsPlugin {
 
         String tablePrefix = conf.tablePrefix ? (conf.tablePrefix + '_' ) : ''
         def dataSourceBean = conf.dataSource
-		def maxVarCharLength = conf.maxVarCharLength
+        def maxVarCharLength = conf.maxVarCharLength
         def loadRequired = loadRequiredSpringBatchBeans.clone()
         loadRequired.delegate = delegate
         loadRequired(dataSourceBean, tablePrefix, conf.database, maxVarCharLength)
@@ -156,10 +156,10 @@ class SpringBatchGrailsPlugin {
         loadBeans 'classpath*:/batch/*BatchConfig.groovy'
     }
 
-    def loadRequiredSpringBatchBeans = { def dataSourceBean, String tablePrefixVal, 
-			String dbType, int maxVarCharLengthVal ->
+    def loadRequiredSpringBatchBeans = { def dataSourceBean, String tablePrefixVal,
+        String dbType, int maxVarCharLengthVal ->
 
-		jobRepository(JobRepositoryFactoryBean) {
+        jobRepository(JobRepositoryFactoryBean) {
             dataSource = ref(dataSourceBean)
             transactionManager = ref("transactionManager")
             tablePrefix = tablePrefixVal
@@ -167,23 +167,23 @@ class SpringBatchGrailsPlugin {
             maxVarCharLength = maxVarCharLengthVal
             //isolationLevelForCreate = "SERIALIZABLE"
         }
-		
-		/*
-		 * Async launcher to use by default
-		 */
+
+        /*
+         * Async launcher to use by default
+         */
         jobLauncher(SimpleJobLauncher){
             jobRepository = ref("jobRepository")
             taskExecutor = { SimpleAsyncTaskExecutor executor -> }
         }
 
-		/*
-		 * Additional Job Launcher to support synchronous scheduling
-		 */
-		syncJobLauncher(SimpleJobLauncher){
-			jobRepository = ref("jobRepository")
-			taskExecutor = { SyncTaskExecutor executor -> }
-		}
-		
+        /*
+         * Additional Job Launcher to support synchronous scheduling
+         */
+        syncJobLauncher(SimpleJobLauncher){
+            jobRepository = ref("jobRepository")
+            taskExecutor = { SyncTaskExecutor executor -> }
+        }
+
         jobExplorer(JobExplorerFactoryBean) {
             dataSource = ref(dataSourceBean)
             tablePrefix = tablePrefixVal
