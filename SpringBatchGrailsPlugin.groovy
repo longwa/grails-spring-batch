@@ -23,8 +23,8 @@ import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDa
 
 
 class SpringBatchGrailsPlugin {
-    def version = "2.0.0"
-    def grailsVersion = "2.0 > *"
+    def version = "2.5.0"
+    def grailsVersion = "2.5 > *"
     def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"
     def authorEmail = "john.r.engelman@gmail.com"
@@ -43,29 +43,21 @@ class SpringBatchGrailsPlugin {
         "file:./plugins/*/grails-app/batch/**/*BatchConfig.groovy",
     ]
 
-    //From Platform Core
-    def doWithConfigOptions = {
-        'jmx.enable'(type: Boolean, defaultValue: false)
-        'jmx.name'(type: String, defaultValue: 'jobOperator')
-        'jmx.remote.enable'(type: Boolean, defaultValue: false)
-        'jmx.remote.rmi.port'(type: Integer, defaultValue: 1099)
-        'jmx.remote.name'(type: String, defaultValue: 'springBatch')
-        'dataSource'(type: String, defaultValue: "dataSource")
-        'tablePrefix'(type: String, defaultValue: "BATCH")
-        'maxVarCharLength'(type: Integer, defaultValue: AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH)
-        'loadTables'(type: Boolean, defaultValue: false)
-        'database'(type: String, defaultValue: 'h2', validator: { v ->
-            v ? null : 'batch.specify.database.type'
-        })
-    }
-
     def doWithSpring = {
         def conf = application.config.plugin.springBatch
 
-        String tablePrefix = conf.tablePrefix ? (conf.tablePrefix + '_' ) : ''
-        def dataSourceBean = conf.dataSource
-        def maxVarCharLength = conf.maxVarCharLength
+        // Database is required
+        if (!conf.database) {
+            log.warn "'plugin.springBatch.database' not configured, using H2 by default..."
+            conf.database = 'h2'
+        }
+
+        String tablePrefix = conf.tablePrefix ? (conf.tablePrefix + '_' ) : 'BATCH_'
+
+        def dataSourceBean = conf.dataSource ?: 'dataSource'
+        def maxVarCharLength = conf.maxVarCharLength ?: AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH
         def loadRequired = loadRequiredSpringBatchBeans.clone()
+
         loadRequired.delegate = delegate
         loadRequired(dataSourceBean, tablePrefix, conf.database, maxVarCharLength)
 
@@ -78,14 +70,14 @@ class SpringBatchGrailsPlugin {
         def loadRemoteJmx = conf.jmx.remote.enable
 
         if(loadJmx) {
-            def jmxExportName = conf.jmx.name
+            def jmxExportName = conf.jmx.name ?: 'jobOperator'
             def loadJmxClosure = loadSpringBatchJmx.clone()
             loadJmxClosure.delegate = delegate
             loadJmxClosure(jmxExportName)
         }
         if(loadRemoteJmx) {
-            def jmxRemoteRmiPort = conf.jmx.remote.rmi.port
-            def jmxRemoteExportName = conf.jmx.remote.name
+            def jmxRemoteRmiPort = conf.jmx.remote.rmi.port ?: 1099
+            def jmxRemoteExportName = conf.jmx.remote.name ?: 'springBatch'
             def loadRemoteJmxClosure = loadSpringBatchRemoteJmx.clone()
             loadRemoteJmxClosure.delegate = delegate
             loadRemoteJmxClosure(jmxRemoteRmiPort, jmxRemoteExportName)
@@ -94,8 +86,9 @@ class SpringBatchGrailsPlugin {
 
     def doWithApplicationContext = { applicationContext ->
         def conf = application.config.plugin.springBatch
-        String dataSourceName = conf.dataSource
-        def database = conf.database
+        String dataSourceName = conf.dataSource ?: 'dataSource'
+        def database = conf.database ?: 'h2'
+
         def loadTables = conf.loadTables
         if(loadTables) {
             if(database) {
@@ -216,11 +209,6 @@ class SpringBatchGrailsPlugin {
         def serviceName = "spring:service=batch,bean=${exportName}".toString()
         springBatchExporter(MBeanExporter) {bean ->
             beans = [
-                //TODO GRAILS-6557
-//                "spring:service=batch,bean=jobOperator": {ProxyFactoryBean proxyFactoryBean ->
-//                    target = ref("jobOperator")
-//                    interceptorNames = "exceptionTranslator"
-//                }
                 (serviceName): ref("jobOperator")
             ]
             assembler = {InterfaceBasedMBeanInfoAssembler interfaceBasedMBeanInfoAssembler ->

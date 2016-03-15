@@ -9,15 +9,17 @@ class JobInstanceModel {
 
     Long id
     String jobName
-	
+
     Integer jobExecutionCount
     BatchStatus lastJobExecutionStatus
 
 	List<JobExecutionModel> executions
-	
-	Map jobParameters
-	
-	boolean isStoppable(){
+
+	boolean isStoppable() {
 		return lastJobExecutionStatus == BatchStatus.STARTED
+	}
+
+	Map getJobParameters() {
+		executions ? executions.last().jobParameters : [:]
 	}
 }

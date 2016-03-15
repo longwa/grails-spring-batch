@@ -259,7 +259,7 @@ where bji.job_name = ?
 	
 	private DataSource _batchDataSource
 	private DataSource getBatchDataSource() {
-		_batchDataSource = _batchDataSource ?: grailsApplication.mainContext.getBean(grailsApplication.config.plugin.springBatch.dataSource)
+		_batchDataSource = _batchDataSource ?: grailsApplication.mainContext.getBean(grailsApplication.config.plugin.springBatch.dataSource ?: "dataSource")
 		return _batchDataSource
 	}
 	private String _batchTablePrefix

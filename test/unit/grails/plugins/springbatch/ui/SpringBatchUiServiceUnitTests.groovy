@@ -173,18 +173,18 @@ class SpringBatchUiServiceUnitTests {
     void testGetJobInstanceModels() {
 
         def jobParameters1 = new JobParameters()
-        def jobInstance1 = new JobInstance(1, jobParameters1, "job1")
+        def jobInstance1 = new JobInstance(1, "job1")
         def jobParameters2 = new JobParameters()
-        def jobInstance2 = new JobInstance(2, jobParameters2, "job1")
+        def jobInstance2 = new JobInstance(2, "job1")
         
-		def jobExecutionMock = new JobExecution(1)
+		def jobExecutionMock = new JobExecution(jobInstance1, 1, jobParameters1, "test")
 		jobExecutionMock.with {
 			status = BatchStatus.COMPLETED
 			startTime = new Date()
 			endTime = new Date()
 			jobInstance = jobInstance1
 		}
-        def jobExecutionMock2 = new JobExecution(2)
+        def jobExecutionMock2 = new JobExecution(jobInstance2, 2, jobParameters2, "test")
 		jobExecutionMock2.with {
 			status = BatchStatus.FAILED
 			startTime = new Date()
@@ -229,18 +229,18 @@ class SpringBatchUiServiceUnitTests {
     void testGetJobInstanceModels_withParams() {
         
         def jobParameters1 = new JobParameters()
-        def jobInstance1 = new JobInstance(1, jobParameters1, "job1")
+        def jobInstance1 = new JobInstance(1, "job1")
         def jobParameters2 = new JobParameters()
-        def jobInstance2 = new JobInstance(2, jobParameters2, "job1")
+        def jobInstance2 = new JobInstance(2, "job1")
         
-		def jobExecutionMock = new JobExecution(1)
+		def jobExecutionMock = new JobExecution(1, jobParameters1)
 		jobExecutionMock.with {
 			status = BatchStatus.COMPLETED
 			startTime = new Date()
 			endTime = new Date()
 			jobInstance = jobInstance1
 		}
-        def jobExecutionMock2 = new JobExecution(2)
+        def jobExecutionMock2 = new JobExecution(2, jobParameters2)
 		jobExecutionMock2.with {
 			status = BatchStatus.FAILED
 			startTime = new Date()
@@ -281,18 +281,18 @@ class SpringBatchUiServiceUnitTests {
     @Test
     void testJobInstanceModel() {
         def jobParameters1 = new JobParameters()
-        def jobInstance1 = new JobInstance(1, jobParameters1, "job1")
+        def jobInstance1 = new JobInstance(1, "job1")
         def jobParameters2 = new JobParameters()
-        def jobInstance2 = new JobInstance(2, jobParameters2, "job1")
+        def jobInstance2 = new JobInstance(2, "job1")
         
-		def jobExecutionMock = new JobExecution(1)
+		def jobExecutionMock = new JobExecution(jobInstance1, 1, jobParameters1, "test")
 		jobExecutionMock.with {
 			status = BatchStatus.COMPLETED
 			startTime = new Date()
 			endTime = new Date()
 			jobInstance = jobInstance1
 		}
-        def jobExecutionMock2 = new JobExecution(2)
+        def jobExecutionMock2 = new JobExecution(jobInstance2, 2, jobParameters2, "test")
 		jobExecutionMock2.with {
 			status = BatchStatus.FAILED
 			startTime = new Date()
@@ -307,14 +307,14 @@ class SpringBatchUiServiceUnitTests {
         }
 
         def jobParameters = new JobParameters()
-        def jobInstance = new JobInstance(1, jobParameters, "testJob")
+        def jobInstance = new JobInstance(1, "testJob")
 		
 		service.jobService = jobServiceMock.createMock()
 
         JobInstanceModel jobInstanceModel = service.jobInstanceModel(jobInstance)
 
         assert jobInstanceModel
-        assert 1 == jobInstanceModel.id
+        assert 1L == jobInstanceModel.id
         assert 2 == jobInstanceModel.jobExecutionCount
         assert 2 == executionList.size()
         assert jobParameters.parameters.size() == jobInstanceModel.jobParameters.size()
@@ -325,8 +325,8 @@ class SpringBatchUiServiceUnitTests {
 
     @Test
     void testGetJobExecutionModels() {
-        JobInstance jobInstance = new JobInstance(1, null, "job1")
-        JobExecution jobExecution = new JobExecution(jobInstance, 1)
+        JobInstance jobInstance = new JobInstance(1, "job1")
+        JobExecution jobExecution = new JobExecution(jobInstance, 1, new JobParameters(), "test")
         jobExecution.startTime = new Date()
         jobExecution.endTime = new Date(jobExecution.startTime.time + 10000)
         jobExecution.status = BatchStatus.COMPLETED
@@ -339,7 +339,7 @@ class SpringBatchUiServiceUnitTests {
 
         jobServiceMock.demand.getJobExecutionsForJobInstance(1) {String jobName, Long id ->
             assert "job1" == jobName
-            assert 1 == id
+            assert 1L == id
             return [jobExecution]
         }
 
@@ -356,8 +356,8 @@ class SpringBatchUiServiceUnitTests {
 
     @Test
     void testGetJobExecutionModels_withParams() {
-        JobInstance jobInstance = new JobInstance(1, null, "job1")
-        JobExecution jobExecution = new JobExecution(jobInstance, 1)
+        JobInstance jobInstance = new JobInstance(1, "job1")
+        JobExecution jobExecution = new JobExecution(jobInstance, 1, new JobParameters(), "test")
         jobExecution.startTime = new Date()
         jobExecution.endTime = new Date(jobExecution.startTime.time + 10000)
         jobExecution.status = BatchStatus.COMPLETED
@@ -368,7 +368,7 @@ class SpringBatchUiServiceUnitTests {
         stepExecution.endTime = new Date(stepExecution.startTime.time + 20000)
         jobExecution.addStepExecutions([stepExecution])
 
-        JobExecution jobExecution2 = new JobExecution(jobInstance, 2)
+        JobExecution jobExecution2 = new JobExecution(jobInstance, 2, new JobParameters(), "test")
         jobExecution2.startTime = new Date()
         jobExecution2.endTime = new Date(jobExecution2.startTime.time + 10000)
         jobExecution2.status = BatchStatus.COMPLETED
@@ -398,10 +398,9 @@ class SpringBatchUiServiceUnitTests {
 	
 	@Test
 	void testJobExecutionModel() {
-
 		def jobServiceMock = mockFor(JobService)
-		JobInstance jobInstance = new JobInstance(1, null, "simpleJob")
-		JobExecution jobExecution = new JobExecution(jobInstance, 1)
+		JobInstance jobInstance = new JobInstance(1, "simpleJob")
+		JobExecution jobExecution = new JobExecution(jobInstance, 1, null, "test")
 		jobExecution.startTime = new Date()
 		jobExecution.endTime = dateWithDuration(new Date(), 10000)
 		jobExecution.status = BatchStatus.COMPLETED
