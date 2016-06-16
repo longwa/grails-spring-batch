@@ -5,6 +5,9 @@ grails.project.test.reports.dir = "target/test-reports"
 grails.project.work.dir = "target/work"
 grails.project.target.level = 1.6
 grails.project.source.level = 1.6
+grails.tomcat.nio = true
+grails.tomcat.scan.enabled = true
+grails.reload.enabled = (Environment.currentEnvironment == Environment.DEVELOPMENT)
 
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
