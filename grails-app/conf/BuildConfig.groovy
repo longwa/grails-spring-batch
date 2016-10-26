@@ -1,6 +1,6 @@
 grails.project.source.level = 1.6
 
-springBatchVersion = '3.0.6.RELEASE'
+springBatchVersion = '3.0.7.RELEASE'
 springBatchAdminVersion = '1.3.1.RELEASE'
 
 grails.project.class.dir = "target/classes"
