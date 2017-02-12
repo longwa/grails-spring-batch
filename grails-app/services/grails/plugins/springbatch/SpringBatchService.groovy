@@ -1,6 +1,5 @@
 package grails.plugins.springbatch
 
-import grails.transaction.Transactional
 import groovy.sql.Sql
 import org.springframework.transaction.annotation.Propagation
 
@@ -24,8 +23,9 @@ import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextClosedEvent
 
-@Transactional(propagation = Propagation.SUPPORTS)
 class SpringBatchService implements ApplicationListener<ApplicationEvent> {
+    static transactional = false
+
     GrailsApplication grailsApplication
 
     /**
