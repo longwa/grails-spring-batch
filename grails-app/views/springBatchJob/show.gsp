@@ -49,23 +49,23 @@
 				<li class="fieldcontain">
 					<span id="mostRecentExecution-label" class="property-label"><g:message code="batch.job.mostRecentJobExecution.label"/></span>
 					<g:link controller="springBatchJobExecution" action="show" id="${job.mostRecentJobExecution.id}">
-						<g:message code="batch.jobExecution.startDateTime.label"/> - 
-							<span class="property-value" aria-labelledby="startDateTime-label">${job.mostRecentJobExecution.startDateTime}</span>    
-						<g:message code="batch.jobExecution.duration.label"/> - 
+						<g:message code="batch.jobExecution.startDateTime.label"/> -
+							<span class="property-value" aria-labelledby="startDateTime-label">${job.mostRecentJobExecution.startDateTime}</span>
+						<g:message code="batch.jobExecution.duration.label"/> -
 							<span class="property-value" aria-labelledby="duration-label">
-								<batch:durationPrint duration="${job.mostRecentJobExecution.duration}"/></span>    
-						<g:message code="batch.jobExecution.status.label"/> - 
-							<span class="property-value" aria-labelledby="status-label">${job.mostRecentJobExecution.status}</span>    
-						<g:message code="batch.jobExecution.exitStatus.label"/> - 
+								<batch:durationPrint duration="${job.mostRecentJobExecution.duration}"/></span>
+						<g:message code="batch.jobExecution.status.label"/> -
+							<span class="property-value" aria-labelledby="status-label">${job.mostRecentJobExecution.status}</span>
+						<g:message code="batch.jobExecution.exitStatus.label"/> -
 							<span class="property-value" aria-labelledby="exitStatus-label">${job.mostRecentJobExecution.exitStatus.exitCode}</span>
 					</g:link>
 				</li>
 				</g:if>
-				
+
 			</ol>
-			
+
 			<h2><g:message code="batch.job.instances.label"/></h2>
-			<table>
+			<table class="table-all">
 				<thead>
 					<tr>
 						<g:sortableColumn property="id" title="${message(code: 'batch.jobInstance.id.label')}" />

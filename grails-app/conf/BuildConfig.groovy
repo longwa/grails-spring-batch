@@ -1,6 +1,6 @@
 grails.project.source.level = 1.6
 
-springBatchVersion = '3.0.7.RELEASE'
+springBatchVersion = '3.0.8.RELEASE'
 springBatchAdminVersion = '1.3.1.RELEASE'
 
 grails.project.class.dir = "target/classes"
@@ -21,7 +21,7 @@ grails.project.fork = [
     console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
 ]
 
-grails.project.dependency.resolver = "maven" 
+grails.project.dependency.resolver = "maven"
 grails.project.dependency.resolution = {
     inherits 'global'
     log 'warn'
