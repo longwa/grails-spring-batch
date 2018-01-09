@@ -35,9 +35,9 @@
 						<span class="property-value" aria-labelledby="jobParameters-label">${jobInstance.jobParameters}</span>
 				</li>
 			</ol>
-			
+
 			<h2><g:message code="batch.jobInstance.executions.label"/></h2>
-			<table>
+			<table class="table-all">
 				<thead>
 					<tr>
 						<g:sortableColumn property="id" title="${message(code: 'batch.jobExecution.id.label', default: 'Id')}" />

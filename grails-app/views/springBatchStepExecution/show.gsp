@@ -18,7 +18,7 @@
 			<g:if test="${flash.error}">
 			<div class="errors" role="status">${flash.error}</div>
 			</g:if>
-			
+
 			<ol class="property-list example">
 				<li class="fieldcontain">
 					<span id="startDateTime-label" class="property-label"><g:message code="batch.stepExecution.startDateTime.label"/></span>
@@ -36,7 +36,7 @@
 					<span id="exitStatus-label" class="property-label"><g:message code="batch.stepExecution.exitStatus.exitCode.label"/></span>
 						<span class="property-value" aria-labelledby="exitStatus-label">${stepExecution.exitStatus.exitCode}</span>
 				</li>
-				
+
 				<li class="fieldcontain">
 					<span id="reads-label" class="property-label"><g:message code="batch.stepExecution.reads.label"/></span>
 						<span class="property-value" aria-labelledby="reads-label">${stepExecution.reads}</span>
@@ -79,18 +79,18 @@
 							<span class="property-value" aria-labelledby="exceptions-label">${stepExecution.exceptions}</span>
 					</li>
 				</g:if>
-				
+
 				<g:if test="${stepExecution.exitStatus.exitDescription}">
 					<li class="fieldcontain">
 						<span id="exceptions2-label" class="property-label"><g:message code="batch.stepExecution.exceptions.label"/></span>
 							<span class="property-value" aria-labelledby="exceptions2-label">${stepExecution.exitStatus.exitDescription}</span>
 					</li>
 				</g:if>
-				
+
 			</ol>
-			
+
 			<h2><g:message code="batch.stepExecution.previousStepExecutions.label"/></h2>
-			<table>
+			<table class="table-all">
 				<thead>
 					<tr>
 						<g:sortableColumn property="id" title="${message(code: 'batch.stepExecution.id.label', default: 'ID')}" />

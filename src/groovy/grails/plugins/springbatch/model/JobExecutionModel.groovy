@@ -7,7 +7,6 @@ import org.springframework.batch.core.ExitStatus
 
 @EqualsAndHashCode
 class JobExecutionModel {
-
     Long id
     Date startDateTime
     Long duration
@@ -16,4 +15,6 @@ class JobExecutionModel {
 	
 	String jobName
 	Long instanceId
+
+    Map jobParameters
 }

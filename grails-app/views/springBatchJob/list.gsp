@@ -28,7 +28,7 @@
 			<g:if test="${flash.error}">
 			<div class="errors" role="status">${flash.error}</div>
 			</g:if>
-			<table>
+			<table class="table-all">
 				<thead>
 					<tr>
 						<g:sortableColumn property="name" title="${message(code: 'jobModel.name.label', default: 'Name')}" />
@@ -46,12 +46,12 @@
 						<td>${fieldValue(bean: modelInstance, field: "executionCount")}</td>
 						<td><g:if test="${modelInstance.mostRecentJobExecution}">
 								<g:link controller="springBatchJobExecution" action="show" id="${modelInstance.mostRecentJobExecution.id}">
-									${modelInstance.mostRecentJobExecution.startDateTime} - ${modelInstance.mostRecentJobExecution.status} - ${modelInstance.mostRecentJobExecution.exitStatus.exitCode} 
+									${modelInstance.mostRecentJobExecution.startDateTime} - ${modelInstance.mostRecentJobExecution.status} - ${modelInstance.mostRecentJobExecution.exitStatus.exitCode}
 								</g:link>
 							</g:if>
 						</td>
 						<td><g:if test="modelInstance.launchable}">
-							<g:link action="launch" id="${modelInstance.name}" 
+							<g:link action="launch" id="${modelInstance.name}"
 								class="launchJobButton" params="[a: 'l']">
 							<g:message code="batch.job.launch.label"/></g:link></g:if></td>
 					</tr>

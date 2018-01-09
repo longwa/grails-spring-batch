@@ -122,8 +122,8 @@ class SpringBatchUiService {
 				jobName: jobInstance.jobName,
 				jobExecutionCount: jobExecutions.size(),
 				lastJobExecutionStatus: jobExecutions[0]?.status,
-				jobParameters: jobInstance.jobParameters.parameters,
-				executions: jobExecutionModels)
+				executions: jobExecutionModels
+		)
 	}
 
 	PagedResult<JobInstanceModel> getJobInstanceModels(String jobName, Map params) {
@@ -156,7 +156,8 @@ class SpringBatchUiService {
 					status: jobExecution.status,
 					exitStatus: jobExecution.exitStatus,
 					jobName: jobExecution.jobInstance.jobName,
-					instanceId: jobExecution.jobInstance.id
+					instanceId: jobExecution.jobInstance.id,
+					jobParameters: jobExecution.jobParameters.parameters
 				)
 	}
 

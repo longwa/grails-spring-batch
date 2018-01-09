@@ -2,6 +2,10 @@ import grails.plugins.springbatch.springbatchadmin.patch.PatchedSimpleJobService
 import grails.plugins.springbatch.ReloadApplicationContextFactory
 import grails.plugins.springbatch.ReloadableJobRegistryBeanPostProcessor
 import groovy.sql.Sql
+import org.springframework.batch.core.configuration.support.JobLoader
+import org.springframework.batch.core.scope.StepScope
+import org.springframework.batch.core.scope.JobScope
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 
 import java.sql.Connection
 import java.sql.Statement
@@ -23,8 +27,8 @@ import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDa
 
 
 class SpringBatchGrailsPlugin {
-    def version = "2.0.0"
-    def grailsVersion = "2.0 > *"
+    def version = "2.5.4"
+    def grailsVersion = "2.5 > *"
     def title = "Grails Spring Batch Plugin"
     def author = "John Engelman"
     def authorEmail = "john.r.engelman@gmail.com"
@@ -34,6 +38,7 @@ class SpringBatchGrailsPlugin {
     def license = "APACHE"
     def developers = [
         [name: "Daniel Bower", email: "daniel.bower@infinum.com"],
+        [name: "Aaron Long",   email: "longwa@gmail.com"],
     ]
     def issueManagement = [ system: "JIRA", url: "https://github.com/johnrengelman/grails-spring-batch/issues" ]
     def scm = [ url: "https://github.com/johnrengelman/grails-spring-batch" ]
@@ -43,49 +48,37 @@ class SpringBatchGrailsPlugin {
         "file:./plugins/*/grails-app/batch/**/*BatchConfig.groovy",
     ]
 
-    //From Platform Core
-    def doWithConfigOptions = {
-        'jmx.enable'(type: Boolean, defaultValue: false)
-        'jmx.name'(type: String, defaultValue: 'jobOperator')
-        'jmx.remote.enable'(type: Boolean, defaultValue: false)
-        'jmx.remote.rmi.port'(type: Integer, defaultValue: 1099)
-        'jmx.remote.name'(type: String, defaultValue: 'springBatch')
-        'dataSource'(type: String, defaultValue: "dataSource")
-        'tablePrefix'(type: String, defaultValue: "BATCH")
-        'maxVarCharLength'(type: Integer, defaultValue: AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH)
-        'loadTables'(type: Boolean, defaultValue: false)
-        'database'(type: String, defaultValue: 'h2', validator: { v ->
-            v ? null : 'batch.specify.database.type'
-        })
-    }
-
     def doWithSpring = {
         def conf = application.config.plugin.springBatch
 
-        String tablePrefix = conf.tablePrefix ? (conf.tablePrefix + '_' ) : ''
-        def dataSourceBean = conf.dataSource
-        def maxVarCharLength = conf.maxVarCharLength
+        // Database is required
+        if (!conf.database) {
+            log.warn "'plugin.springBatch.database' not configured, using H2 by default..."
+            conf.database = 'h2'
+        }
+
+        // Load the spring batch beans
         def loadRequired = loadRequiredSpringBatchBeans.clone()
         loadRequired.delegate = delegate
-        loadRequired(dataSourceBean, tablePrefix, conf.database, maxVarCharLength)
+        loadRequired.call(application.config)
 
         def loadConfig = loadBatchConfig.clone()
         loadConfig.delegate = delegate
         xmlns(batch:"http://www.springframework.org/schema/batch")
-        loadConfig()
+        loadConfig.call()
 
         def loadJmx = conf.jmx.enable
         def loadRemoteJmx = conf.jmx.remote.enable
 
         if(loadJmx) {
-            def jmxExportName = conf.jmx.name
+            def jmxExportName = conf.jmx.name ?: 'jobOperator'
             def loadJmxClosure = loadSpringBatchJmx.clone()
             loadJmxClosure.delegate = delegate
             loadJmxClosure(jmxExportName)
         }
         if(loadRemoteJmx) {
-            def jmxRemoteRmiPort = conf.jmx.remote.rmi.port
-            def jmxRemoteExportName = conf.jmx.remote.name
+            def jmxRemoteRmiPort = conf.jmx.remote.rmi.port ?: 1099
+            def jmxRemoteExportName = conf.jmx.remote.name ?: 'springBatch'
             def loadRemoteJmxClosure = loadSpringBatchRemoteJmx.clone()
             loadRemoteJmxClosure.delegate = delegate
             loadRemoteJmxClosure(jmxRemoteRmiPort, jmxRemoteExportName)
@@ -94,8 +87,9 @@ class SpringBatchGrailsPlugin {
 
     def doWithApplicationContext = { applicationContext ->
         def conf = application.config.plugin.springBatch
-        String dataSourceName = conf.dataSource
-        def database = conf.database
+        String dataSourceName = conf.dataSource ?: 'dataSource'
+        def database = conf.database ?: 'h2'
+
         def loadTables = conf.loadTables
         if(loadTables) {
             if(database) {
@@ -132,22 +126,32 @@ class SpringBatchGrailsPlugin {
     def onChange = { event ->
         if(event.source instanceof Class && event.source.name.endsWith("BatchConfig")) {
             Class configClass = event.source
-            //Get an instance of the changed class file as a script
+
+            // Get an instance of the changed class file as a script
             Script script = (Script) configClass.newInstance()
-            //Create a new script binding so we can assign a delegate to it
+
+            // Create a new script binding so we can assign a delegate to it
             Binding scriptBinding = new Binding()
-            //Allows the script file to delegate the beans DSL to the onChangeEvent
-            scriptBinding.beans = { Closure closure ->
-                delegate.beans(closure)
-            }
+
+            // Allows the script file to delegate the beans DSL to the onChangeEvent
+            scriptBinding.beans = { Closure closure -> delegate.beans(closure) }
             script.binding = scriptBinding
-            //Execute the script to get the new beans that were defined
-            def beans = script.run()
-            //Register new beans into the application context
-            beans.registerBeans(event.ctx)
-            //This forces the job loader to reload the beans defined in the file that changed
-            //This will probably actually reload all spring batch jobs
-            def jobLoader = new DefaultJobLoader(event.ctx.jobRegistry)
+
+            // Execute the script to get the new beans that were defined
+            def scriptBeans = script.run()
+            scriptBeans.registerBeans(event.ctx)
+
+            // Setup step scope proxies
+            def stepScope = new StepScope()
+            def jobScope = new JobScope()
+
+            ConfigurableListableBeanFactory beanFactory = event.ctx.getBeanFactory()
+            stepScope.postProcessBeanFactory(beanFactory)
+            jobScope.postProcessBeanFactory(beanFactory)
+
+            // This forces the job loader to reload the beans defined in the file that changed
+            // This will probably actually reload all spring batch jobs
+            JobLoader jobLoader = new DefaultJobLoader(event.ctx.jobRegistry)
             jobLoader.reload(new ReloadApplicationContextFactory(event.ctx))
         }
     }
@@ -156,8 +160,13 @@ class SpringBatchGrailsPlugin {
         loadBeans 'classpath*:/batch/*BatchConfig.groovy'
     }
 
-    def loadRequiredSpringBatchBeans = { def dataSourceBean, String tablePrefixVal,
-        String dbType, int maxVarCharLengthVal ->
+    def loadRequiredSpringBatchBeans = { config ->
+        def conf = config.plugin.springBatch
+
+        String dbType = conf.database ?: "h2"
+        String tablePrefixVal = conf.tablePrefix ? (conf.tablePrefix + '_' ) : 'BATCH_'
+        String dataSourceBean = conf.dataSource ?: 'dataSource'
+        Integer maxVarCharLengthVal = conf.maxVarCharLength ?: AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH
 
         jobRepository(JobRepositoryFactoryBean) {
             dataSource = ref(dataSourceBean)
@@ -165,7 +174,7 @@ class SpringBatchGrailsPlugin {
             tablePrefix = tablePrefixVal
             databaseType = dbType
             maxVarCharLength = maxVarCharLengthVal
-            //isolationLevelForCreate = "SERIALIZABLE"
+            isolationLevelForCreate = conf.isolation ?: "ISOLATION_READ_COMMITTED"
         }
 
         /*
@@ -188,7 +197,9 @@ class SpringBatchGrailsPlugin {
             dataSource = ref(dataSourceBean)
             tablePrefix = tablePrefixVal
         }
+
         jobRegistry(MapJobRegistry) { }
+
         //Use a custom bean post processor that will unregister the job bean before trying to initializing it again
         //This could cause some problems if you define a job more than once, you'll probably end up with 1 copy
         //of the last definition processed instead of getting a DuplicateJobException
@@ -216,11 +227,6 @@ class SpringBatchGrailsPlugin {
         def serviceName = "spring:service=batch,bean=${exportName}".toString()
         springBatchExporter(MBeanExporter) {bean ->
             beans = [
-                //TODO GRAILS-6557
-//                "spring:service=batch,bean=jobOperator": {ProxyFactoryBean proxyFactoryBean ->
-//                    target = ref("jobOperator")
-//                    interceptorNames = "exceptionTranslator"
-//                }
                 (serviceName): ref("jobOperator")
             ]
             assembler = {InterfaceBasedMBeanInfoAssembler interfaceBasedMBeanInfoAssembler ->
@@ -231,7 +237,7 @@ class SpringBatchGrailsPlugin {
         }
     }
 
-    def loadSpringBatchRemoteJmx = {sbRmiPort, exportName ->
+    def loadSpringBatchRemoteJmx = { sbRmiPort, exportName ->
         sbRmiRegistry(RmiRegistryFactoryBean) {
             port = sbRmiPort
         }

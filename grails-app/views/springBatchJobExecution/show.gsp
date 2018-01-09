@@ -24,7 +24,7 @@
 			<g:if test="${flash.error}">
 			<div class="errors" role="status">${flash.error}</div>
 			</g:if>
-			
+
 			<ol class="property-list example">
 				<li class="fieldcontain">
 					<span id="startDateTime-label" class="property-label"><g:message code="batch.jobExecution.startDateTime.label"/></span>
@@ -43,9 +43,9 @@
 						<span class="property-value" aria-labelledby="exitStatus-label">${jobExecution.exitStatus.exitCode}</span>
 				</li>
 			</ol>
-			
+
 			<h2><g:message code="batch.jobExecution.steps.label"/></h2>
-			<table>
+			<table class="table-all">
 				<thead>
 					<tr>
 						<g:sortableColumn property="id" title="${message(code: 'batch.stepExecution.id.label', default: 'ID')}" />
