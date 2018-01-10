@@ -2,14 +2,11 @@ package grails.plugins.springbatch.ui
 
 import grails.plugins.springbatch.model.JobExecutionModel
 import grails.plugins.springbatch.model.JobInstanceModel
-import grails.test.mixin.*
-
+import grails.testing.web.controllers.ControllerUnitTest
 import org.junit.Before
 import org.junit.Test
 
-@TestFor(SpringBatchJobInstanceController)
-class SpringBatchJobInstanceControllerUnitTests {
-
+class SpringBatchJobInstanceControllerUnitTests implements ControllerUnitTest<SpringBatchJobInstanceController> {
     def springBatchUiServiceMock
 
     @Before

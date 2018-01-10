@@ -1,21 +1,26 @@
 package grails.plugins.springbatch
 
-import org.codehaus.groovy.grails.commons.spring.GrailsApplicationContext
-import org.junit.Test
+import org.grails.spring.GrailsApplicationContext
 import org.springframework.context.ConfigurableApplicationContext
+import spock.lang.Specification
 
-class ReloadApplicationContextFactoryTests {
-
-    @Test(expected=AssertionError)
+class ReloadApplicationContextFactoryTests extends Specification {
     void construct() {
+        when:
         new ReloadApplicationContextFactory(null)
+
+        then:
+        thrown(AssertionError)
     }
 
-    @Test
     void createApplicationContext() {
         def appContextMock = new GrailsApplicationContext()
         def factory = new ReloadApplicationContextFactory(appContextMock)
+
+        when:
         ConfigurableApplicationContext configAppContext = factory.createApplicationContext()
+
+        then:
         assert configAppContext == appContextMock
     }
 }

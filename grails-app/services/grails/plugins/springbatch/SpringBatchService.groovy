@@ -1,12 +1,8 @@
 package grails.plugins.springbatch
 
+import grails.core.GrailsApplication
 import groovy.sql.Sql
-import org.springframework.transaction.annotation.Propagation
-
-import javax.sql.DataSource
-
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.commons.spring.GrailsContextEvent
+import org.grails.spring.GrailsContextEvent
 import org.springframework.batch.admin.service.JobService
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
@@ -23,9 +19,9 @@ import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextClosedEvent
 
-class SpringBatchService implements ApplicationListener<ApplicationEvent> {
-    static transactional = false
+import javax.sql.DataSource
 
+class SpringBatchService implements ApplicationListener<ApplicationEvent> {
     GrailsApplication grailsApplication
 
     /**
@@ -112,9 +108,6 @@ class SpringBatchService implements ApplicationListener<ApplicationEvent> {
      */
     boolean hasRunningExecutions(String jobName) {
         try {
-            //Set<Long> executions = jobOperator.getRunningExecutions(jobName)
-            //return !(executions?.isEmpty())
-
             def result = batchSql.firstRow(
                 """
                 select count(bje.job_execution_id) as "executionCount" 
@@ -145,9 +138,9 @@ class SpringBatchService implements ApplicationListener<ApplicationEvent> {
 
         // Is the app ready?
         if (!ready) {
-            return [success: false,
-                message: "Attempted to launch $jobName, but app is not ready or job processing is disabled.",
-                failurePriority: 'low']
+            return [success        : false,
+                    message        : "Attempted to launch $jobName, but app is not ready or job processing is disabled.",
+                    failurePriority: 'low']
         }
 
         // Select Job
@@ -156,15 +149,15 @@ class SpringBatchService implements ApplicationListener<ApplicationEvent> {
             job = jobRegistry.getJob(jobName)
         }
         catch (NoSuchJobException ignored) {
-            return [success: false, message: "Did not find Spring Batch Job: $jobName",
-                failurePriority: 'high']
+            return [success        : false, message: "Did not find Spring Batch Job: $jobName",
+                    failurePriority: 'high']
         }
 
         // Can we run more than one at a time?
         if (!canBeConcurrent && hasRunningExecutions(jobName)) {
-            return [success: false,
-                message: "Attempted to launch $jobName, but it is currently running.  Aborting launch.",
-                failurePriority: 'low']
+            return [success        : false,
+                    message        : "Attempted to launch $jobName, but it is currently running.  Aborting launch.",
+                    failurePriority: 'low']
         }
 
         // Select Job Launcher
@@ -196,7 +189,7 @@ class SpringBatchService implements ApplicationListener<ApplicationEvent> {
         }
 
         return [
-            jobId: jobExecution.jobId, jobExecutionId: jobExecution.id,
+            jobId  : jobExecution.jobId, jobExecutionId: jobExecution.id,
             success: true,
             message: "Spring Batch Job($jobName) launched from EtlService"
         ]
@@ -252,23 +245,15 @@ class SpringBatchService implements ApplicationListener<ApplicationEvent> {
         }
     }
 
-
-    private DataSource _batchDataSource
-
     private DataSource getBatchDataSource() {
-        _batchDataSource = _batchDataSource ?: grailsApplication.mainContext.getBean(grailsApplication.config.plugin.springBatch.dataSource ?: "dataSource")
-        return _batchDataSource
+        grailsApplication.mainContext.getBean(grailsApplication.config.plugin.springBatch.dataSource ?: "dataSource", DataSource)
     }
-    private String _batchTablePrefix
 
     private String getBatchTablePrefix() {
-        if (null == _batchTablePrefix) {
-            _batchTablePrefix = grailsApplication.config.plugin.springBatch.tablePrefix ? (grailsApplication.config.plugin.springBatch.tablePrefix + '_') : 'BATCH_'
-        }
-        return _batchTablePrefix
+        grailsApplication.config.plugin.springBatch.tablePrefix ? (grailsApplication.config.plugin.springBatch.tablePrefix + '_') : 'BATCH_'
     }
 
     private Sql getBatchSql() {
-        return new Sql(batchDataSource)
+        new Sql(batchDataSource)
     }
 }

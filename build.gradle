@@ -44,7 +44,27 @@ dependencies {
     compile "org.grails.plugins:async"
     compile "org.grails.plugins:scaffolding"
     compile "org.grails.plugins:gsp"
-    compile "org.springframework.batch:spring-batch-core:${springBatchVersion}"
+
+    def excludes = {
+        exclude module: 'junit'
+        exclude module: 'spring-aop'
+        exclude module: 'spring-core'
+        exclude module: 'spring-oxm'
+        exclude module: 'spring-test'
+        exclude module: 'spring-beans'
+        exclude module: 'spring-context'
+        exclude module: 'spring-messaging'
+        exclude module: 'spring-tx'
+        exclude module: 'slf4j-log4j12'
+        exclude module: 'log4j'
+    }
+
+    compile "org.springframework.batch:spring-batch-core:${springBatchVersion}", excludes
+    compile "org.springframework.batch:spring-batch-infrastructure:${springBatchVersion}", excludes
+    compile "org.springframework.batch:spring-batch-admin-resources:${springBatchAdminVersion}", excludes
+    compile "org.springframework.batch:spring-batch-admin-manager:${springBatchAdminVersion}", excludes
+
+    testRuntime "org.springframework.batch:spring-batch-test:${springBatchVersion}", excludes
 
     console "org.grails:grails-console"
 
@@ -53,9 +73,10 @@ dependencies {
 
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.14.2"
 
+    testCompile "cglib:cglib:3.2.5"
     testCompile "org.grails:grails-gorm-testing-support"
-    testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails:grails-web-testing-support"
+    testCompile "org.grails:grails-plugin-testing"
 }
 
 bootRun {

@@ -1,14 +1,16 @@
 package grails.plugins.springbatch
 
+import grails.plugins.Plugin
 import grails.plugins.springbatch.springbatchadmin.patch.PatchedSimpleJobServiceFactoryBean
-import grails.plugins.springbatch.ReloadApplicationContextFactory
-import grails.plugins.springbatch.ReloadableJobRegistryBeanPostProcessor
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j
 import org.springframework.batch.core.configuration.support.JobLoader
 import org.springframework.batch.core.scope.StepScope
 import org.springframework.batch.core.scope.JobScope
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
+import org.springframework.context.ApplicationContext
 
+import javax.sql.DataSource
 import java.sql.Connection
 import java.sql.Statement
 
@@ -27,31 +29,32 @@ import org.springframework.remoting.rmi.RmiRegistryFactoryBean
 
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao
 
+@Slf4j
+@SuppressWarnings("GroovyUnusedDeclaration")
+class SpringBatchGrailsPlugin extends Plugin {
+    def grailsVersion = "3.0.0 > *"
 
-class SpringBatchGrailsPlugin {
-    def version = "2.5.4"
-    def grailsVersion = "2.5 > *"
-    def title = "Grails Spring Batch Plugin"
+    def title = 'Grails Spring Batch Plugin'
+    def description = 'Adds spring batch support including job configuration using Spring Bean DSL and configuration reloading'
+    def license = "APACHE"
     def author = "John Engelman"
     def authorEmail = "john.r.engelman@gmail.com"
-    def description = 'Adds the Spring Batch framework to application. Allows for job configuration using Spring Bean DSL. See documentation at https://github.com/johnrengelman/grails-spring-batch for details.'
 
-    def documentation = "https://github.com/johnrengelman/grails-spring-batch"
-    def license = "APACHE"
     def developers = [
         [name: "Daniel Bower", email: "daniel.bower@infinum.com"],
-        [name: "Aaron Long",   email: "longwa@gmail.com"],
+        [name: "Aaron Long", email: "longwa@gmail.com"],
     ]
-    def issueManagement = [ system: "JIRA", url: "https://github.com/johnrengelman/grails-spring-batch/issues" ]
-    def scm = [ url: "https://github.com/johnrengelman/grails-spring-batch" ]
+    def issueManagement = [system: 'github', url: 'https://github.com/longwa/grails-spring-batch/issues']
+    def scm = [url: 'https://github.com/longwa/grails-spring-batch']
 
     def watchedResources = [
         "file:./grails-app/batch/**/*BatchConfig.groovy",
         "file:./plugins/*/grails-app/batch/**/*BatchConfig.groovy",
     ]
 
-    def doWithSpring = {
-        def conf = application.config.plugin.springBatch
+    @Override
+    Closure doWithSpring() { { ->
+        def conf = config.plugin.springBatch
 
         // Database is required
         if (!conf.database) {
@@ -60,74 +63,84 @@ class SpringBatchGrailsPlugin {
         }
 
         // Load the spring batch beans
-        def loadRequired = loadRequiredSpringBatchBeans.clone()
+        Closure loadRequired = loadRequiredSpringBatchBeans.clone() as Closure
         loadRequired.delegate = delegate
-        loadRequired.call(application.config)
+        loadRequired.call(config)
 
-        def loadConfig = loadBatchConfig.clone()
+        Closure loadConfig = loadBatchConfig.clone() as Closure
         loadConfig.delegate = delegate
-        xmlns(batch:"http://www.springframework.org/schema/batch")
+        xmlns(batch: "http://www.springframework.org/schema/batch")
         loadConfig.call()
 
         def loadJmx = conf.jmx.enable
         def loadRemoteJmx = conf.jmx.remote.enable
 
-        if(loadJmx) {
-            def jmxExportName = conf.jmx.name ?: 'jobOperator'
-            def loadJmxClosure = loadSpringBatchJmx.clone()
+        if (loadJmx) {
+            String jmxExportName = conf.jmx.name ?: 'jobOperator'
+            Closure loadJmxClosure = loadSpringBatchJmx.clone() as Closure
             loadJmxClosure.delegate = delegate
-            loadJmxClosure(jmxExportName)
+            loadJmxClosure.call(jmxExportName)
         }
-        if(loadRemoteJmx) {
-            def jmxRemoteRmiPort = conf.jmx.remote.rmi.port ?: 1099
-            def jmxRemoteExportName = conf.jmx.remote.name ?: 'springBatch'
-            def loadRemoteJmxClosure = loadSpringBatchRemoteJmx.clone()
-            loadRemoteJmxClosure.delegate = delegate
-            loadRemoteJmxClosure(jmxRemoteRmiPort, jmxRemoteExportName)
-        }
-    }
 
-    def doWithApplicationContext = { applicationContext ->
-        def conf = application.config.plugin.springBatch
+        if (loadRemoteJmx) {
+            Integer jmxRemoteRmiPort = conf.jmx.remote.rmi.port ?: 1099
+            String jmxRemoteExportName = conf.jmx.remote.name ?: 'springBatch'
+            Closure loadRemoteJmxClosure = loadSpringBatchRemoteJmx.clone() as Closure
+            loadRemoteJmxClosure.delegate = delegate
+            loadRemoteJmxClosure.call(jmxRemoteRmiPort, jmxRemoteExportName)
+        }
+    }}
+
+    @Override
+    void doWithApplicationContext() {
+        def conf = config.plugin.springBatch
         String dataSourceName = conf.dataSource ?: 'dataSource'
         def database = conf.database ?: 'h2'
 
         def loadTables = conf.loadTables
-        if(loadTables) {
-            if(database) {
-                def ds = applicationContext.getBean(dataSourceName)
+        if (loadTables) {
+            if (database) {
+                def ds = applicationContext.getBean(dataSourceName, DataSource)
                 def sql = new Sql(ds)
-                sql.withTransaction { Connection conn ->
-                    Statement statement = conn.createStatement()
-                    def script = "org/springframework/batch/core/schema-drop-${database}.sql"
-                    def text = applicationContext.classLoader.getResourceAsStream(script).text
-                    text.split(";").each { line ->
-                        if(line.trim()) {
-                            statement.execute(line.trim())
-                        }
-                    }
+                try {
+                    sql.withTransaction { Connection conn ->
+                        Statement statement = conn.createStatement()
 
-                    script = "org/springframework/batch/core/schema-${database}.sql"
-                    text = applicationContext.classLoader.getResourceAsStream(script).text
-                    text.split(";").each { line ->
-                        if(line.trim()) {
-                            statement.execute(line.trim())
+                        String script = "org/springframework/batch/core/schema-drop-${database}.sql"
+                        String text = applicationContext.getClassLoader().getResourceAsStream(script).text
+                        text.split(";").each { line ->
+                            if (line.trim()) {
+                                statement.execute(line.trim())
+                            }
                         }
+
+                        script = "org/springframework/batch/core/schema-${database}.sql"
+                        text = applicationContext.getClassLoader().getResourceAsStream(script).text
+                        text.split(";").each { line ->
+                            if (line.trim()) {
+                                statement.execute(line.trim())
+                            }
+                        }
+
+                        statement.close()
+                        conn.commit()
                     }
-                    statement.close()
-                    conn.commit()
                 }
-                sql.close()
-            } else {
+                finally {
+                    sql.close()
+                }
+            }
+            else {
                 log.error("Must specify plugin.springBatch.database variable if plugin.springBatch.loadTables = true")
                 throw new RuntimeException("Must specify plugin.springBatch.database variable if plugin.springBatch.loadTables = true")
             }
         }
     }
 
-    def onChange = { event ->
-        if(event.source instanceof Class && event.source.name.endsWith("BatchConfig")) {
-            Class configClass = event.source
+    @Override
+    void onChange(Map<String, Object> event) {
+        if (event.source instanceof Class && event.source.name.endsWith("BatchConfig")) {
+            Class configClass = event.source as Class
 
             // Get an instance of the changed class file as a script
             Script script = (Script) configClass.newInstance()
@@ -154,7 +167,7 @@ class SpringBatchGrailsPlugin {
             // This forces the job loader to reload the beans defined in the file that changed
             // This will probably actually reload all spring batch jobs
             JobLoader jobLoader = new DefaultJobLoader(event.ctx.jobRegistry)
-            jobLoader.reload(new ReloadApplicationContextFactory(event.ctx))
+            jobLoader.reload(new ReloadApplicationContextFactory(event.ctx as ApplicationContext))
         }
     }
 
@@ -166,7 +179,7 @@ class SpringBatchGrailsPlugin {
         def conf = config.plugin.springBatch
 
         String dbType = conf.database ?: "h2"
-        String tablePrefixVal = conf.tablePrefix ? (conf.tablePrefix + '_' ) : 'BATCH_'
+        String tablePrefixVal = conf.tablePrefix ? (conf.tablePrefix + '_') : 'BATCH_'
         String dataSourceBean = conf.dataSource ?: 'dataSource'
         Integer maxVarCharLengthVal = conf.maxVarCharLength ?: AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH
 
@@ -182,7 +195,7 @@ class SpringBatchGrailsPlugin {
         /*
          * Async launcher to use by default
          */
-        jobLauncher(SimpleJobLauncher){
+        jobLauncher(SimpleJobLauncher) {
             jobRepository = ref("jobRepository")
             taskExecutor = { SimpleAsyncTaskExecutor executor -> }
         }
@@ -190,7 +203,7 @@ class SpringBatchGrailsPlugin {
         /*
          * Additional Job Launcher to support synchronous scheduling
          */
-        syncJobLauncher(SimpleJobLauncher){
+        syncJobLauncher(SimpleJobLauncher) {
             jobRepository = ref("jobRepository")
             taskExecutor = { SyncTaskExecutor executor -> }
         }
@@ -200,7 +213,7 @@ class SpringBatchGrailsPlugin {
             tablePrefix = tablePrefixVal
         }
 
-        jobRegistry(MapJobRegistry) { }
+        jobRegistry(MapJobRegistry) {}
 
         //Use a custom bean post processor that will unregister the job bean before trying to initializing it again
         //This could cause some problems if you define a job more than once, you'll probably end up with 1 copy
@@ -227,11 +240,11 @@ class SpringBatchGrailsPlugin {
 
     def loadSpringBatchJmx = { exportName ->
         def serviceName = "spring:service=batch,bean=${exportName}".toString()
-        springBatchExporter(MBeanExporter) {bean ->
+        springBatchExporter(MBeanExporter) { bean ->
             beans = [
                 (serviceName): ref("jobOperator")
             ]
-            assembler = {InterfaceBasedMBeanInfoAssembler interfaceBasedMBeanInfoAssembler ->
+            assembler = { InterfaceBasedMBeanInfoAssembler interfaceBasedMBeanInfoAssembler ->
                 interfaceMappings = [
                     (serviceName): "org.springframework.batch.core.launch.JobOperator"
                 ]
