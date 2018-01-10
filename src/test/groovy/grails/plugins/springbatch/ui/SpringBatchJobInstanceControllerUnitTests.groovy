@@ -3,55 +3,51 @@ package grails.plugins.springbatch.ui
 import grails.plugins.springbatch.model.JobExecutionModel
 import grails.plugins.springbatch.model.JobInstanceModel
 import grails.testing.web.controllers.ControllerUnitTest
-import org.junit.Before
-import org.junit.Test
+import spock.lang.Specification
 
-class SpringBatchJobInstanceControllerUnitTests implements ControllerUnitTest<SpringBatchJobInstanceController> {
-    def springBatchUiServiceMock
-
-    @Before
-    void setUp() {
-        springBatchUiServiceMock = mockFor(SpringBatchUiService)
+class SpringBatchJobInstanceControllerUnitTests extends Specification implements ControllerUnitTest<SpringBatchJobInstanceController> {
+    void setup() {
+        controller.springBatchUiService = Mock(SpringBatchUiService)
     }
 
-    @Test
     void testShow() {
-        springBatchUiServiceMock.demand.jobInstanceModel(1..1) {String id->
-			return new JobInstanceModel()
-        }
-		springBatchUiServiceMock.demand.getJobExecutionModels(1..1) {String jobName, Long id, Map params ->
-            return new PagedResult<JobExecutionModel>(resultsTotalCount:0, results:[])
-        }
-        
-        controller.springBatchUiService = springBatchUiServiceMock.createMock()
-
+        when:
         def results = controller.show("testJob", 1L)
 
-		assert results.modelInstances.results.size() == 0
-		assert results.modelInstances.resultsTotalCount == 0
+        then:
+		results.modelInstances.results.size() == 0
+		results.modelInstances.resultsTotalCount == 0
 
-        springBatchUiServiceMock.verify()
-
+        and:
+        1 * controller.springBatchUiService.jobInstanceModel(_) >> {
+            return new JobInstanceModel()
+        }
+        1 * controller.springBatchUiService.getJobExecutionModels(_, _, _) >> {
+            return new PagedResult<JobExecutionModel>(resultsTotalCount:0, results:[])
+        }
     }
 
-    @Test
     void testListNullId() {
+        when:
         controller.show('myJob', null)
 
-        assert response.redirectUrl.endsWith("/springBatchJob/show/myJob")
+        then:
+        response.redirectUrl.endsWith("/springBatchJob/show/myJob")
     }
 
-    @Test
     void testListNullJobName() {
+        when:
         controller.show(null, null)
 
-        assert response.redirectUrl.endsWith("/springBatchJob/list")
+        then:
+        response.redirectUrl.endsWith("/springBatchJob/list")
     }
 
-    @Test
     void testListBlankJobName() {
+        when:
         controller.show("", null)
 
-        assert response.redirectUrl.endsWith("/springBatchJob/list")
+        then:
+        response.redirectUrl.endsWith("/springBatchJob/list")
     }
 }

@@ -3,35 +3,27 @@ package grails.plugins.springbatch.ui
 import grails.plugins.springbatch.model.JobExecutionModel
 import grails.plugins.springbatch.model.StepExecutionModel
 import grails.testing.web.controllers.ControllerUnitTest
-import org.junit.Before
-import org.junit.Test
+import spock.lang.Specification
 
-class SpringBatchJobExecutionControllerUnitTests implements ControllerUnitTest<SpringBatchJobExecutionController> {
-    def springBatchUiServiceMock
-
-    @Before
-    void setUp() {
-        springBatchUiServiceMock = mockFor(SpringBatchUiService)
+class SpringBatchJobExecutionControllerUnitTests extends Specification implements ControllerUnitTest<SpringBatchJobExecutionController> {
+    void setup() {
+        controller.springBatchUiService = Mock(SpringBatchUiService)
     }
 
-    @Test
     void testShow() {
-		springBatchUiServiceMock.demand.jobExecutionModel(1..1) {String id->
-			return new JobExecutionModel()
-		}
-		springBatchUiServiceMock.demand.getStepExecutionModels(1..1) {Long id, Map params ->
-			return new PagedResult<StepExecutionModel>(resultsTotalCount:0, results:[])
-		}
-        
-        controller.springBatchUiService = springBatchUiServiceMock.createMock()
+        when:
+        def results = controller.show(1L)
 
-        def results = controller.show(1,)
-		
-		assert results.modelInstances.results.size() == 0
-		assert results.modelInstances.resultsTotalCount == 0
+        then:
+		results.modelInstances.results.size() == 0
+		results.modelInstances.resultsTotalCount == 0
 
-        springBatchUiServiceMock.verify()
-
+        and:
+        1 * controller.springBatchUiService.jobExecutionModel(_) >> {
+            return new JobExecutionModel()
+        }
+        1 * controller.springBatchUiService.getStepExecutionModels(_, _)  >> {
+            return new PagedResult<StepExecutionModel>(resultsTotalCount:0, results:[])
+        }
     }
-
 }

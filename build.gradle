@@ -99,6 +99,15 @@ grailsPublish {
     vcsUrl = "https://github.com/longwa/grails-spring-batch"
 }
 
+allprojects {
+    tasks.withType(Test) {
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat "full"
+        }
+    }
+}
+
 assets {
     packagePlugin = true
 }

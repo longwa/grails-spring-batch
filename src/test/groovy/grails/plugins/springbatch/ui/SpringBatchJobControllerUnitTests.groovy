@@ -3,37 +3,25 @@ package grails.plugins.springbatch.ui
 import grails.plugins.springbatch.SpringBatchService
 import grails.plugins.springbatch.model.JobModel
 import grails.testing.web.controllers.ControllerUnitTest
-import org.junit.Before
-import org.junit.Test
+import spock.lang.Specification
 
-class SpringBatchJobControllerUnitTests implements ControllerUnitTest<SpringBatchJobController> {
-
-    def springBatchUiServiceMock
-	def springBatchServiceMock
-
-    @Before
-    void setUp() {
-        springBatchUiServiceMock = mockFor(SpringBatchUiService)
-		springBatchServiceMock = mockFor(SpringBatchService)
+class SpringBatchJobControllerUnitTests extends Specification implements ControllerUnitTest<SpringBatchJobController> {
+    void setup() {
+        controller.springBatchService = Mock(SpringBatchService)
+        controller.springBatchUiService = Mock(SpringBatchUiService)
     }
 
-    @Test
     void testList() {
-        springBatchUiServiceMock.demand.getJobModels(1..1) {Map params ->
-            return new PagedResult<JobModel>(resultsTotalCount:0, results:[])
-        }
-        springBatchServiceMock.demand.ready(1..1) {Map params ->
-            return true
-        }
-        controller.springBatchUiService = springBatchUiServiceMock.createMock()
-        controller.springBatchService = springBatchServiceMock.createMock()
-
+        when:
         def results = controller.list()
 
-        assert results.modelInstances.results.size() == 0
-        assert results.modelInstances.resultsTotalCount == 0
+        then:
+        results.modelInstances.results.size() == 0
+        results.modelInstances.resultsTotalCount == 0
 
-        springBatchUiServiceMock.verify()
-
+        and:
+        1 * controller.springBatchUiService.getJobModels(_) >> {
+            return new PagedResult<JobModel>(resultsTotalCount:0, results:[])
+        }
     }
 }
