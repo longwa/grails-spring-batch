@@ -1,3 +1,5 @@
+package grails.plugins.springbatch
+
 import grails.plugins.springbatch.springbatchadmin.patch.PatchedSimpleJobServiceFactoryBean
 import grails.plugins.springbatch.ReloadApplicationContextFactory
 import grails.plugins.springbatch.ReloadableJobRegistryBeanPostProcessor
