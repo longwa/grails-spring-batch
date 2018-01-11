@@ -4,11 +4,11 @@ This plugin adds the Spring Batch framework to a Grails project. It's intent is 
 
 ## Getting Started
 
-The Grails Spring Batch plugin is built using Grails 2.x, it currently has not been tested against Grails 1.3.x and will not install in those versions.
+The Grails Spring Batch plugin is built using Grails 3.3.2 and should work for Grails 3.0.x and higher.
 
-To install the plugin, add the following entry to your `BuildConfig.groovy` file in the plugins sections:
+To install the plugin, add the following entry to your `build.gradle` dependencies:
 ```groovy
-compile ':spring-batch:2.0.0'
+compile ':spring-batch:3.0.0.RC1'
 ```
 
 Once the plugin is installed, you can define your Spring Batch job configuration in a Groovy script file in your application's `grails-app/batch` directory. The script's filename must end with BatchConfig (i.e. `SimpleJobBatchConfig.groovy`). Define your Spring Batch job using the Grails BeanBuilder syntax (just like in the `resources.groovy` file).
@@ -41,7 +41,7 @@ class FooService {
    def jobLauncher
    def simpleJob
 
-   public void launchFoo() {
+   void launchFoo() {
       jobLauncher.launch(simpleJob, new JobParameters())
    }
 }
@@ -190,6 +190,9 @@ The jobs will run fairly frequently to demonstrate the difference between async 
 
 
 ## Versions
++ v.3.0.0
+  + Upgraded to spring batch 3.0.8
+  + Upgraded to support Grails 3.x
 + v.2.0.0 (thanks to [Daniel Bower](https://github.com/danieldbower))
   + Added ability to configure size of exit messages for job executions, step executions and contexts
   + Added ability to start/restart/stop jobs in more locations
