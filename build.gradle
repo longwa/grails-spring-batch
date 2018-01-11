@@ -26,7 +26,6 @@ ext {
 
 subprojects {
     version project.projectVersion
-
     ext {
         userOrg = "grails"
         isGrailsPlugin = name.startsWith('grails-plugin')
