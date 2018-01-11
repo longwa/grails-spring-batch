@@ -2,13 +2,16 @@ package grails.plugins.springbatch
 
 import grails.plugins.Plugin
 import grails.plugins.springbatch.springbatchadmin.patch.PatchedSimpleJobServiceFactoryBean
+import grails.spring.BeanBuilder
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j
+import org.grails.spring.DefaultRuntimeSpringConfiguration
 import org.springframework.batch.core.configuration.support.JobLoader
 import org.springframework.batch.core.scope.StepScope
 import org.springframework.batch.core.scope.JobScope
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
-import org.springframework.context.ApplicationContext
+import org.springframework.beans.factory.support.BeanDefinitionRegistry
+import org.springframework.core.io.FileSystemResource
 
 import javax.sql.DataSource
 import java.sql.Connection
@@ -48,48 +51,47 @@ class SpringBatchGrailsPlugin extends Plugin {
     def scm = [url: 'https://github.com/longwa/grails-spring-batch']
 
     def watchedResources = [
-        "file:./grails-app/batch/**/*BatchConfig.groovy",
-        "file:./plugins/*/grails-app/batch/**/*BatchConfig.groovy",
+        "file:./src/main/resources/batch/**/*BatchConfig.groovy",
     ]
 
     @Override
-    Closure doWithSpring() { { ->
-        def conf = config.plugin.springBatch
+    Closure doWithSpring() {
+        { ->
+            // Database is required
+            if (!config.plugin.springBatch.database) {
+                log.warn "Configuration for 'plugin.springBatch.database' missing, using H2 by default..."
+                config.plugin.springBatch.database = 'h2'
+            }
 
-        // Database is required
-        if (!conf.database) {
-            log.warn "'plugin.springBatch.database' not configured, using H2 by default..."
-            conf.database = 'h2'
+            // Load the spring batch beans
+            Closure loadRequired = loadRequiredSpringBatchBeans.clone() as Closure
+            loadRequired.delegate = delegate
+            loadRequired.call(config)
+
+            Closure loadConfig = loadBatchConfig.clone() as Closure
+            loadConfig.delegate = delegate
+            xmlns(batch: "http://www.springframework.org/schema/batch")
+            loadConfig.call()
+
+            def loadJmx = config.plugin.springBatch.jmx.enable
+            def loadRemoteJmx = config.plugin.springBatch.jmx.remote.enable
+
+            if (loadJmx) {
+                String jmxExportName = config.plugin.springBatch.jmx.name ?: 'jobOperator'
+                Closure loadJmxClosure = loadSpringBatchJmx.clone() as Closure
+                loadJmxClosure.delegate = delegate
+                loadJmxClosure.call(jmxExportName)
+            }
+
+            if (loadRemoteJmx) {
+                Integer jmxRemoteRmiPort = config.plugin.springBatch.jmx.remote.rmi.port ?: 1099
+                String jmxRemoteExportName = config.plugin.springBatch.jmx.remote.name ?: 'springBatch'
+                Closure loadRemoteJmxClosure = loadSpringBatchRemoteJmx.clone() as Closure
+                loadRemoteJmxClosure.delegate = delegate
+                loadRemoteJmxClosure.call(jmxRemoteRmiPort, jmxRemoteExportName)
+            }
         }
-
-        // Load the spring batch beans
-        Closure loadRequired = loadRequiredSpringBatchBeans.clone() as Closure
-        loadRequired.delegate = delegate
-        loadRequired.call(config)
-
-        Closure loadConfig = loadBatchConfig.clone() as Closure
-        loadConfig.delegate = delegate
-        xmlns(batch: "http://www.springframework.org/schema/batch")
-        loadConfig.call()
-
-        def loadJmx = conf.jmx.enable
-        def loadRemoteJmx = conf.jmx.remote.enable
-
-        if (loadJmx) {
-            String jmxExportName = conf.jmx.name ?: 'jobOperator'
-            Closure loadJmxClosure = loadSpringBatchJmx.clone() as Closure
-            loadJmxClosure.delegate = delegate
-            loadJmxClosure.call(jmxExportName)
-        }
-
-        if (loadRemoteJmx) {
-            Integer jmxRemoteRmiPort = conf.jmx.remote.rmi.port ?: 1099
-            String jmxRemoteExportName = conf.jmx.remote.name ?: 'springBatch'
-            Closure loadRemoteJmxClosure = loadSpringBatchRemoteJmx.clone() as Closure
-            loadRemoteJmxClosure.delegate = delegate
-            loadRemoteJmxClosure.call(jmxRemoteRmiPort, jmxRemoteExportName)
-        }
-    }}
+    }
 
     @Override
     void doWithApplicationContext() {
@@ -139,40 +141,29 @@ class SpringBatchGrailsPlugin extends Plugin {
 
     @Override
     void onChange(Map<String, Object> event) {
-        if (event.source instanceof Class && event.source.name.endsWith("BatchConfig")) {
-            Class configClass = event.source as Class
+        FileSystemResource fileSystemResource = event.source as FileSystemResource
 
-            // Get an instance of the changed class file as a script
-            Script script = (Script) configClass.newInstance()
+        def springConfig = new DefaultRuntimeSpringConfiguration()
+        def bb = new BeanBuilder(applicationContext, springConfig, grailsApplication.classLoader)
+        bb.importBeans(fileSystemResource)
 
-            // Create a new script binding so we can assign a delegate to it
-            Binding scriptBinding = new Binding()
+        // Setup step scope proxies
+        def stepScope = new StepScope()
+        def jobScope = new JobScope()
 
-            // Allows the script file to delegate the beans DSL to the onChangeEvent
-            scriptBinding.beans = { Closure closure -> delegate.beans(closure) }
-            script.binding = scriptBinding
+        ConfigurableListableBeanFactory beanFactory = event.ctx.getBeanFactory()
+        stepScope.postProcessBeanFactory(beanFactory)
+        jobScope.postProcessBeanFactory(beanFactory)
+        bb.registerBeans(applicationContext as BeanDefinitionRegistry)
 
-            // Execute the script to get the new beans that were defined
-            def scriptBeans = script.run()
-            scriptBeans.registerBeans(event.ctx)
-
-            // Setup step scope proxies
-            def stepScope = new StepScope()
-            def jobScope = new JobScope()
-
-            ConfigurableListableBeanFactory beanFactory = event.ctx.getBeanFactory()
-            stepScope.postProcessBeanFactory(beanFactory)
-            jobScope.postProcessBeanFactory(beanFactory)
-
-            // This forces the job loader to reload the beans defined in the file that changed
-            // This will probably actually reload all spring batch jobs
-            JobLoader jobLoader = new DefaultJobLoader(event.ctx.jobRegistry)
-            jobLoader.reload(new ReloadApplicationContextFactory(event.ctx as ApplicationContext))
-        }
+        // This forces the job loader to reload the beans defined in the file that changed
+        // This will probably actually reload all spring batch jobs
+        JobLoader jobLoader = new DefaultJobLoader(event.ctx.jobRegistry)
+        jobLoader.reload(new ReloadApplicationContextFactory(event.ctx))
     }
 
     def loadBatchConfig = { ->
-        loadBeans 'classpath*:/batch/*BatchConfig.groovy'
+        loadBeans "classpath:batch/**/*BatchConfig.groovy"
     }
 
     def loadRequiredSpringBatchBeans = { config ->

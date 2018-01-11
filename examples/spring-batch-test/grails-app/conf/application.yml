@@ -2,7 +2,7 @@
 grails:
     profile: web
     codegen:
-        defaultPackage: simple.schedule
+        defaultPackage: spring.batch.test
     spring:
         transactionManagement:
             proxies: false
@@ -129,9 +129,3 @@ environments:
                 testOnReturn: false
                 jdbcInterceptors: ConnectionState
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
-
----
-plugin:
-  springBatch:
-    loadTables: true
-

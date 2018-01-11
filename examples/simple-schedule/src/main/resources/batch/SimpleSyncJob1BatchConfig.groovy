@@ -18,7 +18,7 @@ beans {
 
     simpleSyncJob1PrintStartMessage(PrintMessageTasklet) { bean ->
         bean.autowire = "byName"
-		mesg = 'Starting Simple Sync Job 1'
+		mesg = 'Starting AAA Simple Sync Job 1'
     }
 	
 	simpleSyncJob1Wait10Seconds(WaitTasklet) { bean ->

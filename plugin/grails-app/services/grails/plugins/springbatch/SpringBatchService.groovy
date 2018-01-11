@@ -18,6 +18,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextClosedEvent
+import org.springframework.context.event.ContextRefreshedEvent
 
 import javax.sql.DataSource
 
@@ -135,7 +136,6 @@ class SpringBatchService implements ApplicationListener<ApplicationEvent> {
      * @return map containing whether the job was successful, and a message regarding either why it failed or what job was started
      */
     Map launch(String jobName, boolean canBeConcurrent = true, JobParameters jobParams = null, String jobLauncherName = null) {
-
         // Is the app ready?
         if (!ready) {
             return [success        : false,
@@ -213,7 +213,7 @@ class SpringBatchService implements ApplicationListener<ApplicationEvent> {
      * For job x, give me the last time it ran and whether it failed or not
      *
      * This method gives some of the same info as the SpringBatchUiService.jobModel,
-     * but might be more useful for automated monitoring.
+     * but might be more useful for automated monitoring
      */
     Map jobStatus(String jobName) {
         List<JobExecution> mostRecentJobExecutions = jobService.listJobExecutionsForJob(jobName, 0, 1)
@@ -236,7 +236,7 @@ class SpringBatchService implements ApplicationListener<ApplicationEvent> {
      */
     @Override
     void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof GrailsContextEvent) {
+        if (event instanceof ContextRefreshedEvent) {
             ready = true
         }
         if (event instanceof ContextClosedEvent) {

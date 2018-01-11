@@ -47,14 +47,14 @@ dependencies {
 
     def excludes = {
         exclude module: 'junit'
-        exclude module: 'spring-aop'
-        exclude module: 'spring-core'
-        exclude module: 'spring-oxm'
-        exclude module: 'spring-test'
-        exclude module: 'spring-beans'
-        exclude module: 'spring-context'
-        exclude module: 'spring-messaging'
-        exclude module: 'spring-tx'
+//        exclude module: 'spring-aop'
+//        exclude module: 'spring-core'
+//        exclude module: 'spring-oxm'
+//        exclude module: 'spring-test'
+//        exclude module: 'spring-beans'
+//        exclude module: 'spring-context'
+//        exclude module: 'spring-messaging'
+//        exclude module: 'spring-tx'
         exclude module: 'slf4j-log4j12'
         exclude module: 'log4j'
     }
