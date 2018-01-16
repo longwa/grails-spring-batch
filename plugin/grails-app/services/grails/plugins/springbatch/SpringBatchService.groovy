@@ -2,7 +2,6 @@ package grails.plugins.springbatch
 
 import grails.core.GrailsApplication
 import groovy.sql.Sql
-import org.grails.spring.GrailsContextEvent
 import org.springframework.batch.admin.service.JobService
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution

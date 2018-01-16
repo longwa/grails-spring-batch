@@ -24,9 +24,18 @@ repositories {
     maven { url "https://repo.grails.org/grails/core" }
 }
 
-dependencies {
-    profile "org.grails.profiles:web-plugin"
+def moduleExcludes = [
+    'junit',
+    'spring-aop',
+    'spring-core',
+    'spring-oxm',
+    'spring-test',
+    'spring-tx',
+    'slf4j-log4j12',
+    'log4j'
+]
 
+dependencies {
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.grails:grails-core"
@@ -44,39 +53,30 @@ dependencies {
     compile "org.grails.plugins:async"
     compile "org.grails.plugins:scaffolding"
     compile "org.grails.plugins:gsp"
-
-    def excludes = {
-        exclude module: 'junit'
-//        exclude module: 'spring-aop'
-//        exclude module: 'spring-core'
-//        exclude module: 'spring-oxm'
-//        exclude module: 'spring-test'
-//        exclude module: 'spring-beans'
-//        exclude module: 'spring-context'
-//        exclude module: 'spring-messaging'
-//        exclude module: 'spring-tx'
-        exclude module: 'slf4j-log4j12'
-        exclude module: 'log4j'
-    }
-
-    compile "org.springframework.batch:spring-batch-core:${springBatchVersion}", excludes
-    compile "org.springframework.batch:spring-batch-infrastructure:${springBatchVersion}", excludes
-    compile "org.springframework.batch:spring-batch-admin-resources:${springBatchAdminVersion}", excludes
-    compile "org.springframework.batch:spring-batch-admin-manager:${springBatchAdminVersion}", excludes
-
-    testRuntime "org.springframework.batch:spring-batch-test:${springBatchVersion}", excludes
-
     console "org.grails:grails-console"
-
+    profile "org.grails.profiles:web-plugin"
     provided "org.grails:grails-plugin-services"
     provided "org.grails:grails-plugin-domain-class"
-
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.14.2"
-
-    testCompile "cglib:cglib:3.2.5"
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-web-testing-support"
     testCompile "org.grails:grails-plugin-testing"
+    testCompile "cglib:cglib:3.2.5"
+
+    compile("org.springframework.batch:spring-batch-core:${springBatchVersion}") {
+        moduleExcludes.each { exclude module: it }
+    }
+    compile("org.springframework.batch:spring-batch-infrastructure:${springBatchVersion}") {
+        moduleExcludes.each { exclude module: it }
+    }
+    compile( "org.springframework.batch:spring-batch-admin-resources:${springBatchAdminVersion}") {
+        moduleExcludes.each { exclude module: it }
+    }
+    compile("org.springframework.batch:spring-batch-admin-manager:${springBatchAdminVersion}") {
+        moduleExcludes.each { exclude module: it }
+    }
+
+    testRuntime "org.springframework.batch:spring-batch-test:${springBatchVersion}"
 }
 
 bootRun {

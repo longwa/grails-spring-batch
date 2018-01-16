@@ -1,3 +1,5 @@
+package grails.plugins.springbatch.ui
+
 class UrlMappings {
 
 	static mappings = {

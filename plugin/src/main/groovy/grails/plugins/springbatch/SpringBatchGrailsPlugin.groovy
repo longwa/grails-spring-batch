@@ -163,7 +163,7 @@ class SpringBatchGrailsPlugin extends Plugin {
     }
 
     def loadBatchConfig = { ->
-        loadBeans "classpath:batch/**/*BatchConfig.groovy"
+        loadBeans "classpath*:batch/**/*BatchConfig.groovy"
     }
 
     def loadRequiredSpringBatchBeans = { config ->
