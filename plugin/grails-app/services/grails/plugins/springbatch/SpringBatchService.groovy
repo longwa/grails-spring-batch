@@ -89,7 +89,7 @@ class SpringBatchService implements ApplicationListener<ApplicationEvent> {
                 jobOperator.stop(it)
             }
             catch (Exception e) {
-                log.debug(e)
+                log.debug("Error stopping job execution $it for $jobName", e)
             }
         }
     }
